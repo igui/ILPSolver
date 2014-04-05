@@ -22,7 +22,6 @@
 #include "Mouse.h"
 #include <optixu/optixu_matrix_namespace.h>
 #include <iostream>
-#include <QMouseEvent>
 
 # ifdef _WIN32
 #   include <cfloat>
@@ -46,9 +45,9 @@
 
 #include "renderer/Camera.h"
 
-#define LEFT_BUTTON Qt::LeftButton
-#define RIGHT_BUTTON Qt::RightButton
-#define MIDDLE_BUTTON Qt::MiddleButton
+#define LEFT_BUTTON 1
+#define RIGHT_BUTTON 2
+#define MIDDLE_BUTTON 3
 #define SHIFT_MODIFIER 123
 #define STATE_DOWN 1
 #define STATE_UP 2
