@@ -179,8 +179,6 @@
     <None Include="BuildRuleQt.targets">
       <SubType>Designer</SubType>
     </None>
-    <None Include="LICENSE.txt" />
-    <None Include="TrainOfThought.txt" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="geometry_instance\AAB.cu" />

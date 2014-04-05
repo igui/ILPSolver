@@ -159,9 +159,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="TrainOfThought.txt" />
     <None Include="BuildRuleQt.targets" />
-    <None Include="LICENSE.txt" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="parallelogram.cu" />
