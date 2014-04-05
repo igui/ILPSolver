@@ -12,6 +12,7 @@
 #include "ComputeDeviceRepository.h"
 #include <QThread>
 #include <QTextStream>
+#include <qmessagebox.h>
 
 //#include <vld.h>
 

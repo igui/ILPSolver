@@ -20,6 +20,9 @@
 #include "ComputeDeviceRepository.h"
 #include "scene/SceneFactory.h"
 #include "config.h"
+#include <qfiledialog.h>
+#include <qinputdialog.h>
+#include <qlineedit.h>
 
 MainWindowBase::MainWindowBase(Application& application)
     : m_application(application),

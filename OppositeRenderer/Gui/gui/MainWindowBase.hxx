@@ -10,6 +10,7 @@
 #include "ui/ui_MainWindowBase.h"
 #include "gui_export_api.h"
 #include <QString>
+#include <qlabel.h>
 
 class RenderWidget;
 class OptixRenderer;
