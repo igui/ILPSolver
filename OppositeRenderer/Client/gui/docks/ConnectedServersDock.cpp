@@ -13,7 +13,11 @@ ConnectedServersDock::ConnectedServersDock(QWidget *parent, const RenderServerCo
     ui->tableView->setModel(&m_model);
 
     ui->tableView->horizontalHeader()->show();
-    ui->tableView->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
+
+	// IGUI
+    //ui->tableView->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
+	ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+
     ui->tableView->verticalHeader()->setDefaultSectionSize(100);
 
     ui->tableView->verticalHeader()->hide();

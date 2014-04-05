@@ -81,7 +81,9 @@ int ConnectedServersTableModel::rowCount( const QModelIndex & parent ) const
 
 QModelIndex ConnectedServersTableModel::index( int row, int column, const QModelIndex & parent) const
 {
-    return createIndex(row, column, NULL);
+	// IGUI
+    //return createIndex(row, column, NULL);
+	return createIndex(row, column);
 }
 
 QVariant ConnectedServersTableModel::headerData( int section, Qt::Orientation orientation, int role) const
@@ -114,7 +116,10 @@ QVariant ConnectedServersTableModel::headerData( int section, Qt::Orientation or
 
 void ConnectedServersTableModel::onServersInfoUpdated()
 {
-    reset();
+	// IGUI
+    // reset();
+	beginResetModel();
+	endResetModel();
 }
 
 void ConnectedServersTableModel::abCde(int abc)
