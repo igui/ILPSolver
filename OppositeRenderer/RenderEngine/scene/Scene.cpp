@@ -73,7 +73,7 @@ IScene* Scene::createFromFile( const char* filename )
     if(!QFile::exists(filename))
     {
         QString error = QString("The file that was supplied (%s) does not exist.").arg(filename);
-        throw std::exception(error.toAscii().constData());
+        throw std::exception(error.toLatin1().constData());
     }
 
     QScopedPointer<Scene> scenePtr (new Scene);
@@ -156,7 +156,7 @@ IScene* Scene::createFromFile( const char* filename )
         scenePtr->loadDefaultSceneCamera();
     }
 
-    scenePtr->m_sceneName = QByteArray(scenePtr->m_sceneFile->absoluteFilePath().toAscii().constData());
+    scenePtr->m_sceneName = QByteArray(scenePtr->m_sceneFile->absoluteFilePath().toLatin1().constData());
     return scenePtr.take();
 }
 

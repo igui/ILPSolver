@@ -22,7 +22,7 @@ Image::Image(const QString & imageCompletePath)
     if(!imageFile.exists())
     {
         QString string = QString("The file %1 does not exist.").arg(imageCompletePath);
-        throw std::exception(string.toAscii().constData());
+		throw std::exception(string.toLatin1().constData());
     }
 
     if(imageFile.open(QIODevice::ReadOnly))
@@ -42,7 +42,7 @@ Image::Image(const QString & imageCompletePath)
                 if(convertedImage.isNull())
                 {
                     QString string = QString("Image is null.");
-                    throw std::exception(string.toAscii().constData());
+                    throw std::exception(string.toLatin1().constData());
                 }
                 else
                 {
@@ -60,14 +60,14 @@ Image::Image(const QString & imageCompletePath)
             else
             {
                 QString error = QString("Unable to load image %1 using Qt.").arg(imageCompletePath);
-                throw std::exception(error.toAscii().constData());
+                throw std::exception(error.toLatin1().constData());
             }
         }
     }
     else
     {
         QString string = QString("An error occurred trying to open the image %1.").arg(imageFile.fileName());
-        throw std::exception(string.toAscii().constData());
+        throw std::exception(string.toLatin1().constData());
     }
 }
 
@@ -125,19 +125,19 @@ void Image::loadImageFromTga( const QFile & image )
                 }
 
                 error += QString(" for %1").arg(image.fileName());
-                throw std::exception(error.toAscii().constData());
+                throw std::exception(error.toLatin1().constData());
             }
         }
         else
         {
             QString error = QString("Unknown error reading TGA data for %1.").arg(image.fileName());
-            throw std::exception(error.toAscii().constData());
+            throw std::exception(error.toLatin1().constData());
         }
     }
     else
     {
         QString error = QString("FILE*=null for TGA file %1.").arg(image.fileName());
-        throw std::exception(error.toAscii().constData());
+        throw std::exception(error.toLatin1().constData());
     }
 
 }

@@ -39,7 +39,7 @@ void SceneManager::onLoadNewScene( QString sceneName )
     try
     {
         IScene* oldScene = m_scene;
-        m_scene = m_factory.getSceneByName(sceneName.toAscii().constData());
+        m_scene = m_factory.getSceneByName(sceneName.toLatin1().constData());
         emit sceneUpdated();
         delete oldScene;
         m_status = SceneManagerStatus::HAS_SCENE;

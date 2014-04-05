@@ -40,7 +40,7 @@ void Texture::loadDiffuseImage( const QString & textureAbsoluteFilePath )
     catch(const std::exception & e)
     {
         QString exceptionStr = QString("An error occurred loading of texture: %2").arg(textureAbsoluteFilePath).arg(e.what());
-        throw std::exception(exceptionStr.toAscii().constData());
+        throw std::exception(exceptionStr.toLatin1().constData());
     }
 }
 
@@ -49,12 +49,12 @@ void Texture::loadNormalMapImage( const QString & normalMapAbsoluteFilePath )
     try
     {
         m_normalMapImage = new Image(normalMapAbsoluteFilePath);
-        printf("Loaded normals: %s\n", normalMapAbsoluteFilePath.toAscii().constData());
+        printf("Loaded normals: %s\n", normalMapAbsoluteFilePath.toLatin1().constData());
     }
     catch(const std::exception & e)
     {
         QString exceptionStr = QString("An error occurred loading of texture's normal map: %1").arg(e.what());
-        throw std::exception(exceptionStr.toAscii().constData());
+        throw std::exception(exceptionStr.toLatin1().constData());
     }
 }
 

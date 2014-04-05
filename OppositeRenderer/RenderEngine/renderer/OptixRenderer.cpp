@@ -79,7 +79,7 @@ OptixRenderer::OptixRenderer() :
     catch(const std::exception & e)
     {
         QString error = QString("Error during initialization of Optix: %1").arg(e.what());
-        throw std::exception(error.toAscii().constData());
+        throw std::exception(error.toLatin1().constData());
     }
 }
 
@@ -400,7 +400,7 @@ void OptixRenderer::initScene( IScene & scene )
     catch(const optix::Exception & e)
     {
         QString error = QString("An OptiX error occurred when initializing scene: %1").arg(e.getErrorString().c_str());
-        throw std::exception(error.toAscii().constData());
+        throw std::exception(error.toLatin1().constData());
     }
 }
 
@@ -599,7 +599,7 @@ void OptixRenderer::renderNextIteration(unsigned long long iterationNumber, unsi
     catch(const optix::Exception & e)
     {
         QString error = QString("An OptiX error occurred: %1").arg(e.getErrorString().c_str());
-        throw std::exception(error.toAscii().constData());
+        throw std::exception(error.toLatin1().constData());
     }
 }
 
