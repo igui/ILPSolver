@@ -21,3 +21,4 @@ ui_*.h
 *.ptx
 *.mtl
 *.idb
+*.suo
