@@ -133,6 +133,7 @@
     <ClInclude Include="renderer\helpers\light.h" />
     <ClInclude Include="renderer\helpers\nsight.h" />
     <ClInclude Include="renderer\TransmissionPRD.h" />
+    <ClInclude Include="renderer\helpers\vector_types.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="sutil">

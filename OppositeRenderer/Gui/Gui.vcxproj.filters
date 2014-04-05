@@ -29,7 +29,6 @@
     <ClCompile Include="models\PPMSettingsModel.cpp" />
     <ClCompile Include="models\RenderStatisticsModel.cpp" />
     <ClCompile Include="moc_Application.cpp" />
-    <ClCompile Include="moc_RenderManager.cpp" />
     <ClCompile Include="scene\SceneFactory.cpp" />
     <ClCompile Include="scene\SceneManager.cpp" />
     <ClCompile Include="scene\moc_SceneManager.cpp" />
