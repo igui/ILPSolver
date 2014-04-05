@@ -2,7 +2,11 @@
 # Opposite Renderer
 Forked from [apartridge/OppositeRenderer](https://github.com/apartridge/OppositeRenderer)
 
-In short *Opposite Renderer* is a GPU Photon Mapping Rendering Tool implemented in CUDA using OptiX library, using C++ and Qt. It allows importing DAE scenes files and render an image using Progressive Photon Mapping.
+In short *Opposite Renderer* is a GPU Photon Mapping Rendering Tool implemented in [CUDA](https://wikipedia.org/wiki/CUDA) using [OptiX](https://en.wikipedia.org/wiki/OptiX) library. It allows importing [Collada](https://en.wikipedia.org/wiki/Collada) scenes files and then render them to an image using [Progressive Photon Mapping](http://www.cgg.unibe.ch/publications/2011/progressive-photon-mapping-a-probabilistic-approach).
+
+#####Why this fork?
+
+This fork is intended to extend the original project to help implementing ILP problems. See this [paper](](http://ima.udg.es/~dagush/papers/surveyInvLighting.pdf)) for more info on the topic.
 
 ## Where To Start?
 If this is your first time hearing about *Opposite Renderer*, we recommend you start with the original website: [http://apartridge.github.io/OppositeRenderer/](http://apartridge.github.io/OppositeRenderer/).
@@ -27,8 +31,7 @@ If this is your first time hearing about *Opposite Renderer*, we recommend you s
 - A [CUDA compatible GPU](https://developer.nvidia.com/cuda-gpus). Almost all recent GeForce GPUs support CUDA.
 - Windows 7 or newer, running on x64.
 
----
-## Building
+### Building
 
 The project needs some [environment variables](http://environmentvariables.org/Main_Page#Environment_variables) to be set so it can build. If you don't define them you will get missing files errors while compiling.
  
@@ -57,9 +60,7 @@ The project needs some [environment variables](http://environmentvariables.org/M
 
 3. Open the Visual Studio Solution `OppositeRenderer.sln` and build.
 
-
-----
-## Running
+### Running
 
 1. Go to the folder `%USER_ROOT%\VisualStudioBuilds\OppositeRenderer\Debug`
 2. Open `Standalone.exe`
