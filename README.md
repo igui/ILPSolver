@@ -53,7 +53,8 @@ The project needs some [environment variables](http://environmentvariables.org/M
 	    FREEGLUT_PATH=C:\Program Files\Common Files\freeglut
 	    OPTIX_PATH=C:\Program Files\NVIDIA Corporation\OptiX SDK 3.0.1
 	    CUDA_PATH=C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v5.5
-2.  Append to the [PATH](http://environmentvariables.org/Path) environment variable the following folders  
+
+2.  Append to the [PATH](http://environmentvariables.org/Path) environment variable the following folders
 
         %QTDIR%\bin;%GLEW_PATH%\bin\Release\x64;%ASSIMP_PATH%\bin\x64;%OPTIX_PATH%\bin
 
