@@ -14,6 +14,7 @@
 #include <QObject>
 #include "gui/ServerWindow.hxx"
 #include <QApplication>
+#include <QMessageBox>
 #include "server/RenderServer.hxx"
 //#include <vld.h>
 
@@ -23,10 +24,16 @@ int main( int argc, char** argv )
     app.setOrganizationName("Opposite Renderer");
     app.setApplicationName("Opposite Renderer");
 
-    RenderServer renderServer;
-    ServerWindow serverWindow(NULL, renderServer);
-    serverWindow.show();
-    int appCode = app.exec();
-    renderServer.wait();
-    return appCode;
+	try {
+		RenderServer renderServer;
+		ServerWindow serverWindow(NULL, renderServer);
+		serverWindow.show();
+		int appCode = app.exec();
+		renderServer.wait();
+		return appCode;
+	} catch(std::exception ex){
+		QString error = QString("An unexpected error ocurred during execution:\n\t%1\nApplication will now quit.").arg(ex.what());
+		QMessageBox::critical(nullptr, "Critical", error);
+		return 1;
+	}
 }
