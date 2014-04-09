@@ -35,15 +35,13 @@ If this is your first time hearing about *Opposite Renderer*, we recommend you s
 
 The project needs some [environment variables](http://environmentvariables.org/Main_Page#Environment_variables) to be set so it can build. If you don't define them you will get missing files errors while compiling.
  
-1. [Define](http://environmentvariables.org/Getting_and_setting_environment_variables) the following environment variables:
+* [Define](http://environmentvariables.org/Getting_and_setting_environment_variables) the following environment variables:
 
 	- `QTDIR` should point to your QT instalation dir.
-	- `GLEW_PATH` point to GLEW installation dir
+	- `GLEW_PATH` point to where you extracted GLEW.
 	- `ASSIMP_PATH` should point to Asset Import installation dir 
-	- `FREEGLUT_PATH` should point to FreeGlut Path 
-	- `OPTIX_PATH` points to Optix Installation dir
-	- `CUDA_PATH` Should point to Cuda installation directory. *Note:* This var is usually set by the CUDA installer.
-	
+	- `FREEGLUT_PATH` should point to where you extracted FreeGlu.
+	- `OPTIX_PATH` points to OptiX installation directory
 	
 	For example
 	
@@ -52,14 +50,9 @@ The project needs some [environment variables](http://environmentvariables.org/M
 	    ASSIMP_PATH=C:\Program Files\Assimp
 	    FREEGLUT_PATH=C:\Program Files\Common Files\freeglut
 	    OPTIX_PATH=C:\Program Files\NVIDIA Corporation\OptiX SDK 3.0.1
-	    CUDA_PATH=C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v5.5
 
-2.  Append to the [PATH](http://environmentvariables.org/Path) environment variable the following folders
-
-        %QTDIR%\bin;%GLEW_PATH%\bin\Release\x64;%ASSIMP_PATH%\bin\x64;%OPTIX_PATH%\bin
-
-
-3. Open the Visual Studio Solution `OppositeRenderer.sln` and build.
+* Open the Visual Studio Solution `OppositeRenderer.sln` and build.
+	* *Note:* Be sure that all projects are in x64 configuration
 
 ### Running
 
