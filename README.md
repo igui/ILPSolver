@@ -22,14 +22,18 @@ If this is your first time hearing about *Opposite Renderer*, we recommend you s
 ### Dependencies
 
 - [Visual Studio 2012](http://www.visualstudio.com/) or better
-- [CUDA](https://developer.nvidia.com/cuda-downloads) v5.x
-- [Optix SDK](https://developer.nvidia.com/optix-download) v3.x. **Note:** You must register to [Nvidia Developer Zone](https://developer.nvidia.com/user/register) First
+- [CUDA](https://developer.nvidia.com/cuda-downloads) v5.0 
+- [OptiX SDK](https://developer.nvidia.com/optix-download) v3.0.1
+   - **Note:** You must register to [Nvidia Developer Zone](https://developer.nvidia.com/user/register) First
+   - Take note that OptiX 3.0.1 [is not compatible](http://developer.download.nvidia.com/assets/tools/files/optix/3.0.1/NVIDIA-OptiX-SDK-3.0.1-OptiX_Release_Notes.pdf) with CUDA 5.5 
 - [Qt SDK](http://qt-project.org/downloads) 5.x for Windows (VS 201X)
 - [FreeGlut](http://www.transmissionzero.co.uk/software/freeglut-devel/) MSVC Package
 - [GLEW](http://sourceforge.net/projects/glew/files/) - OpenGL Extension Wrangler Library  
 - [Open Asset Import Library](http://sourceforge.net/projects/assimp/files/)
-- A [CUDA compatible GPU](https://developer.nvidia.com/cuda-gpus). Almost all recent GeForce GPUs support CUDA.
+- A [CUDA compatible GPU](https://developer.nvidia.com/cuda-gpus) 2.0 or greater. Almost all recent GeForce GPUs support CUDA.
 - Windows 7 or newer, running on x64.
+
+
 
 ### Building
 
@@ -57,5 +61,5 @@ The project needs some [environment variables](http://environmentvariables.org/M
 ### Running
 
 1. Go to the folder `%USER_ROOT%\VisualStudioBuilds\OppositeRenderer\Debug`
-2. Open `Standalone.exe`
+2. Open `Server.exe` and `Client.exe`
 3. Enjoy!
