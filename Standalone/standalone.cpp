@@ -31,7 +31,15 @@ int main( int argc, char** argv )
 
         const std::vector<ComputeDevice> & repo = repository.getComputeDevices();
 
-        out << "Available compute devices:" << endl;
+		if(repo.empty())
+		{
+			out << "You must have a CUDA enabled GPU to run this application." 
+				<< endl << "Press ENTER to quit." << endl;
+			in.read(1);
+			return 1;
+		}
+
+		out << "Available compute devices:" << endl;
 
         for(int i = 0; i < repo.size(); i++)
         {
