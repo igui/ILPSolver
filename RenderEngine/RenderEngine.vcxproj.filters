@@ -160,6 +160,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="BuildRuleQt.targets" />
+    <None Include="BuildRuleCopyDLLs.targets" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="parallelogram.cu" />

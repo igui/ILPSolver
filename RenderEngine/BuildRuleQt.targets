@@ -14,27 +14,6 @@
   <Target Name="CompileQtMOC" BeforeTargets="ClCompile" Inputs="@(MocFiles)" Outputs="@(MocFiles->'%(RootDir)%(Directory)/moc_%(Filename).cpp')">
     <Message Text="Qt: MOC'ing .h file %(MocFiles.FullPath)" Importance="High" />
     <Exec Command="$(QTDIR)\bin\moc.exe %(MocFiles.FullPath) -o %(MocFiles.RootDir)%(MocFiles.Directory)/moc_%(MocFiles.Filename).cpp"/>
-  </Target>
-  
-  
-  <Target Name="CopyDLLs" AfterTargets="AfterLink">
-    <Message Text="Copying Dependency Dlls into target dir" Importance="High" />
-    <Exec Command='copy /Y "$(QTDIR)\bin\Qt5Cored.dll" "$(OutputPath)"'/>
-    <Exec Command='copy /Y "$(QTDIR)\bin\Qt5Guid.dll" "$(OutputPath)"'/>
-    <Exec Command='copy /Y "$(QTDIR)\bin\Qt5Networkd.dll" "$(OutputPath)"'/>
-    <Exec Command='copy /Y "$(QTDIR)\bin\Qt5OpenGLd.dll" "$(OutputPath)"'/>
-    <Exec Command='copy /Y "$(QTDIR)\bin\Qt5Widgetsd.dll" "$(OutputPath)"'/>
-    <Exec Command='copy /Y "$(QTDIR)\bin\icudt51.dll" "$(OutputPath)"'/>
-    <Exec Command='copy /Y "$(QTDIR)\bin\icuin51.dll" "$(OutputPath)"'/>
-    <Exec Command='copy /Y "$(QTDIR)\bin\icuuc51.dll" "$(OutputPath)"'/>
-    <Exec Command='copy /Y "$(GLEW_PATH)\bin\Release\x64\glew32.dll" "$(OutputPath)"'/>
-    <Exec Command='copy /Y "$(ASSIMP_PATH)\bin\x64\Assimp64.dll" "$(OutputPath)"'/>
-    <Exec Command='copy /Y "$(OPTIX_PATH)\bin64\optix.1.dll" "$(OutputPath)"'/>
-    <Exec Command='copy /Y "$(OPTIX_PATH)\bin64\cudart64_42_9.dll" "$(OutputPath)"'/>
-    <Exec Command='copy /Y "$(NVTOOLSEXT_PATH)\bin\x64\nvToolsExt64_1.dll" "$(OutputPath)"'/>
-  </Target>
-  
-
-  
+  </Target>  
 </Project>
 

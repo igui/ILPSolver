@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <DllFiles Include="$(QTDIR)\bin\Qt5Cored.dll"/>
+    <DllFiles Include="$(QTDIR)\bin\Qt5Guid.dll"/>
+    <DllFiles Include="$(QTDIR)\bin\Qt5Networkd.dll"/>
+    <DllFiles Include="$(QTDIR)\bin\Qt5OpenGLd.dll"/>
+    <DllFiles Include="$(QTDIR)\bin\Qt5Widgetsd.dll"/>
+    <DllFiles Include="$(QTDIR)\bin\icudt51.dll"/>
+    <DllFiles Include="$(QTDIR)\bin\icuin51.dll"/>
+    <DllFiles Include="$(QTDIR)\bin\icuuc51.dll"/>
+    <DllFiles Include="$(GLEW_PATH)\bin\Release\x64\*.dll"/>
+    <DllFiles Include="$(ASSIMP_PATH)\bin\x64\*.dll"/>
+    <DllFiles Include="$(OPTIX_PATH)\bin64\*.dll"/>
+    <DllFiles Include="$(NVTOOLSEXT_PATH)\bin\x64\*.dll"/>
+    <DllFiles Include="$(CUDA_PATH)\bin\*.dll"/>
+  </ItemGroup>
+
+  <Target Name="CopyDLLs" AfterTargets="AfterLink" Inputs="@(DllFiles)" Outputs="@(DllFiles->'$(OutputPath)%(Filename)%(Extension)')">
+    <Message Text="Copying Dependency &quot;%(DllFiles.Identity)&quot; Dlls into target dir" Importance="High" />
+    <Copy SourceFiles="@(DllFiles)" DestinationFolder="$(OutputPath)" RetryDelayMilliseconds="30000"/>
+  </Target>
+
+  <Target Name="RemoveDLLs" AfterTargets="AfterClean" >
+    <Delete Files="$(OutputPath)%(DllFiles.Filename).dll" />
+  </Target>
+</Project>
+
