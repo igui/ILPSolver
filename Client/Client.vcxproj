@@ -161,5 +161,6 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="..\RenderEngine\BuildRuleQt.targets" />
+    <Import Project="..\RenderEngine\BuildRuleCopyDLLs.targets" />
   </ImportGroup>
 </Project>
