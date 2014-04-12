@@ -16,6 +16,8 @@
 #include <QApplication>
 #include <QMessageBox>
 #include "server/RenderServer.hxx"
+#include <optix.h>
+
 //#include <vld.h>
 
 int main( int argc, char** argv )
@@ -31,6 +33,10 @@ int main( int argc, char** argv )
 		int appCode = app.exec();
 		renderServer.wait();
 		return appCode;
+	} catch(optix::Exception ex){
+		QString error = QString("An OptiX unexpected error ocurred during execution:\n\t%2(cod: %1)\nApplication will now quit.").arg(QString(ex.getErrorCode()), QString(ex.getErrorString().c_str()));
+		QMessageBox::critical(nullptr, "Critical", error);
+		return 1;
 	} catch(std::exception ex){
 		QString error = QString("An unexpected error ocurred during execution:\n\t%1\nApplication will now quit.").arg(ex.what());
 		QMessageBox::critical(nullptr, "Critical", error);
