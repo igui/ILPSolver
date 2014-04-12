@@ -23,6 +23,10 @@ RenderServerRenderer::RenderServerRenderer(const RenderServer & renderServer) :
     m_quit(false),
     m_currentSequenceNumber(0)
 {
+	// Modified IGUI
+	m_waitConditionMutex.lock();
+
+
     qRegisterMetaType<RenderResultPacket>("RenderResultPacket");
     qRegisterMetaType<RenderServerRenderRequest>("RenderServerRenderRequest");
 }
