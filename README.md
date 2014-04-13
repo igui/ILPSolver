@@ -21,9 +21,9 @@ If this is your first time hearing about *Opposite Renderer*, we recommend you s
 
 ### Dependencies
 
-- [Visual Studio 2012](http://www.visualstudio.com/) or better
-- [CUDA](https://developer.nvidia.com/cuda-downloads) v5.0 
-- [OptiX SDK](https://developer.nvidia.com/optix-download) v3.0.1
+- [Visual Studio 2012](http://www.visualstudio.com/)
+- [CUDA](https://developer.nvidia.com/cuda-downloads) v5.5 
+- [OptiX SDK](https://developer.nvidia.com/optix-download) v3.5
    - **Note:** You must register to [Nvidia Developer Zone](https://developer.nvidia.com/user/register) First
    - Take note that OptiX 3.0.1 [is not compatible](http://developer.download.nvidia.com/assets/tools/files/optix/3.0.1/NVIDIA-OptiX-SDK-3.0.1-OptiX_Release_Notes.pdf) with CUDA 5.5 
 - [Qt SDK](http://qt-project.org/downloads) 5.x for Windows (VS 201X)
@@ -56,7 +56,6 @@ The project needs some [environment variables](http://environmentvariables.org/M
 	    OPTIX_PATH=C:\Program Files\NVIDIA Corporation\OptiX SDK 3.0.1
 
 * Open the Visual Studio Solution `OppositeRenderer.sln` and build.
-	* *Note:* Be sure that all projects are in x64 configuration
 
 ### Running
 
