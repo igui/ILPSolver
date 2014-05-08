@@ -56,8 +56,8 @@ static __device__ __inline__ optix::float2 sampleUnitDisc(const optix::float2& s
 {
     float r = sqrtf(sample.x);
     float theta = 2.f*M_PIf*sample.y;
-    float x = r*cosf(theta);
-    float y = r*sinf(theta);
+    float x = r*cosf(theta); // crashes with "defs/uses not defined for PTX instruction" without -use_fast_math flag on GTX770 CUDA v6 runtime
+    float y = r*sinf(theta); // crashes with "defs/uses not defined for PTX instruction" without -use_fast_math flag on GTX770 CUDA v6 runtime
     return make_float2(x, y);
 }
 
