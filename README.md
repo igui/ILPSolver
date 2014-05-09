@@ -6,7 +6,7 @@ In short *Opposite Renderer* is a GPU Photon Mapping Rendering Tool implemented 
 
 #####Why this fork?
 
-This fork is intended to extend the original project to help implementing ILP problems. See this [paper](](http://ima.udg.es/~dagush/papers/surveyInvLighting.pdf)) for more info on the topic.
+This fork is intended to extend the original project to help implementing ILP problems. See this [paper](http://ima.udg.es/~dagush/papers/surveyInvLighting.pdf) for more info on the topic.
 
 ## Where To Start?
 If this is your first time hearing about *Opposite Renderer*, we recommend you start with the original website: [http://apartridge.github.io/OppositeRenderer/](http://apartridge.github.io/OppositeRenderer/).
@@ -44,7 +44,7 @@ The project needs some [environment variables](http://environmentvariables.org/M
 	- `QTDIR` should point to your QT instalation dir.
 	- `GLEW_PATH` point to where you extracted GLEW.
 	- `ASSIMP_PATH` should point to Asset Import installation dir 
-	- `FREEGLUT_PATH` should point to where you extracted FreeGlu.
+	- `FREEGLUT_PATH` should point to where you extracted FreeGlut.
 	- `OPTIX_PATH` points to OptiX installation directory
 	
 	For example
