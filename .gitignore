@@ -23,3 +23,4 @@ ui_*.h
 *.idb
 *.suo
 /Debug
+/x64
