@@ -55,10 +55,10 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>$(USERPROFILE)/VisualStudioBuilds/$(SolutionName)/$(Configuration)/</OutDir>
+    <OutDir>../$(Configuration)/</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IntDir>$(USERPROFILE)/VisualStudioBuilds/$(SolutionName)/$(Configuration)/intermediate/$(MSBuildProjectName)\</IntDir>
+    <IntDir>../$(Configuration)/intermediate/$(MSBuildProjectName)\</IntDir>
     <IncludePath>$(MSBuildProjectDirectory);$(IncludePath);$(OPTIX_PATH)/include;$(CUDA_INC_PATH);$(CUDA_PATH)\include;$(NVTOOLSEXT_PATH)\include;$(OPTIX_PATH)/include/optixu;$(SolutionDir)/Gui;$(SolutionDir)/RenderEngine/;$(SolutionDir)/include/;$(QTDIR)\include;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtNetwork;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtOpenGL;%(AdditionalIncludeDirectories)</IncludePath>
     <LibraryPath>$(OutDir);$(LibraryPath);$(SolutionDir)\lib;$(NVTOOLSEXT_PATH)\lib\x64;$(QTDIR)\lib;$(CUDA_PATH)\lib\x64;$(OPTIX_PATH)\lib64;$(FREEGLUT_PATH)\lib\x64</LibraryPath>
     <LinkIncremental>true</LinkIncremental>

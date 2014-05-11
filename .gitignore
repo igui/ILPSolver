@@ -22,3 +22,4 @@ ui_*.h
 *.mtl
 *.idb
 *.suo
+/Debug

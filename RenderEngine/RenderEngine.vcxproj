@@ -30,10 +30,10 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(USERPROFILE)/VisualStudioBuilds/$(SolutionName)/$(Configuration)/</OutDir>
+    <OutDir>../$(Configuration)/</OutDir>
     <IncludePath>$(MSBuildProjectDirectory);$(IncludePath);$(OPTIX_PATH)/include;$(OPTIX_PATH)/include/optixu;$(CUDA_INC_PATH);$(NVTOOLSEXT_PATH)\include;$(MSBuildProjectDirectory)\..\include;sutil/;$(QTDIR)\include;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtOpenGL;%(AdditionalIncludeDirectories);$(CUDA_PATH)/include</IncludePath>
     <LibraryPath>$(LibraryPath);$(SolutionDir)\lib;$(NVTOOLSEXT_PATH)\lib\x64;$(CUDA_PATH)\lib\x64;$(QTDIR)\lib;$(ASSIMP_PATH)\lib\x64;$(OPTIX_PATH)\lib64;$(FREEGLUT_PATH)\lib\x64</LibraryPath>
-    <IntDir>$(USERPROFILE)/VisualStudioBuilds/$(SolutionName)/$(Configuration)/intermediate\$(MSBuildProjectName)\</IntDir>
+    <IntDir>../$(Configuration)/intermediate/$(MSBuildProjectName)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -198,16 +198,22 @@
     <CudaCompile Include="parallelogram.cu" />
     <CudaCompile Include="renderer\ppm\DirectRadianceEstimation.cu" />
     <CudaCompile Include="renderer\ppm\Output.cu" />
-    <CudaCompile Include="renderer\ppm\PhotonGenerator.cu" />
+    <CudaCompile Include="renderer\ppm\PhotonGenerator.cu">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">-use_fast_math %(AdditionalOptions)</AdditionalOptions>
+    </CudaCompile>
     <CudaCompile Include="renderer\ppm\UniformGridPhotonInitialize.cu" />
     <CudaCompile Include="renderer\ppm\VolumetricPhotonInitialize.cu" />
     <CudaCompile Include="renderer\ppm\VolumetricPhotonSphere.cu" />
     <CudaCompile Include="renderer\ppm\VolumetricPhotonSphereRadiance.cu" />
-    <CudaCompile Include="renderer\pt\RayGeneratorPT.cu" />
+    <CudaCompile Include="renderer\pt\RayGeneratorPT.cu">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">-use_fast_math %(AdditionalOptions)</AdditionalOptions>
+    </CudaCompile>
     <CudaCompile Include="renderer\OptixRenderer_SpatialHash.cu">
       <NvccCompilation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">compile</NvccCompilation>
     </CudaCompile>
-    <CudaCompile Include="renderer\ppm\RayGeneratorPPM.cu" />
+    <CudaCompile Include="renderer\ppm\RayGeneratorPPM.cu">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">-use_fast_math %(AdditionalOptions)</AdditionalOptions>
+    </CudaCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

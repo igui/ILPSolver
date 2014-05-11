@@ -2,9 +2,9 @@
 <ui version="4.0">
  <class>PPMDock</class>
  <widget class="QDockWidget" name="PPMDock">
-  <property name="windowModality">
+  <!--<property name="windowModality">
    <enum>Qt::WindowModal</enum>
-  </property>
+  </property>-->
   <property name="geometry">
    <rect>
     <x>0</x>
