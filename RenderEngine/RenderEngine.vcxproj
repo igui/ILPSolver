@@ -30,10 +30,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>../$(Configuration)/</OutDir>
     <IncludePath>$(MSBuildProjectDirectory);$(IncludePath);$(OPTIX_PATH)/include;$(OPTIX_PATH)/include/optixu;$(CUDA_INC_PATH);$(NVTOOLSEXT_PATH)\include;$(MSBuildProjectDirectory)\..\include;sutil/;$(QTDIR)\include;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtOpenGL;%(AdditionalIncludeDirectories);$(CUDA_PATH)/include</IncludePath>
     <LibraryPath>$(LibraryPath);$(SolutionDir)\lib;$(NVTOOLSEXT_PATH)\lib\x64;$(CUDA_PATH)\lib\x64;$(QTDIR)\lib;$(ASSIMP_PATH)\lib\x64;$(OPTIX_PATH)\lib64;$(FREEGLUT_PATH)\lib\x64</LibraryPath>
-    <IntDir>../$(Configuration)/intermediate/$(MSBuildProjectName)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
