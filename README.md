@@ -53,7 +53,7 @@ The project needs some [environment variables](http://environmentvariables.org/M
 	    GLEW_PATH=C:\Program Files\Common Files\glew
 	    ASSIMP_PATH=C:\Program Files\Assimp
 	    FREEGLUT_PATH=C:\Program Files\Common Files\freeglut
-	    OPTIX_PATH=C:\Program Files\NVIDIA Corporation\OptiX SDK 3.0.1
+	    OPTIX_PATH=C:\ProgramData\NVIDIA Corporation\OptiX SDK 3.5.1
 
 * Open the Visual Studio Solution `OppositeRenderer.sln` and build.
 
