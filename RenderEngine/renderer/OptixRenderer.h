@@ -48,7 +48,6 @@ private:
     void initializeStochasticHashPhotonMap(float ppmRadius);
     void createPhotonKdTreeOnCPU();
 
-
     optix::Buffer m_outputBuffer;
     optix::Buffer m_photons;
     optix::Buffer m_photonKdTree;

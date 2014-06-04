@@ -379,6 +379,17 @@ void OptixRenderer::initScene( IScene & scene )
         throw std::exception("No lights exists in this scene.");
     }
 
+	int sceneNMeshes = scene.getNumTriangles();
+	optix::Buffer hitsPerMeshBuffer = m_context->createBuffer(RT_BUFFER_INPUT_OUTPUT, RT_FORMAT_UNSIGNED_INT, sceneNMeshes);
+	unsigned int* bufferHost = (unsigned int*)hitsPerMeshBuffer->map();
+	for(int i = 0; i < sceneNMeshes; i++)
+	{
+		bufferHost[i] = 0;
+	}
+	hitsPerMeshBuffer->unmap();
+	m_context["hitsPerMeshBuffer"]->setBuffer(hitsPerMeshBuffer);
+	m_context["sceneNMeshes"]->setInt(sceneNMeshes);
+
     try
     {
         m_sceneRootGroup = scene.getSceneRootGroup(m_context);
@@ -420,7 +431,7 @@ void OptixRenderer::compile()
 void OptixRenderer::renderNextIteration(unsigned long long iterationNumber, unsigned long long localIterationNumber, float PPMRadius, 
                                         bool createOutput, const RenderServerRenderRequestDetails & details)
 {
-    //printf("----------------------- %d Local: %d\n", iterationNumber, localIterationNumber);
+    printf("----------------------- %d Local: %d\n", iterationNumber, localIterationNumber);
     if(!m_initialized)
     {
         throw std::exception("Traced before OptixRenderer was initialized.");
@@ -429,6 +440,13 @@ void OptixRenderer::renderNextIteration(unsigned long long iterationNumber, unsi
     char buffer[40];
     sprintf(buffer, "OptixRenderer::Trace Iteration %d", iterationNumber);
     nvtx::ScopedRange r(buffer);
+
+	// print scene meshes count
+	int sceneNMeshes = m_context["sceneNMeshes"]->getInt();
+	optix::Buffer hitsPerMeshBuffer = m_context["hitsPerMeshBuffer"]->getBuffer();
+	unsigned int* bufferHost = (unsigned int*)hitsPerMeshBuffer->map();
+	memset(bufferHost, 0, sizeof(unsigned int) * sceneNMeshes);
+	hitsPerMeshBuffer->unmap();
 
     try
     {
@@ -595,6 +613,17 @@ void OptixRenderer::renderNextIteration(unsigned long long iterationNumber, unsi
         double end;
         sutilCurrentTime( &end );
         double traceTime = end-traceStartTime;
+
+		// print scene meshes count
+		int sceneNMeshes = m_context["sceneNMeshes"]->getInt();
+		optix::Buffer hitsPerMeshBuffer = m_context["hitsPerMeshBuffer"]->getBuffer();
+		unsigned int* bufferHost = (unsigned int*)hitsPerMeshBuffer->map();
+		for(int i = 0; i < sceneNMeshes; i++)
+		{
+			if(bufferHost[i] > 0)
+				printf("hitsPerMesh [%i] = %u\n", i, bufferHost[i]);
+		}
+		hitsPerMeshBuffer->unmap();
     }
     catch(const optix::Exception & e)
     {

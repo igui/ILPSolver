@@ -30,8 +30,13 @@ Cornell::Cornell(void)
     m_sceneAABB.max = Vector3(556.0f, 548.85f, 559.2f) + 5;
 }
 
-optix::GeometryInstance Cornell::createParallelogram(optix::Context & context, const optix::float3& anchor,
-    const optix::float3& offset1, const optix::float3& offset2, Material & material)
+optix::GeometryInstance Cornell::createParallelogram(
+	unsigned int meshId,
+	optix::Context & context,
+	const optix::float3& anchor,
+    const optix::float3& offset1,
+	const optix::float3& offset2,
+	Material & material)
 {
     optix::Geometry parallelogram = context->createGeometry();
     parallelogram->setPrimitiveCount( 1u );
@@ -45,6 +50,7 @@ optix::GeometryInstance Cornell::createParallelogram(optix::Context & context, c
     optix::float3 v1 = offset1 / optix::dot( offset1, offset1 );
     optix::float3 v2 = offset2 / optix::dot( offset2, offset2 );
 
+	parallelogram["meshId"]->setUint(meshId);
     parallelogram["plane"]->setFloat( plane );
     parallelogram["anchor"]->setFloat( anchor );
     parallelogram["v1"]->setFloat( v1 );
@@ -70,75 +76,75 @@ optix::Group Cornell::getSceneRootGroup(optix::Context & context)
     Diffuse diffuseRed = Diffuse(optix::make_float3( 1.f, 0.05f, 0.05f ));
 
     // Floor
-    gis.push_back( createParallelogram(context, optix::make_float3( 0.0f, 0.0f, 0.0f ),
+    gis.push_back( createParallelogram(0, context, optix::make_float3( 0.0f, 0.0f, 0.0f ),
         optix::make_float3( 0.0f, 0.0f, 559.2f ),
         optix::make_float3( 556.0f, 0.0f, 0.0f ),
         diffuseWhite ) );
 
     // Ceiling
-    gis.push_back( createParallelogram(context, optix::make_float3( 0.0f, 548.80f, 0.0f ),
+    gis.push_back( createParallelogram(1, context, optix::make_float3( 0.0f, 548.80f, 0.0f ),
         optix::make_float3( 556.0f, 0.0f, 0.0f ),
         optix::make_float3( 0.0f, 0.0f, 559.2f ),
         diffuseWhite ) );
 
     // Back wall
-    gis.push_back( createParallelogram( context,optix::make_float3( 0.0f, 0.0f, 559.2f),
+    gis.push_back( createParallelogram(2, context,optix::make_float3( 0.0f, 0.0f, 559.2f),
         optix::make_float3( 0.0f, 548.8f, 0.0f),
         optix::make_float3( 556.0f, 0.0f, 0.0f),
         diffuseWhite));
 
     // Right wall
-    gis.push_back( createParallelogram(context, optix::make_float3( 0.0f, 0.0f, 0.0f ),
+    gis.push_back( createParallelogram(3, context, optix::make_float3( 0.0f, 0.0f, 0.0f ),
         optix::make_float3( 0.0f, 548.8f, 0.0f ),
         optix::make_float3( 0.0f, 0.0f, 559.2f ),
         diffuseGreen ) );
 
     // Left wall
-    gis.push_back( createParallelogram(context, optix::make_float3( 556.0f, 0.0f, 0.0f ),
+    gis.push_back( createParallelogram(4, context, optix::make_float3( 556.0f, 0.0f, 0.0f ),
         optix::make_float3( 0.0f, 0.0f, 559.2f ),
         optix::make_float3( 0.0f, 548.8f, 0.0f ),
         diffuseRed ) );
 
     // Short block
-    gis.push_back( createParallelogram(context, optix::make_float3( 130.0f, 165.0f, 65.0f),
+    gis.push_back( createParallelogram(5, context, optix::make_float3( 130.0f, 165.0f, 65.0f),
         optix::make_float3( -48.0f, 0.0f, 160.0f),
         optix::make_float3( 160.0f, 0.0f, 49.0f),
         diffuseWhite ) );
-    gis.push_back( createParallelogram(context, optix::make_float3( 290.0f, 0.0f, 114.0f),
+    gis.push_back( createParallelogram(6, context, optix::make_float3( 290.0f, 0.0f, 114.0f),
         optix::make_float3( 0.0f, 165.0f, 0.0f),
         optix::make_float3( -50.0f, 0.0f, 158.0f),
         diffuseWhite ) );
-    gis.push_back( createParallelogram(context, optix::make_float3( 130.0f, 0.0f, 65.0f),
+    gis.push_back( createParallelogram(7, context, optix::make_float3( 130.0f, 0.0f, 65.0f),
         optix::make_float3( 0.0f, 165.0f, 0.0f),
         optix::make_float3( 160.0f, 0.0f, 49.0f),
         diffuseWhite ) );
-    gis.push_back( createParallelogram(context, optix::make_float3( 82.0f, 0.0f, 225.0f),
+    gis.push_back( createParallelogram(8, context, optix::make_float3( 82.0f, 0.0f, 225.0f),
         optix::make_float3( 0.0f, 165.0f, 0.0f),
         optix::make_float3( 48.0f, 0.0f, -160.0f),
         diffuseWhite ) );
-    gis.push_back( createParallelogram(context, optix::make_float3( 240.0f, 0.0f, 272.0f),
+    gis.push_back( createParallelogram(9, context, optix::make_float3( 240.0f, 0.0f, 272.0f),
         optix::make_float3( 0.0f, 165.0f, 0.0f),
         optix::make_float3( -158.0f, 0.0f, -47.0f),
         diffuseWhite));
         
     // Tall block
-    gis.push_back( createParallelogram(context, optix::make_float3( 423.0f, 340.0f, 247.0f),
+    gis.push_back( createParallelogram(10, context, optix::make_float3( 423.0f, 340.0f, 247.0f),
         optix::make_float3( -158.0f, 0.0f, 49.0f),
         optix::make_float3( 49.0f, 0.0f, 159.0f),
         diffuseWhite ) );
-    gis.push_back( createParallelogram(context, optix::make_float3( 423.0f, 0.0f, 247.0f),
+    gis.push_back( createParallelogram(11, context, optix::make_float3( 423.0f, 0.0f, 247.0f),
         optix::make_float3( 0.0f, 340.0f, 0.0f),
         optix::make_float3( 49.0f, 0.0f, 159.0f),
         diffuseWhite ) );
-    gis.push_back( createParallelogram(context, optix::make_float3( 472.0f, 0.0f, 406.0f),
+    gis.push_back( createParallelogram(12, context, optix::make_float3( 472.0f, 0.0f, 406.0f),
         optix::make_float3( 0.0f, 340.0f, 0.0f),
         optix::make_float3( -158.0f, 0.0f, 50.0f),
         diffuseWhite ) );
-    gis.push_back( createParallelogram(context, optix::make_float3( 314.0f, 0.0f, 456.0f),
+    gis.push_back( createParallelogram(13, context, optix::make_float3( 314.0f, 0.0f, 456.0f),
         optix::make_float3( 0.0f, 340.0f, 0.0f),
         optix::make_float3( -49.0f, 0.0f, -160.0f),
         diffuseWhite ) );
-    gis.push_back( createParallelogram(context, optix::make_float3( 265.0f, 0.0f, 296.0f),
+    gis.push_back( createParallelogram(14, context, optix::make_float3( 265.0f, 0.0f, 296.0f),
         optix::make_float3( 0.0f, 340.1f, 0.0f),
         optix::make_float3( 158.0f, 0.0f, -49.0f),
         diffuseWhite ) );
@@ -149,7 +155,7 @@ optix::Group Cornell::getSceneRootGroup(optix::Context & context)
     emitter.setInverseArea(m_sceneLights[0].inverseArea);
     for(int i = 0; i < m_sceneLights.size(); i++)
     {
-        gis.push_back(createParallelogram(context, m_sceneLights[i].position, m_sceneLights[i].v1, m_sceneLights[i].v2, emitter));
+        gis.push_back(createParallelogram(15 + i, context, m_sceneLights[i].position, m_sceneLights[i].v1, m_sceneLights[i].v2, emitter));
     }
 
     Glass glass = Glass(1.5, optix::make_float3(1.f,1.f,1.f));
@@ -217,5 +223,5 @@ const char* Cornell::getCornellSceneName()
 
 unsigned int Cornell::getNumTriangles() const
 {
-    return 0;
+	return 16; // should be automatically calculated from the getSceneRootGroup count
 }
