@@ -9,6 +9,7 @@
 #include "renderer/OptixRenderer.h"
 #include <QString>
 #include <QMessageBox>
+#include <QStandardPaths>
 #include "RenderWidget.hxx"
 #include "gui/AboutWindow.hxx"
 #include "gui/ComputeDeviceInformationWidget.hxx"
@@ -145,8 +146,14 @@ void MainWindowBase::onConfigureGPUDevices()
 
 void MainWindowBase::onOpenSceneFile()
 {
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"),
-                        "Open a scene", tr("Scene files (*.dae *.blend *.3ds);;Any(*.*)"));
+	QString desktopDir = QStandardPaths::locate(QStandardPaths::DesktopLocation, "", QStandardPaths::LocateDirectory);
+
+    QString fileName = QFileDialog::getOpenFileName(
+			this,
+			tr("Open File"),
+			desktopDir,
+			tr("Scene files (*.dae *.blend *.3ds);;Any(*.*)")
+	);
     if(fileName.length() > 0)
     {
         m_lastOpenedSceneFile = QFileInfo(fileName);
