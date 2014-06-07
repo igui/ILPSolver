@@ -379,7 +379,7 @@ void OptixRenderer::initScene( IScene & scene )
         throw std::exception("No lights exists in this scene.");
     }
 
-	int sceneNMeshes = scene.getNumTriangles();
+	int sceneNMeshes = scene.getNumMeshes();
 	optix::Buffer hitsPerMeshBuffer = m_context->createBuffer(RT_BUFFER_INPUT_OUTPUT, RT_FORMAT_UNSIGNED_INT, sceneNMeshes);
 	unsigned int* bufferHost = (unsigned int*)hitsPerMeshBuffer->map();
 	for(int i = 0; i < sceneNMeshes; i++)

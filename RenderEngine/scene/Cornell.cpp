@@ -225,3 +225,9 @@ unsigned int Cornell::getNumTriangles() const
 {
 	return 16; // should be automatically calculated from the getSceneRootGroup count
 }
+
+unsigned int Cornell::getNumMeshes() const
+{
+	return 16; // should be automatically calculated from the getSceneRootGroup count
+}
+

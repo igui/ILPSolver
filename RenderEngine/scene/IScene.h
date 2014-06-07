@@ -25,4 +25,5 @@ public:
     RENDER_ENGINE_EXPORT_API virtual AAB getSceneAABB() const = 0;
     RENDER_ENGINE_EXPORT_API virtual float getSceneInitialPPMRadiusEstimate() const;
     RENDER_ENGINE_EXPORT_API virtual unsigned int getNumTriangles() const = 0;
+	RENDER_ENGINE_EXPORT_API virtual unsigned int getNumMeshes() const = 0;
 };

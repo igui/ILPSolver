@@ -5,11 +5,16 @@
 */
 
 #include <optix.h>
+#include <optix_cuda.h>
 #include <optixu/optixu_math_namespace.h>
 #include <optixu/optixu_matrix_namespace.h>
 #include <optixu/optixu_aabb_namespace.h>
 
 using namespace optix;
+
+// for mesh intesection count
+rtDeclareVariable(uint, meshId, , );
+rtBuffer<uint, 1> hitsPerMeshBuffer;
 
 rtBuffer<float3> vertexBuffer;     
 rtBuffer<float3> normalBuffer;
@@ -83,6 +88,7 @@ RT_PROGRAM void mesh_intersect(int primIdx)
                 textureCoordinate = t1*beta + t2*gamma + t0*(1.0f-beta-gamma);
             }
 
+			atomicAdd(&hitsPerMeshBuffer[meshId], 1);
             rtReportIntersection(0);
         }
     }

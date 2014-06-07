@@ -21,6 +21,7 @@
 #include "material/ParticipatingMedium.h"
 #include "geometry_instance/AABInstance.h"
 #include "config.h"
+#include <cstdio>
 
 Scene::Scene(void)
     : m_scene(NULL),
@@ -115,6 +116,8 @@ IScene* Scene::createFromFile( const char* filename )
 
     Vector3 sceneAABBMin (1e33f);
     Vector3 sceneAABBMax (-1e33f);
+
+	walkNode(scenePtr->m_scene->mRootNode, 0);
 
     for(unsigned int i = 0; i < scenePtr->m_scene->mNumMeshes; i++)
     {
@@ -313,7 +316,7 @@ optix::Group Scene::getSceneRootGroup( optix::Context & context )
     QVector<optix::Geometry> geometries;
     for(unsigned int i = 0; i < m_scene->mNumMeshes; i++)
     {
-        optix::Geometry geometry = createGeometryFromMesh(m_scene->mMeshes[i], context);
+        optix::Geometry geometry = createGeometryFromMesh(i, m_scene->mMeshes[i], context);
         geometries.push_back(geometry);
         //optix::GeometryInstance instance = getGeometryInstanceFromMesh(m_scene->mMeshes[i], context, materials);
         //instances.push_back(instance);
@@ -345,10 +348,11 @@ optix::Group Scene::getSceneRootGroup( optix::Context & context )
     return rootNodeGroup;
 }
 
-optix::Geometry Scene::createGeometryFromMesh(aiMesh* mesh, optix::Context & context)
+optix::Geometry Scene::createGeometryFromMesh(uint meshId, aiMesh* mesh, optix::Context & context)
 {
     unsigned int numFaces = mesh->mNumFaces;
     unsigned int numVertices = mesh->mNumVertices;
+	
 
     optix::Geometry geometry = context->createGeometry();
     geometry->setPrimitiveCount(numFaces);
@@ -445,6 +449,8 @@ optix::Geometry Scene::createGeometryFromMesh(aiMesh* mesh, optix::Context & con
     }
 
     indexBuffer->unmap();
+
+	geometry["meshId"]->setUint(meshId);
 
     return geometry;
 
@@ -572,8 +578,27 @@ unsigned int Scene::getNumTriangles() const
 {
     return m_numTriangles;
 }
+unsigned int Scene::getNumMeshes() const
+{
+	return m_scene->mNumMeshes;
+}
 
 AAB Scene::getSceneAABB() const
 {
     return m_sceneAABB;
+}
+
+void Scene::walkNode(aiNode *node, int depth)
+{
+	if(!node)
+		return;
+	for(unsigned int i = 0; i < depth; ++i)
+	{
+		putchar(' ');
+	}
+	printf("%s\n", node->mName.C_Str());
+	for(unsigned int i = 0; i < node->mNumChildren; ++i)
+	{
+		walkNode(node->mChildren[i], depth+1);
+	}
 }

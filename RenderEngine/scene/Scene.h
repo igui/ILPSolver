@@ -39,15 +39,18 @@ public:
     virtual const char* getSceneName() const;
     virtual AAB getSceneAABB() const ;
     RENDER_ENGINE_EXPORT_API virtual unsigned int getNumTriangles() const;
+	RENDER_ENGINE_EXPORT_API virtual unsigned int getNumMeshes() const;
 
 private:
-    optix::Geometry Scene::createGeometryFromMesh(aiMesh* mesh, optix::Context & context);
+    optix::Geometry Scene::createGeometryFromMesh(uint meshId, aiMesh* mesh, optix::Context & context);
     void loadMeshLightSource( aiMesh* mesh, DiffuseEmitter* diffuseEmitter );
     optix::Group getGroupFromNode(optix::Context & context, aiNode* node, QVector<optix::Geometry> & geometries, QVector<Material*> & materials);
     optix::GeometryInstance getGeometryInstance( optix::Context & context, optix::Geometry & geometry, Material* material );
     bool colorHasAnyComponent(const aiColor3D & color);
     void loadSceneMaterials();
     void loadLightSources();
+	static void walkNode(aiNode *node, int depth);
+
     QVector<Material*> m_materials;
     QVector<Light> m_lights;
     QByteArray m_sceneName;
@@ -59,5 +62,4 @@ private:
     Camera m_defaultCamera;
     AAB m_sceneAABB;
     unsigned int m_numTriangles;
-
 };
