@@ -9,6 +9,7 @@
 #include <QFileInfo>
 #include <QScopedPointer>
 #include <QDir>
+#include <QTime>
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/material.h>
@@ -77,12 +78,18 @@ IScene* Scene::createFromFile( const char* filename )
         throw std::exception(error.toLatin1().constData());
     }
 
+	QTime timerTotal;
+	timerTotal.start();
+
     QScopedPointer<Scene> scenePtr (new Scene);
     scenePtr->m_sceneFile = new QFileInfo(filename);
 
     // Remove point and lines from the model
     scenePtr->m_importer->SetPropertyInteger(AI_CONFIG_PP_SBP_REMOVE, 
         aiPrimitiveType_POINT | aiPrimitiveType_LINE );
+
+	QTime readFileTimer;
+	readFileTimer.start();
 
     scenePtr->m_scene = scenePtr->m_importer->ReadFile( filename,
         aiProcess_Triangulate            |
@@ -97,6 +104,8 @@ IScene* Scene::createFromFile( const char* filename )
         aiProcess_PreTransformVertices   |
         aiProcess_GenSmoothNormals                              
         );
+
+	printf("Scene createFromFile ReadFile: ellapsed %5.2fs\n", readFileTimer.elapsed() / 1000.0f);
         
     if(!scenePtr->m_scene)
     {
@@ -160,6 +169,9 @@ IScene* Scene::createFromFile( const char* filename )
     }
 
     scenePtr->m_sceneName = QByteArray(scenePtr->m_sceneFile->absoluteFilePath().toLatin1().constData());
+
+	printf("Scene createFromFile Total: ellapsed %5.2fs\n", timerTotal.elapsed() / 1000.0f);
+
     return scenePtr.take();
 }
 
@@ -307,23 +319,19 @@ optix::Group Scene::getSceneRootGroup( optix::Context & context )
         m_boundingBoxProgram = context->createProgramFromPTXFile( ptxFilename, "mesh_bounds" );
     }
 
-    //printf("Sizeof materials array: %d", materials.size());
+	QTime timer;
+	timer.start();
 
-    //QVector<optix::GeometryInstance> instances;
 
     // Convert meshes into Geometry objects
-    
     QVector<optix::Geometry> geometries;
     for(unsigned int i = 0; i < m_scene->mNumMeshes; i++)
     {
         optix::Geometry geometry = createGeometryFromMesh(i, m_scene->mMeshes[i], context);
         geometries.push_back(geometry);
-        //optix::GeometryInstance instance = getGeometryInstanceFromMesh(m_scene->mMeshes[i], context, materials);
-        //instances.push_back(instance);
     }
 
     // Convert nodes into a full scene Group
-
     optix::Group rootNodeGroup = getGroupFromNode(context, m_scene->mRootNode, geometries, m_materials);
 
 #if ENABLE_PARTICIPATING_MEDIA
@@ -345,6 +353,8 @@ optix::Group Scene::getSceneRootGroup( optix::Context & context )
     optix::Acceleration acceleration = context->createAcceleration("Sbvh", "Bvh");
     rootNodeGroup->setAcceleration( acceleration );
     acceleration->markDirty();
+
+	printf("Scene getSceneRootGroup: ellapsed %5.2fs\n", timer.elapsed() / 1000.0f);
     return rootNodeGroup;
 }
 
