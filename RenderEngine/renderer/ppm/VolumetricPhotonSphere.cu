@@ -5,6 +5,7 @@
 */
 
 #include <optix_world.h>
+#include <optix_cuda.h>
 #include "Photon.h"
 
 #if ENABLE_PARTICIPATING_MEDIA

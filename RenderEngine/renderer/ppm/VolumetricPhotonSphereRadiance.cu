@@ -5,6 +5,7 @@
  */
 
 #include <optix.h>
+#include <optix_cuda.h>
 #include <optixu/optixu_math_namespace.h>
 #include "renderer/ppm/VolumetricRadiancePRD.h"
 

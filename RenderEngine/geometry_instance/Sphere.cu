@@ -19,6 +19,7 @@
  */
 
 #include <optix_world.h>
+#include <optix_cuda.h>
 
 using namespace optix;
 

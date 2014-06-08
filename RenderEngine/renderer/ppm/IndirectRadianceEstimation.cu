@@ -7,6 +7,7 @@
 //#define MAX_DEPTH 20
 
 #include <optix.h>
+#include <optix_cuda.h>
 #include <optixu/optixu_math_namespace.h>
 #include "config.h"
 #include "renderer/Light.h"

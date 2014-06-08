@@ -4,6 +4,7 @@
  * file that was distributed with this source code.
 */
 #include <cuda.h>
+#include <optix_cuda.h>
 #include <curand_kernel.h>
 #include <optix.h>
 #include <optixu/optixu_math_namespace.h>
