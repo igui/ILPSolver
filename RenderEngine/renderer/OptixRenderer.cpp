@@ -382,10 +382,7 @@ void OptixRenderer::initScene( IScene & scene )
 	int sceneNMeshes = scene.getNumMeshes();
 	optix::Buffer hitsPerMeshBuffer = m_context->createBuffer(RT_BUFFER_INPUT_OUTPUT, RT_FORMAT_UNSIGNED_INT, sceneNMeshes);
 	unsigned int* bufferHost = (unsigned int*)hitsPerMeshBuffer->map();
-	for(int i = 0; i < sceneNMeshes; i++)
-	{
-		bufferHost[i] = 0;
-	}
+	memset(bufferHost, 0, sizeof(unsigned int) * sceneNMeshes);
 	hitsPerMeshBuffer->unmap();
 	m_context["hitsPerMeshBuffer"]->setBuffer(hitsPerMeshBuffer);
 	m_context["sceneNMeshes"]->setInt(sceneNMeshes);
