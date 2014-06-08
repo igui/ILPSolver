@@ -71,13 +71,17 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Application.hxx" />
+    <ClInclude Include="gui\docks\ConsoleDock.hxx" />
     <ClInclude Include="gui\docks\CameraDock.hxx" />
     <ClInclude Include="gui\docks\OutputDock.hxx" />
     <ClInclude Include="gui\docks\PPMDock.hxx" />
     <ClInclude Include="gui\docks\SceneDock.hxx" />
+    <ClInclude Include="gui\docks\ui\ui_CameraDock.h" />
+    <ClInclude Include="gui\docks\ui\ui_ConsoleDock.h" />
     <ClInclude Include="gui\docks\ui\ui_OutputDock.h" />
     <ClInclude Include="gui\docks\ui\ui_PPMDock.h" />
     <ClInclude Include="gui\docks\ui\ui_RenderInformationDock.h" />
+    <ClInclude Include="gui\docks\ui\ui_SceneDock.h" />
     <ClInclude Include="gui_export_api.h" />
     <ClInclude Include="gui\AboutWindow.hxx" />
     <ClInclude Include="gui\docks\RenderInformationDock.hxx" />
@@ -103,8 +107,10 @@
     <ClCompile Include="gui\AboutWindow.cpp" />
     <ClCompile Include="gui\ComputeDeviceInformationWidget.cpp" />
     <ClCompile Include="gui\ComputeDeviceInformationWidgetTabPage.cpp" />
+    <ClCompile Include="gui\docks\ConsoleDock.cpp" />
     <ClCompile Include="gui\docks\CameraDock.cpp" />
     <ClCompile Include="gui\docks\moc_CameraDock.cpp" />
+    <ClCompile Include="gui\docks\moc_ConsoleDock.cpp" />
     <ClCompile Include="gui\docks\moc_OutputDock.cpp" />
     <ClCompile Include="gui\docks\moc_PPMDock.cpp" />
     <ClCompile Include="gui\docks\moc_RenderInformationDock.cpp" />
@@ -135,6 +141,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="gui\docks\ui\CameraDock.ui" />
+    <None Include="gui\docks\ui\ConsoleDock.ui" />
     <None Include="gui\docks\ui\OutputDock.ui" />
     <None Include="gui\docks\ui\PPMDock.ui" />
     <None Include="gui\docks\ui\RenderInformationDock.ui" />
@@ -154,6 +161,9 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
       <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="LICENSE.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

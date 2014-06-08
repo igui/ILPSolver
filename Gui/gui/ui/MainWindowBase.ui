@@ -21,7 +21,16 @@
     <string notr="true"/>
    </property>
    <layout class="QGridLayout" name="gridLayout">
-    <property name="margin">
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
      <number>0</number>
     </property>
    </layout>
@@ -97,20 +106,32 @@ padding-right:40px;
    <property name="text">
     <string>&amp;Exit</string>
    </property>
+   <property name="shortcut">
+    <string>Alt+Q</string>
+   </property>
   </action>
   <action name="actionRenderStatusToggle">
    <property name="text">
     <string>Pause render</string>
+   </property>
+   <property name="shortcut">
+    <string>P</string>
    </property>
   </action>
   <action name="actionRenderRestart">
    <property name="text">
     <string>Restart render</string>
    </property>
+   <property name="shortcut">
+    <string>R</string>
+   </property>
   </action>
   <action name="actionSetCameraToDefault">
    <property name="text">
     <string>Default camera</string>
+   </property>
+   <property name="shortcut">
+    <string>D</string>
    </property>
   </action>
   <action name="actionConfigure_GPU_devices">
@@ -122,10 +143,16 @@ padding-right:40px;
    <property name="text">
     <string>Progressive Photon Mapping</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+P</string>
+   </property>
   </action>
   <action name="actionPath_Tracing">
    <property name="text">
     <string>Path Tracing</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+T</string>
    </property>
   </action>
   <action name="actionPath_Tracing_With_Direct_Light_Sampling">
@@ -137,15 +164,24 @@ padding-right:40px;
    <property name="text">
     <string>Open scene from file</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
   </action>
   <action name="actionReload_scene">
    <property name="text">
     <string>Reload scene</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+R, F5</string>
+   </property>
   </action>
   <action name="actionOpenBuiltInScene">
    <property name="text">
     <string>Open built-in scene by name</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+O</string>
    </property>
   </action>
   <action name="actionSaveImagePPM">

@@ -18,6 +18,7 @@
 #include "gui/docks/PPMDock.hxx"
 #include "gui/docks/CameraDock.hxx"
 #include "gui/docks/SceneDock.hxx"
+#include "gui/docks/ConsoleDock.hxx"
 #include "ComputeDeviceRepository.h"
 #include "scene/SceneFactory.h"
 #include "config.h"
@@ -63,6 +64,10 @@ MainWindowBase::MainWindowBase(Application& application)
 
     SceneDock* sceneDock = new SceneDock(this, application.getSceneManager());
     this->addDockWidget(Qt::RightDockWidgetArea, sceneDock);
+
+	// Console Dock
+	ConsoleDock *consoleDock = new ConsoleDock(this);
+	this->addDockWidget(Qt::BottomDockWidgetArea, consoleDock);
 
     // Status Bar Running Status and Time
 

@@ -34,6 +34,8 @@
     <ClCompile Include="scene\moc_SceneManager.cpp" />
     <ClCompile Include="gui\main.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="gui\docks\ConsoleDock.cpp" />
+    <ClCompile Include="gui\docks\moc_ConsoleDock.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gui\ui\ui_AboutWindow.h" />
@@ -63,17 +65,25 @@
     <ClInclude Include="scene\SceneManager.hxx" />
     <ClInclude Include="scene\SceneFactory.h" />
     <ClInclude Include="RendererStatus.h" />
+    <ClInclude Include="gui\docks\ui\ui_CameraDock.h" />
+    <ClInclude Include="gui\docks\ui\ui_SceneDock.h" />
+    <ClInclude Include="gui\docks\ui\ui_ConsoleDock.h" />
+    <ClInclude Include="gui\docks\ConsoleDock.hxx" />
   </ItemGroup>
   <ItemGroup>
     <None Include="gui\ui\AboutWindow.ui" />
     <None Include="gui\ui\RenderTypePPMInfo.ui" />
     <None Include="gui\ui\ComputeDeviceInformationWidget.ui" />
-    <None Include="gui\ui\ComputeDeviceInformationWidgetTabPage.ui" />
     <None Include="gui\ui\MainWindowBase.ui" />
     <None Include="gui\docks\ui\RenderInformationDock.ui" />
     <None Include="gui\docks\ui\OutputDock.ui" />
     <None Include="gui\docks\ui\PPMDock.ui" />
     <None Include="gui\docks\ui\CameraDock.ui" />
     <None Include="gui\docks\ui\SceneDock.ui" />
+    <None Include="gui\docks\ui\ConsoleDock.ui" />
+    <None Include="gui\ui\ComputeDeviceInformationWidgetTabPage.ui" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="LICENSE.txt" />
   </ItemGroup>
 </Project>
