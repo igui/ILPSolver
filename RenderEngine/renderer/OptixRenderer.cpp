@@ -19,6 +19,7 @@
 #include "renderer/ppm/Photon.h"
 #include "Camera.h"
 #include <QThread>
+#include <sstream>
 #include "renderer/RayType.h"
 #include "ComputeDevice.h"
 #include "clientserver/RenderServerRenderRequest.h"
@@ -85,17 +86,17 @@ OptixRenderer::OptixRenderer() :
 
 OptixRenderer::~OptixRenderer()
 {
-    printf("Context Destroy\n");
     m_context->destroy();
     cudaDeviceReset();
 }
 
-void OptixRenderer::initialize(const ComputeDevice & device)
+void OptixRenderer::initialize(const ComputeDevice & device, Logger *logger)
 {
     if(m_initialized)
     {
         throw std::exception("ERROR: Multiple OptixRenderer::initialize!\n");
     }
+	m_logger = logger;
 
     initDevice(device);
 
@@ -328,12 +329,12 @@ void OptixRenderer::initialize(const ComputeDevice & device)
 
     m_initialized = true;
 
-    //printf("Num CPU threads: %d\n", m_context->getCPUNumThreads());
-    //printf("GPU paging active: %d\n", m_context->getGPUPagingActive());
-    //printf("Enabled devices count: %d\n", m_context->getEnabledDeviceCount());
-    //printf("Get devices count: %d\n", m_context->getDeviceCount());
-    //printf("Used host memory: %d\n", m_context->getUsedHostMemory());
-    //printf("Sizeof Photon %d\n", sizeof(Photon));
+    //m_logger->log("Num CPU threads: %d\n", m_context->getCPUNumThreads());
+    //m_logger->log("GPU paging active: %d\n", m_context->getGPUPagingActive());
+    //m_logger->log("Enabled devices count: %d\n", m_context->getEnabledDeviceCount());
+    //m_logger->log("Get devices count: %d\n", m_context->getDeviceCount());
+    //m_logger->log("Used host memory: %d\n", m_context->getUsedHostMemory());
+    //m_logger->log("Sizeof Photon %d\n", sizeof(Photon));
 }
 
 void OptixRenderer::initDevice(const ComputeDevice & device)
@@ -428,15 +429,15 @@ void OptixRenderer::compile()
 void OptixRenderer::renderNextIteration(unsigned long long iterationNumber, unsigned long long localIterationNumber, float PPMRadius, 
                                         bool createOutput, const RenderServerRenderRequestDetails & details)
 {
-    printf("----------------------- %d Local: %d\n", iterationNumber, localIterationNumber);
+	m_logger->log("----------------------- %d Local: %d\n", iterationNumber, localIterationNumber);
     if(!m_initialized)
     {
         throw std::exception("Traced before OptixRenderer was initialized.");
     }
 
-    char buffer[40];
-    sprintf(buffer, "OptixRenderer::Trace Iteration %d", iterationNumber);
-    nvtx::ScopedRange r(buffer);
+	std::stringstream ss;
+    ss << "OptixRenderer::Trace Iteration %d" << iterationNumber;
+	nvtx::ScopedRange r(ss.str().c_str());
 
 	// print scene meshes count
 	int sceneNMeshes = m_context["sceneNMeshes"]->getInt();
@@ -553,7 +554,7 @@ void OptixRenderer::renderNextIteration(unsigned long long iterationNumber, unsi
                 sutilCurrentTime( &t1);
                 if(iterationNumber % 20 == 0 && iterationNumber < 100)
                 {
-                    printf("Rebuilt volumetric photons (%d photons) in %.4f.\n", NUM_VOLUMETRIC_PHOTONS, t1-t0);
+                    m_logger->log("Rebuilt volumetric photons (%d photons) in %.4f.\n", NUM_VOLUMETRIC_PHOTONS, t1-t0);
                 }
             }
 #endif
@@ -618,7 +619,7 @@ void OptixRenderer::renderNextIteration(unsigned long long iterationNumber, unsi
 		for(int i = 0; i < sceneNMeshes; i++)
 		{
 			if(bufferHost[i] > 0)
-				printf("hitsPerMesh [%i] = %u\n", i, bufferHost[i]);
+				m_logger->log("hitsPerMesh [%i] = %u\n", i, bufferHost[i]);
 		}
 		hitsPerMeshBuffer->unmap();
     }
@@ -672,7 +673,7 @@ unsigned int OptixRenderer::getScreenBufferSizeBytes() const
 void OptixRenderer::debugOutputPhotonTracing()
 {
 #if ENABLE_RENDER_DEBUG_OUTPUT
-    printf("Grid size: %d %d %d. Cellsize: %.4f\n", m_gridSize.x, m_gridSize.y, m_gridSize.z, m_context["photonsGridCellSize"]->getFloat());
+    m_logger->log("Grid size: %d %d %d. Cellsize: %.4f\n", m_gridSize.x, m_gridSize.y, m_gridSize.z, m_context["photonsGridCellSize"]->getFloat());
     {
         optix::Buffer buffer = m_context["debugPhotonPathLengthBuffer"]->getBuffer();
         unsigned int* buffer_Host = (unsigned int*)buffer->map();
@@ -689,7 +690,7 @@ void OptixRenderer::debugOutputPhotonTracing()
         buffer->unmap();
         double averagePathLength = double(sumPaths)/(PHOTON_LAUNCH_WIDTH*PHOTON_LAUNCH_HEIGHT);
         double percentageZero = 100*double(numZero)/(PHOTON_LAUNCH_WIDTH*PHOTON_LAUNCH_HEIGHT);
-        printf("  Average photonprd path length: %.4f (Paths with 0: %.4f%%)\n", averagePathLength, percentageZero);
+        m_logger->log("  Average photonprd path length: %.4f (Paths with 0: %.4f%%)\n", averagePathLength, percentageZero);
     }
 
     {
@@ -697,7 +698,7 @@ void OptixRenderer::debugOutputPhotonTracing()
         unsigned int* buffer_Host = (unsigned int*)buffer->map();
         unsigned long long sumVisited = 0;
         unsigned int numNotZero = 0;
-        for(int i = 0; i < m_width*m_height; i++)
+        for(unsigned int i = 0; i < m_width*m_height; i++)
         {
             if(buffer_Host[i] > 0)
             {
@@ -707,7 +708,7 @@ void OptixRenderer::debugOutputPhotonTracing()
         }
         buffer->unmap();
         double visitedAvg = double(sumVisited)/(numNotZero);
-        printf("  Average cells visited during indirect estimation  (per pixel): %.4f\n", visitedAvg);
+        m_logger->log("  Average cells visited during indirect estimation  (per pixel): %.4f\n", visitedAvg);
     }
 
     {
@@ -715,7 +716,7 @@ void OptixRenderer::debugOutputPhotonTracing()
         unsigned int* buffer_Host = (unsigned int*)buffer->map();
         unsigned long long sumVisited = 0;
         unsigned int numNotZero = 0;
-        for(int i = 0; i < m_width*m_height; i++)
+        for(unsigned int i = 0; i < m_width*m_height; i++)
         {
             if(buffer_Host[i] > 0)
             {
@@ -725,7 +726,7 @@ void OptixRenderer::debugOutputPhotonTracing()
         }
         buffer->unmap();
         double visitedAvg = double(sumVisited)/(numNotZero);
-        printf("  Average photons visited during indirect estimation (per pixel): %.4f\n", visitedAvg);
+        m_logger->log("  Average photons visited during indirect estimation (per pixel): %.4f\n", visitedAvg);
     }
 
 #if ACCELERATION_STRUCTURE == ACCELERATION_STRUCTURE_STOCHASTIC_HASH
@@ -746,7 +747,7 @@ void OptixRenderer::debugOutputPhotonTracing()
         buffer->unmap();
         double fillRate = 100*double(numFilled)/hashTableSize;
         double averageCollisions = double(sumCollisions)/numFilled;
-        printf("  Table size %d Filled: %d fill%%: %.4f\n  Uniform grid collisions (in filled cells): %.4f\n", hashTableSize, numFilled, fillRate, averageCollisions);
+        m_logger->log("  Table size %d Filled: %d fill%%: %.4f\n  Uniform grid collisions (in filled cells): %.4f\n", hashTableSize, numFilled, fillRate, averageCollisions);
     }
 #endif
 #endif

@@ -347,8 +347,6 @@ void Mouse::handleResize(int new_xres, int new_yres)
 
 void Mouse::call_func(int x, int y)
 {
-    //printf("Modifier:%d\nButton:%d\n", current_interaction.modifier, current_interaction.button);
-
     int modifier = current_interaction.modifier;
     int button   = current_interaction.button;
     if (modifier == 0                 && button == LEFT_BUTTON)
@@ -419,7 +417,6 @@ void Mouse::dolly(int x, int y)
 
 void Mouse::rotate(int x, int y)
 {
-    //printf("Rotate! Current state %d\n",  current_interaction.state);
     float xpos = 2.0f*static_cast<float>(x)/static_cast<float>(xres) - 1.0f;
     float ypos = 1.0f - 2.0f*static_cast<float>(y)/static_cast<float>(yres);
 

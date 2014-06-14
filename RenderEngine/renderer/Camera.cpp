@@ -420,13 +420,6 @@ QDataStream & operator >> ( QDataStream & in, Camera & camera )
     in >> eye_x >> eye_y >> eye_z >> lookat_x >> lookat_y >> lookat_z
        >> up_x >> up_y >> up_z >> hfov >> vfov >> aperture;
 
-    /*printf("eye_x %.2f ", eye_x);
-    printf("eye_y %.2f ", eye_y);
-    printf("eye_z %.2f\n", eye_z);
-    printf("up_x %.2f ", up_x);
-    printf("up_y %.2f ", up_y);
-    printf("up_z %.2f\n", up_z);*/
-
     camera = Camera( Vector3(eye_x, eye_y, eye_z),  Vector3(lookat_x, lookat_y, lookat_z),
                       Vector3(up_x, up_y, up_z), hfov, vfov, aperture);
 
