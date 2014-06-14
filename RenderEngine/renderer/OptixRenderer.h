@@ -10,6 +10,7 @@
 #include <optixu/optixu_aabb_namespace.h>
 #include "render_engine_export_api.h"
 #include "math/AAB.h"
+#include "logging/Logger.h"
 
 class ComputeDevice;
 class RenderServerRenderRequestDetails;
@@ -23,7 +24,7 @@ public:
     RENDER_ENGINE_EXPORT_API ~OptixRenderer();
 
     RENDER_ENGINE_EXPORT_API void initScene(IScene & scene);
-    RENDER_ENGINE_EXPORT_API void initialize(const ComputeDevice & device);
+    RENDER_ENGINE_EXPORT_API void initialize(const ComputeDevice & device, Logger *logger);
 
     void createGpuDebugBuffers();
 
@@ -56,7 +57,7 @@ private:
     optix::Buffer m_raytracePassOutputBuffer;
     optix::Buffer m_directRadianceBuffer;
     optix::Buffer m_indirectRadianceBuffer;
-    optix::Group m_sceneRootGroup;
+    optix::Group  m_sceneRootGroup;
     optix::Buffer m_volumetricPhotonsBuffer;
     optix::Buffer m_lightBuffer;
     optix::Buffer m_randomStatesBuffer;
@@ -85,4 +86,6 @@ private:
 
     // Volumetric
     optix::GeometryGroup m_volumetricPhotonsRoot;
+
+	Logger *m_logger;
 };

@@ -8,6 +8,7 @@
 #include "scene/Cornell.h"
 #include "clientserver/RenderServerRenderRequest.h"
 #include "clientserver/RenderResultPacket.h"
+#include "logging/DummyLogger.h"
 #include <QTime>
 #include <QMetaType>
 #include "RenderServer.hxx"
@@ -55,7 +56,7 @@ void RenderServerRenderer::onThreadStarted()
 
 void RenderServerRenderer::initialize(const ComputeDevice* computeDevice)
 {
-    m_renderer.initialize(*computeDevice);
+    m_renderer.initialize(*computeDevice, new DummyLogger());
     m_computeDevice = computeDevice;
     m_totalTime.start();
     m_renderTime.start();

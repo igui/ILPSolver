@@ -11,6 +11,7 @@
 #include <optixu/optixpp_namespace.h>
 #include "renderer/OptixRenderer.h"
 #include "renderer/Camera.h"
+#include "logging/DummyLogger.h"
 
 class IScene;
 class Application;
@@ -57,4 +58,5 @@ private:
     double m_PPMRadius;
     bool m_compileScene;
     bool m_noEmittedSignals;
+	DummyLogger m_logger;
 };

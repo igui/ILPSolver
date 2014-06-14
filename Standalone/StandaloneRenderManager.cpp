@@ -24,7 +24,8 @@ StandaloneRenderManager::StandaloneRenderManager(QApplication & qApplication, Ap
     m_currentScene(NULL),
     m_compileScene(false),
     m_application(application),
-    m_noEmittedSignals(true)
+    m_noEmittedSignals(true),
+	m_logger()
 {
     connect(&application, SIGNAL(sequenceNumberIncremented()), this, SLOT(onSequenceNumberIncremented()));
     connect(&application, SIGNAL(runningStatusChanged()), this, SLOT(onRunningStatusChanged()));
@@ -50,7 +51,7 @@ StandaloneRenderManager::~StandaloneRenderManager()
 void StandaloneRenderManager::start()
 {
     m_application.setRendererStatus(RendererStatus::INITIALIZING_ENGINE);
-    m_renderer.initialize(m_device);
+	m_renderer.initialize(m_device, &m_logger);
 }
 
 void StandaloneRenderManager::onContinueRayTracing()
