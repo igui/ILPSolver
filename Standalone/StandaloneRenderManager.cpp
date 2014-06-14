@@ -39,6 +39,11 @@ StandaloneRenderManager::StandaloneRenderManager(QApplication & qApplication, Ap
             Qt::QueuedConnection);
 }
 
+SignalLogger& StandaloneRenderManager::logger()
+{
+	return m_logger;
+}
+
 StandaloneRenderManager::~StandaloneRenderManager()
 {
     if(m_outputBuffer != NULL)

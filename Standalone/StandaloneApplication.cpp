@@ -35,6 +35,11 @@ StandaloneApplication::~StandaloneApplication(void)
 
 }
 
+StandaloneRenderManager& StandaloneApplication::rendererManager()
+{
+	return m_renderManager;
+}
+
 void StandaloneApplication::wait()
 {
     waitOnApplicationFinished();

@@ -10,6 +10,9 @@
     <height>300</height>
    </rect>
   </property>
+  <property name="styleSheet">
+   <string notr="true">p { margin: 0px; }</string>
+  </property>
   <property name="windowTitle">
    <string>Console Log</string>
   </property>

@@ -55,6 +55,8 @@
     </ClCompile>
     <ClCompile Include="logging\Logger.cpp" />
     <ClCompile Include="logging\DummyLogger.cpp" />
+    <ClCompile Include="logging\SignalLogger.cpp" />
+    <ClCompile Include="logging\moc_SignalLogger.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="select.h" />
@@ -138,6 +140,7 @@
     <ClInclude Include="renderer\helpers\vector_types.h" />
     <ClInclude Include="logging\Logger.h" />
     <ClInclude Include="logging\DummyLogger.h" />
+    <ClInclude Include="logging\SignalLogger.hxx" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="sutil">

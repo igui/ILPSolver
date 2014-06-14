@@ -67,6 +67,7 @@ MainWindowBase::MainWindowBase(Application& application)
 
 	// Console Dock
 	ConsoleDock *consoleDock = new ConsoleDock(this);
+	this->m_consoleDock = consoleDock;
 	this->addDockWidget(Qt::BottomDockWidgetArea, consoleDock);
 
     // Status Bar Running Status and Time
@@ -106,6 +107,11 @@ MainWindowBase::MainWindowBase(Application& application)
 void MainWindowBase::closeEvent( QCloseEvent* event )
 {
     
+}
+
+ConsoleDock *MainWindowBase::consoleDock()
+{
+	return m_consoleDock;
 }
 
 MainWindowBase::~MainWindowBase()

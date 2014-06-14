@@ -12,11 +12,13 @@
 class QApplication;
 class ComputeDevice;
 class QThread;
+
 class StandaloneApplication : public Application
 {
 public:
     StandaloneApplication(QApplication & qApplication, const ComputeDevice & device);
     ~StandaloneApplication(void);
+	StandaloneRenderManager& rendererManager();
     void wait();
 private:
     StandaloneRenderManager m_renderManager;

@@ -11,7 +11,7 @@
 #include <optixu/optixpp_namespace.h>
 #include "renderer/OptixRenderer.h"
 #include "renderer/Camera.h"
-#include "logging/DummyLogger.h"
+#include "logging/SignalLogger.hxx"
 
 class IScene;
 class Application;
@@ -26,6 +26,8 @@ public:
     virtual ~StandaloneRenderManager();
     void renderNextIteration();
     void wait();
+
+	SignalLogger &logger();
 
 public slots:
     void start();
@@ -58,5 +60,5 @@ private:
     double m_PPMRadius;
     bool m_compileScene;
     bool m_noEmittedSignals;
-	DummyLogger m_logger;
+	SignalLogger m_logger;
 };

@@ -16,6 +16,7 @@ class RenderWidget;
 class OptixRenderer;
 class Application;
 class Camera;
+class ConsoleDock;
 
 class MainWindowBase : public QMainWindow, public Ui::MainWindowBase
 {
@@ -26,10 +27,11 @@ public:
     GUI_EXPORT_API virtual void closeEvent(QCloseEvent* event);
     static QString getApplicationStatusString(const Application & application, bool showSeconds = true);
 
+	GUI_EXPORT_API ConsoleDock *consoleDock();
+
 signals:
     void renderRestart();
     void renderStatusToggle();
-    //void cameraUpdated();
 
 private slots:
     GUI_EXPORT_API_QT void onSetCameraToDefault();
@@ -38,9 +40,7 @@ private slots:
     GUI_EXPORT_API_QT void onConfigureGPUDevices();
     void onOpenSceneFile();
     void onReloadLastScene();
-    //void onCameraUpdated();
     void onRunningStatusChanged();
-
     void onRenderMethodChanged(); 
     void onActionAbout();
     void onRenderStatusToggle();
@@ -53,7 +53,7 @@ private slots:
 private:
     void loadSceneByName( QString &fileName );
     RenderWidget* m_renderWidget;
-    //void onChangeRenderMethod();
+    ConsoleDock* m_consoleDock;
     Application & m_application;
     QLabel* m_statusbar_renderMethodLabel;
     QLabel* m_statusbar_runningStatusLabel;

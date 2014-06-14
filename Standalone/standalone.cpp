@@ -14,7 +14,16 @@
 #include <QTextStream>
 #include <qmessagebox.h>
 
-//#include <vld.h>
+int main( int argc, char** argv );
+
+int CALLBACK WinMain(
+  _In_  HINSTANCE hInstance,
+  _In_  HINSTANCE hPrevInstance,
+  _In_  LPSTR lpCmdLine,
+  _In_  int nCmdShow
+){
+	return main(0, NULL);
+}
 
 int main( int argc, char** argv )
 {
@@ -67,9 +76,10 @@ int main( int argc, char** argv )
         applicationThread->start();
 
         MainWindowBase mainWindow(application);
-        //mainWindow.showMaximized();
-		mainWindow.show();
-		mainWindow.resize(1400,900);
+        mainWindow.showMaximized();
+
+		application.rendererManager().logger().setSignalReceiver((QObject *) mainWindow.consoleDock());
+
         int returnCode = qApplication.exec();
         application.wait();
 
