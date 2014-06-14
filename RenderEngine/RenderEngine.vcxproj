@@ -41,6 +41,7 @@
       </AdditionalIncludeDirectories>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <DisableSpecificWarnings>4244;4305</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>NotSet</SubSystem>
@@ -76,6 +77,8 @@
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="logging\DummyLogger.h" />
+    <ClInclude Include="logging\Logger.h" />
     <ClInclude Include="math\AAB.h" />
     <ClInclude Include="math\Sphere.h" />
     <ClInclude Include="math\Vector3.h" />
@@ -140,6 +143,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="clientserver\RenderServerRenderRequestDetails.cpp" />
+    <ClCompile Include="logging\DummyLogger.cpp" />
+    <ClCompile Include="logging\Logger.cpp" />
     <ClCompile Include="math\AAB.cpp" />
     <ClCompile Include="math\Sphere.cpp" />
     <ClCompile Include="util\imageformats\libtga\tga.c" />

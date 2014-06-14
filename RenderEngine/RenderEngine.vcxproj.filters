@@ -53,6 +53,8 @@
     <ClCompile Include="geometry_instance\AABInstance.cpp">
       <Filter>geometry</Filter>
     </ClCompile>
+    <ClCompile Include="logging\Logger.cpp" />
+    <ClCompile Include="logging\DummyLogger.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="select.h" />
@@ -134,6 +136,8 @@
     <ClInclude Include="renderer\helpers\nsight.h" />
     <ClInclude Include="renderer\TransmissionPRD.h" />
     <ClInclude Include="renderer\helpers\vector_types.h" />
+    <ClInclude Include="logging\Logger.h" />
+    <ClInclude Include="logging\DummyLogger.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="sutil">
