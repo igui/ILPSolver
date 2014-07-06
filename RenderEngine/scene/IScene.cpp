@@ -26,6 +26,6 @@ float IScene::getSceneInitialPPMRadiusEstimate() const
     float volume = sceneExtent.x*sceneExtent.y*sceneExtent.z;
     float cubelength = pow(volume, 1.f/3.f);
     float A = 6*cubelength*cubelength;
-    float radius = A*3.94e-6;
+    float radius = A*0.0004f;
     return radius;
 }
