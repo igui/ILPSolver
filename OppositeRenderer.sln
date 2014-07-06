@@ -1,17 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Server", "Server\Server.vcxproj", "{244F1889-074A-437D-AEE8-33F458DA85A1}"
-	ProjectSection(ProjectDependencies) = postProject
-		{26470E25-7DBB-4133-A0AE-0009C41FEA2B} = {26470E25-7DBB-4133-A0AE-0009C41FEA2B}
-		{FB73D5CD-9955-42F7-BD92-91FDC008C71C} = {FB73D5CD-9955-42F7-BD92-91FDC008C71C}
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Client", "Client\Client.vcxproj", "{A710623A-DB44-4513-BA25-A1637C8F2CE9}"
-	ProjectSection(ProjectDependencies) = postProject
-		{26470E25-7DBB-4133-A0AE-0009C41FEA2B} = {26470E25-7DBB-4133-A0AE-0009C41FEA2B}
-	EndProjectSection
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Application", "Gui\Gui.vcxproj", "{FB73D5CD-9955-42F7-BD92-91FDC008C71C}"
 	ProjectSection(ProjectDependencies) = postProject
 		{26470E25-7DBB-4133-A0AE-0009C41FEA2B} = {26470E25-7DBB-4133-A0AE-0009C41FEA2B}
@@ -32,13 +21,6 @@ Global
 		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{244F1889-074A-437D-AEE8-33F458DA85A1}.Debug|x64.ActiveCfg = Debug|x64
-		{244F1889-074A-437D-AEE8-33F458DA85A1}.Debug|x64.Build.0 = Debug|x64
-		{244F1889-074A-437D-AEE8-33F458DA85A1}.Release|x64.ActiveCfg = Release|Win32
-		{A710623A-DB44-4513-BA25-A1637C8F2CE9}.Debug|x64.ActiveCfg = Debug|x64
-		{A710623A-DB44-4513-BA25-A1637C8F2CE9}.Debug|x64.Build.0 = Debug|x64
-		{A710623A-DB44-4513-BA25-A1637C8F2CE9}.Release|x64.ActiveCfg = Release|x64
-		{A710623A-DB44-4513-BA25-A1637C8F2CE9}.Release|x64.Build.0 = Release|x64
 		{FB73D5CD-9955-42F7-BD92-91FDC008C71C}.Debug|x64.ActiveCfg = Debug|x64
 		{FB73D5CD-9955-42F7-BD92-91FDC008C71C}.Debug|x64.Build.0 = Debug|x64
 		{FB73D5CD-9955-42F7-BD92-91FDC008C71C}.Release|x64.ActiveCfg = Debug|x64
