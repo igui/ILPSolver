@@ -166,6 +166,7 @@
   <ItemGroup>
     <None Include="BuildRuleQt.targets" />
     <None Include="BuildRuleCopyDLLs.targets" />
+    <None Include="BuildRuleResources.targets" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="material\Glass.cu">

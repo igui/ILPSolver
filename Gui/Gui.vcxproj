@@ -82,6 +82,7 @@
     <ClInclude Include="gui\docks\ui\ui_PPMDock.h" />
     <ClInclude Include="gui\docks\ui\ui_RenderInformationDock.h" />
     <ClInclude Include="gui\docks\ui\ui_SceneDock.h" />
+    <ClInclude Include="gui\ui\resources.h" />
     <ClInclude Include="gui_export_api.h" />
     <ClInclude Include="gui\AboutWindow.hxx" />
     <ClInclude Include="gui\docks\RenderInformationDock.hxx" />
@@ -165,9 +166,23 @@
   <ItemGroup>
     <Text Include="LICENSE.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <Xml Include="gui\ui\resources.qrc">
+      <DeploymentContent>true</DeploymentContent>
+      <FileType>XML</FileType>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</DeploymentContent>
+    </Xml>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="gui\ui\icon.png">
+      <DeploymentContent>true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</DeploymentContent>
+    </Image>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="..\RenderEngine\BuildRuleQt.targets" />
     <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 5.5.targets" />
+    <Import Project="..\RenderEngine\BuildRuleResources.targets" />
   </ImportGroup>
 </Project>

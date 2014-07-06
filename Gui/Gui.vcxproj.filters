@@ -69,6 +69,7 @@
     <ClInclude Include="gui\docks\ui\ui_SceneDock.h" />
     <ClInclude Include="gui\docks\ui\ui_ConsoleDock.h" />
     <ClInclude Include="gui\docks\ConsoleDock.hxx" />
+    <ClInclude Include="gui\ui\resources.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="gui\ui\AboutWindow.ui" />
@@ -85,5 +86,11 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="LICENSE.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="gui\ui\icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="gui\ui\resources.qrc" />
   </ItemGroup>
 </Project>

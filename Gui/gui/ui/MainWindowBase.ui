@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>Opposite Renderer</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="resources.qrc">
+    <normaloff>:/default/icon.png</normaloff>:/default/icon.png</iconset>
+  </property>
   <property name="dockOptions">
    <set>QMainWindow::AllowTabbedDocks|QMainWindow::AnimatedDocks</set>
   </property>
@@ -58,6 +62,7 @@
      <property name="title">
       <string>Render method</string>
      </property>
+     <addaction name="actionClassical_Photon_Mapping"/>
      <addaction name="actionProgressive_Photon_Mapping"/>
      <addaction name="actionPath_Tracing"/>
     </widget>
@@ -72,7 +77,6 @@
      <string>&amp;File</string>
     </property>
     <addaction name="actionOpen_scene"/>
-    <addaction name="actionOpenBuiltInScene"/>
     <addaction name="actionReload_scene"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
@@ -189,8 +193,15 @@ padding-right:40px;
     <string>Save image as .PPM</string>
    </property>
   </action>
+  <action name="actionClassical_Photon_Mapping">
+   <property name="text">
+    <string>Classical Photon Mapping</string>
+   </property>
+  </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>actionAbout</sender>

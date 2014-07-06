@@ -25,6 +25,7 @@
 #include <qfiledialog.h>
 #include <qinputdialog.h>
 #include <qlineedit.h>
+#include "gui/ui/resources.h"
 
 MainWindowBase::MainWindowBase(Application& application)
     : m_application(application),
