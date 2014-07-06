@@ -1,6 +1,6 @@
 #include "ConsoleDock.hxx"
 
-const int ConsoleDock::maximumLines = 10000;
+const int ConsoleDock::maximumLines = 100;
 
 ConsoleDock::ConsoleDock(QWidget *parent) :
 	QDockWidget(parent),
