@@ -29,7 +29,8 @@ RenderWidget::RenderWidget( QWidget *parent, Camera & camera, const OutputSettin
     m_outputSettingsModel(outputSettings),
     m_hasLoadedGLShaders(false),
     m_GLProgram(0),
-    m_GLTextureSampler(0)
+    m_GLTextureSampler(0),
+	m_frameRendered(false)
 {
     this->resize(outputSettings.getWidth(), outputSettings.getHeight());
     setMouseTracking(false);
@@ -39,6 +40,12 @@ RenderWidget::RenderWidget( QWidget *parent, Camera & camera, const OutputSettin
     m_iterationNumberLabel->setStyleSheet("background:rgb(51,51,51); font-size:20pt; color:rgb(170,170,170);");
     m_iterationNumberLabel->setAlignment(Qt::AlignRight);
     m_iterationNumberLabel->hide();
+
+	m_openFileLabel = new QLabel(this);
+    m_openFileLabel->setStyleSheet("background:rgb(51,51,51); font-size:20pt; color:rgb(170,170,170);");
+	m_openFileLabel->setAlignment(Qt::AlignCenter);
+	m_openFileLabel->setText("No Scene Opened. Open a scene by pressing Ctrl+O"); 
+    m_openFileLabel->hide();
 }
 
 RenderWidget::~RenderWidget()
@@ -72,6 +79,8 @@ void RenderWidget::displayFrame(const float* cpuBuffer, unsigned long long itera
 
     //assert(cpuBuffer);
     //memcpy(m_displayBufferCpu, cpuBuffer, getDisplayBufferSizeBytes());
+
+	m_openFileLabel->hide();
 
     int offsetX = ((int)size().width() - (int)m_outputSettingsModel.getWidth())/2;
     int offsetY = ((int)size().height() - (int)m_outputSettingsModel.getHeight())/2;
@@ -123,6 +132,7 @@ void RenderWidget::displayFrame(const float* cpuBuffer, unsigned long long itera
 
     glDisable(GL_TEXTURE_2D);
 
+	m_frameRendered = true;
 }
 
 void RenderWidget::onNewFrameReadyForDisplay(const float* cpuBuffer, unsigned long long iterationNumber)
@@ -138,7 +148,13 @@ void RenderWidget::resizeGL( int w, int h )
 
 void RenderWidget::paintGL()
 {
-
+	
+	if(!m_frameRendered)
+	{
+		glClear(GL_COLOR_BUFFER_BIT);
+		m_openFileLabel->show();
+		m_openFileLabel->setGeometry(0, 0, size().width(), size().height());
+	}
 }
 
 size_t RenderWidget::getDisplayBufferSizeBytes()

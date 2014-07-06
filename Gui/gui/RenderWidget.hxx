@@ -60,4 +60,6 @@ private:
     GLuint m_GLTextureSampler;
     GLuint m_GLOutputBufferTexture;
     QLabel* m_iterationNumberLabel;
+	QLabel* m_openFileLabel;
+	bool m_frameRendered;
 };
