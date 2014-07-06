@@ -23,5 +23,12 @@
   <ItemGroup>
     <ClInclude Include="StandaloneRenderManager.hxx" />
     <ClInclude Include="StandaloneApplication.h" />
+    <ClInclude Include="resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resource.rc" />
   </ItemGroup>
 </Project>

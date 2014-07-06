@@ -41,8 +41,15 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="resource.h" />
     <ClInclude Include="StandaloneApplication.h" />
     <ClInclude Include="StandaloneRenderManager.hxx" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resource.rc" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{442214DB-20C0-4DCB-AA5F-5B5359FF71CB}</ProjectGuid>
