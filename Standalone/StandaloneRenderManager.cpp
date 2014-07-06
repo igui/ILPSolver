@@ -10,7 +10,6 @@
 #include "renderer/Camera.h"
 #include <QTime>
 #include "scene/Scene.h"
-#include "scene/Cornell.h"
 #include "clientserver/RenderServerRenderRequest.h"
 #include <QCoreApplication>
 #include <QApplication>
@@ -82,7 +81,7 @@ void StandaloneRenderManager::renderNextIteration()
             }
 
             // We only diplay one every X frames on screen (to make fair comparison with distributed renderer)
-            bool shouldOutputIteration = m_nextIterationNumber % 5 == 0;
+            bool shouldOutputIteration = m_nextIterationNumber % 1 == 0;
 
             const double PPMAlpha = 2.0/3.0;
             QVector<unsigned long long> iterationNumbers;
