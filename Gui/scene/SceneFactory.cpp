@@ -5,8 +5,8 @@
 */
 
 #include "SceneFactory.h"
-#include "scene/IScene.h"
-#include "scene/Cornell.h"
+#include "scene/Scene.h"
+
 
 SceneFactory::SceneFactory(void)
 {
@@ -19,12 +19,5 @@ SceneFactory::~SceneFactory(void)
 
 IScene* SceneFactory::getSceneByName( const char* name )
 {
-    if(strcmp(name, "Cornell") == 0)
-    {
-        return new Cornell();
-    }
-    else
-    {
-        return Scene::createFromFile(name);
-    }
+	return Scene::createFromFile(name);
 }

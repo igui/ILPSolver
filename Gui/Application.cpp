@@ -32,7 +32,6 @@ Application::Application(QApplication & qApplication) :
     m_outputSettingsModel.setHeight(720);
     m_outputSettingsModel.setGamma(2.2f);
     m_PPMSettingsModel.setPPMInitialRadius(0.20);
-    m_sceneManager.setScene("Cornell");
 
     connect(&m_outputSettingsModel, SIGNAL(resolutionUpdated()), this, SLOT(onOutputSettingsUpdated()));
     connect(&m_PPMSettingsModel, SIGNAL(updated()), this, SLOT(onPPMSettingsUpdated()));
