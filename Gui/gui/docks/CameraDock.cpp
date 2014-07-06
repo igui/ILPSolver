@@ -112,18 +112,18 @@ void CameraDock::onCameraUpdated()
 
 void CameraDock::onCornell()
 {
-    m_camera.eye.x = 0.4861;
-    m_camera.eye.y = 2.192;
-    m_camera.eye.z = 7.701;
-    m_camera.lookat.x = 0.3500;
-    m_camera.lookat.y = 2.179;
-    m_camera.lookat.z = -1.50;
-    m_camera.up.x = -0.0003;
-    m_camera.up.y = 0.9999;
-    m_camera.up.z = -0.0136;
-    m_camera.hfov = 49.82;
-    m_camera.vfov = 38.40;
-    m_camera.aperture = 0.0150;
+    m_camera.eye.x = 0.4861f;
+    m_camera.eye.y = 2.192f;
+    m_camera.eye.z = 7.701f;
+    m_camera.lookat.x = 0.3500f;
+    m_camera.lookat.y = 2.179f;
+    m_camera.lookat.z = -1.50f;
+    m_camera.up.x = -0.0003f;
+    m_camera.up.y = 0.9999f;
+    m_camera.up.z = -0.0136f;
+    m_camera.hfov = 49.82f;
+    m_camera.vfov = 38.40f;
+    m_camera.aperture = 0.0150f;
     m_camera.setup();
     m_PPMModel.setPPMInitialRadius(0.02);
     m_outputModel.setWidth(1024);
@@ -133,18 +133,18 @@ void CameraDock::onCornell()
 
 void CameraDock::onSponza()
 {
-    m_camera.eye.x = 6.852;
-    m_camera.eye.y = 5.063;
-    m_camera.eye.z = -0.50;
-    m_camera.lookat.x = -6.70;
-    m_camera.lookat.y = 3.10;
-    m_camera.lookat.z = 0.80;
+    m_camera.eye.x = 6.852f;
+    m_camera.eye.y = 5.063f;
+    m_camera.eye.z = -0.50f;
+    m_camera.lookat.x = -6.70f;
+    m_camera.lookat.y = 3.10f;
+    m_camera.lookat.z = 0.80f;
     m_camera.up.x = 0;
     m_camera.up.y = 1;
     m_camera.up.z = 0;
-    m_camera.hfov = 54.87;
-    m_camera.vfov = 32.56;
-    m_camera.aperture = 0.0010;
+    m_camera.hfov = 54.87f;
+    m_camera.vfov = 32.56f;
+    m_camera.aperture = 0.0010f;
     m_camera.setup();
     emit cameraUpdated();
     m_PPMModel.setPPMInitialRadius(0.08);
@@ -154,18 +154,18 @@ void CameraDock::onSponza()
 
 void CameraDock::onConference()
 {
-    m_camera.eye.x = -7.70;
-    m_camera.eye.y = 2.50;
-    m_camera.eye.z = -3.30;
+    m_camera.eye.x = -7.70f;
+    m_camera.eye.y = 2.50f;
+    m_camera.eye.z = -3.30f;
     m_camera.lookat.x = 9;
-    m_camera.lookat.y = 0.80;
-    m_camera.lookat.z = 4.30;
+    m_camera.lookat.y = 0.80f;
+    m_camera.lookat.z = 4.30f;
     m_camera.up.x = 0;
     m_camera.up.y = 1;
     m_camera.up.z = 0;
-    m_camera.hfov = 49.82;
-    m_camera.vfov = 29.28;
-    m_camera.aperture = 0.0030;
+    m_camera.hfov = 49.82f;
+    m_camera.vfov = 29.28f;
+    m_camera.aperture = 0.0030f;
     m_PPMModel.setPPMInitialRadius(0.02);
     m_camera.setup();
     emit cameraUpdated();
