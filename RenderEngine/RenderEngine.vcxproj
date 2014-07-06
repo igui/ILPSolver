@@ -115,7 +115,6 @@
     <ClInclude Include="material\Material.h" />
     <ClInclude Include="material\ParticipatingMedium.h" />
     <ClInclude Include="clientserver\RenderServerRenderRequest.h" />
-    <ClInclude Include="scene\Cornell.h" />
     <ClInclude Include="scene\Scene.h" />
     <ClInclude Include="renderer\ppm\Photon.h" />
     <ClInclude Include="renderer\ppm\PhotonPRD.h" />
@@ -174,7 +173,6 @@
     <ClCompile Include="renderer\Camera.cpp" />
     <ClCompile Include="renderer\OptixRenderer_CPUKdTree.cpp" />
     <ClCompile Include="clientserver\RenderServerRenderRequest.cpp" />
-    <ClCompile Include="scene\Cornell.cpp" />
     <ClCompile Include="scene\Scene.cpp" />
     <ClCompile Include="renderer\OptixRenderer.cpp" />
     <ClCompile Include="scene\IScene.cpp" />
@@ -201,7 +199,6 @@
     </CudaCompile>
     <CudaCompile Include="material\Glass.cu" />
     <CudaCompile Include="material\ParticipatingMedium.cu" />
-    <CudaCompile Include="parallelogram.cu" />
     <CudaCompile Include="renderer\ppm\DirectRadianceEstimation.cu" />
     <CudaCompile Include="renderer\ppm\Output.cu" />
     <CudaCompile Include="renderer\ppm\PhotonGenerator.cu">

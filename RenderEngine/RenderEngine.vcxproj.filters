@@ -20,7 +20,6 @@
     <ClCompile Include="util\sutil.c" />
     <ClCompile Include="ComputeDeviceRepository.cpp" />
     <ClCompile Include="material\DiffuseEmitter.cpp" />
-    <ClCompile Include="scene\Cornell.cpp" />
     <ClCompile Include="scene\IScene.cpp" />
     <ClCompile Include="scene\Scene.cpp" />
     <ClCompile Include="clientserver\RenderResultPacket.cpp" />
@@ -86,7 +85,6 @@
     <ClInclude Include="sutil\SunSky.h" />
     <ClInclude Include="ComputeDeviceRepository.h" />
     <ClInclude Include="material\DiffuseEmitter.h" />
-    <ClInclude Include="scene\Cornell.h" />
     <ClInclude Include="render_engine_export_api.h" />
     <ClInclude Include="scene\IScene.h" />
     <ClInclude Include="scene\Scene.h" />
@@ -170,7 +168,6 @@
     <None Include="BuildRuleCopyDLLs.targets" />
   </ItemGroup>
   <ItemGroup>
-    <CudaCompile Include="parallelogram.cu" />
     <CudaCompile Include="material\Glass.cu">
       <Filter>material</Filter>
     </CudaCompile>

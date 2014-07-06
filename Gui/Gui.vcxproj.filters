@@ -21,7 +21,6 @@
     <ClCompile Include="gui\docks\moc_CameraDock.cpp" />
     <ClCompile Include="gui\docks\moc_SceneDock.cpp" />
     <ClCompile Include="gui\docks\SceneDock.cpp" />
-    <ClCompile Include="Application.cpp" />
     <ClCompile Include="models\moc_OutputSettingsModel.cpp" />
     <ClCompile Include="models\moc_PPMSettingsModel.cpp" />
     <ClCompile Include="models\moc_RenderStatisticsModel.cpp" />
@@ -31,11 +30,12 @@
     <ClCompile Include="moc_Application.cpp" />
     <ClCompile Include="scene\SceneFactory.cpp" />
     <ClCompile Include="scene\SceneManager.cpp" />
-    <ClCompile Include="scene\moc_SceneManager.cpp" />
     <ClCompile Include="gui\main.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="gui\docks\ConsoleDock.cpp" />
     <ClCompile Include="gui\docks\moc_ConsoleDock.cpp" />
+    <ClCompile Include="Application.cpp" />
+    <ClCompile Include="scene\moc_SceneManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gui\ui\ui_AboutWindow.h" />
