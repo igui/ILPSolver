@@ -80,6 +80,12 @@ int main( int argc, char** argv )
 
 		application.rendererManager().logger().setSignalReceiver((QObject *) mainWindow.consoleDock());
 
+		if(argc >= 2)
+		{
+			// load scene by command line
+			application.getSceneManager().setScene(argv[1]);
+		}
+
         int returnCode = qApplication.exec();
         application.wait();
 
