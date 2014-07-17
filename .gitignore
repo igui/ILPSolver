@@ -22,5 +22,6 @@ ui_*.h
 *.mtl
 *.idb
 *.suo
+*.vcxproj.user
 /Debug
 /x64
