@@ -549,11 +549,13 @@ optix::Group Scene::getGroupFromNode(optix::Context & context, aiNode* node, QVe
             return group;
         }
     }
-
-    optix::Group emptyGroup = context->createGroup();
-    optix::Acceleration acceleration = context->createAcceleration("NoAccel", "NoAccel");
-    emptyGroup->setAcceleration(acceleration);
-    return emptyGroup;
+	else
+	{
+		optix::Group emptyGroup = context->createGroup();
+		optix::Acceleration acceleration = context->createAcceleration("NoAccel", "NoAccel");
+		emptyGroup->setAcceleration(acceleration);
+		return emptyGroup;
+	}
 }
 
 optix::GeometryInstance Scene::getGeometryInstance( optix::Context & context, optix::Geometry & geometry, Material* material )
