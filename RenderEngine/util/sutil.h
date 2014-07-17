@@ -184,11 +184,11 @@ extern "C" {
                                                    float W[3] );
 
 
-  /* Get current time in seconds for benchmarking/timing purposes. 
-   *   current_time      : return param for the current time in double
+  /*
+   * Get current time in seconds for benchmarking/timing purposes. 
+   * Returns -1 on error
    */
-  RTresult SUTILAPI sutilCurrentTime( double* current_time );
-
+  double SUTILAPI sutilCurrentTime();
 
   ///* Parse the image dimensions command line option, <width>x<height>
   // * used by most samples.
