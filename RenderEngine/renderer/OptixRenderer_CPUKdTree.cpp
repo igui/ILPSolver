@@ -4,7 +4,8 @@
  * file that was distributed with this source code.
 */
 
-#include "OptixRenderer.h"
+#include "PPMOptixRenderer.h"
+#include "PMOptixRenderer.h"
 #include "renderer/ppm/Photon.h"
 #include "config.h"
 #include "select.h"
@@ -86,7 +87,48 @@ static void buildKDTree( Photon* photons, int start, int end, int depth, Photon*
     buildKDTree( photons, median+1, end, depth+1, kd_tree, 2*current_root+2, rightMin, bbmax );
 }
 
-void OptixRenderer::createPhotonKdTreeOnCPU()
+void PPMOptixRenderer::createPhotonKdTreeOnCPU()
+{
+    Photon* photons_host = reinterpret_cast<Photon*>( m_photons->map() );
+    Photon* photonKdTree_host = reinterpret_cast<Photon*>( m_photonKdTree->map() );
+
+    int numValidPhotons = NUM_PHOTONS >= m_photonKdTreeSize ? m_photonKdTreeSize : NUM_PHOTONS;
+
+    for( unsigned int i = 0; i < numValidPhotons; ++i )
+    {
+        Photon a = photons_host[i];
+
+        if(! (fmaxf(photons_host[i].power) > 0.0f))
+        {
+            photons_host[i] = photons_host[numValidPhotons-1];
+            numValidPhotons--;
+            i--;
+        }
+    }
+
+    optix::float3 bbmin = optix::make_float3(0.0f);
+    optix::float3 bbmax = optix::make_float3(0.0f);
+
+    bbmin = optix::make_float3(  std::numeric_limits<float>::max() );
+    bbmax = optix::make_float3( -std::numeric_limits<float>::max() );
+
+    // Compute the bounds of the photons
+    for(int i = 0; i < numValidPhotons; ++i)
+    {
+        optix::float3 position = (photons_host[i]).position;
+        bbmin = fminf(bbmin, position);
+        bbmax = fmaxf(bbmax, position);
+    }
+
+    // Now build KD tree
+    buildKDTree( photons_host, 0, numValidPhotons, 0, photonKdTree_host, 0, bbmin, bbmax );
+
+    m_numberOfPhotonsLastFrame = numValidPhotons;
+    m_photonKdTree->unmap();
+    m_photons->unmap();
+}
+
+void PMOptixRenderer::createPhotonKdTreeOnCPU()
 {
     Photon* photons_host = reinterpret_cast<Photon*>( m_photons->map() );
     Photon* photonKdTree_host = reinterpret_cast<Photon*>( m_photonKdTree->map() );

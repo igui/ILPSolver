@@ -20,7 +20,8 @@
 #include <cmath>
 #include "renderer/ppm/PhotonGrid.h"
 #include "renderer/Hitpoint.h"
-#include "renderer/OptixRenderer.h"
+#include "renderer/PPMOptixRenderer.h"
+#include "renderer/PMOptixRenderer.h"
 #include "util/sutil.h"
 #include "renderer/OptixEntryPoint.h"
 #include "renderer/helpers/optix.h"
@@ -206,7 +207,7 @@ static void createHashmapOffsetTable(thrust::device_ptr<unsigned int> & hashmapO
     thrust::exclusive_scan(hashmapOffsetTable, hashmapOffsetTable+numHashCells+1, hashmapOffsetTable, 0);
 }
 
-void OptixRenderer::createUniformGridPhotonMap(float ppmRadius)
+void PPMOptixRenderer::createUniformGridPhotonMap(float ppmRadius)
 {
     nvtxRangePushA("Get photon AABB");
     int deviceNumber = 0;
@@ -244,7 +245,80 @@ void OptixRenderer::createUniformGridPhotonMap(float ppmRadius)
     if(numHashCells > PHOTON_GRID_MAX_SIZE)
     {
         throw std::exception("Too many cells in SpatialHash.cu, over defined PHOTON_GRID_MAX_SIZE.");
-        exit(1);
+    }
+
+    // Calculate hash values for each photon and build the histogram
+    unsigned int invalidHashCellValue = numHashCells+1;
+
+    nvtxRangePushA("calculateHashCells and histogram");
+    thrust::device_ptr<unsigned int> hashmapOffsetTable = getThrustDevicePtr<unsigned int>(m_hashmapOffsetTable, deviceNumber);
+    thrust::fill(hashmapOffsetTable, hashmapOffsetTable+numHashCells, 0);
+    thrust::device_ptr<unsigned int> photonsHashCell = getThrustDevicePtr<unsigned int>(m_photonsHashCells, deviceNumber);
+    calculateHashCells(photons, photonsHashCell, hashmapOffsetTable, NUM_PHOTONS, m_gridSize, sceneWorldOrigo, cellSize, invalidHashCellValue);
+    cudaDeviceSynchronize();
+    nvtxRangePop();
+
+    // Sort the photons by their hash value
+
+    nvtxRangePushA("Sort photons by hash");
+    sortPhotonsByHash(photons, photonsHashCell, NUM_PHOTONS);
+    nvtxRangePop();
+
+    // Calculate the offset table from the histogram
+    nvtxRangePushA("Create hashmap offset table");
+    createHashmapOffsetTable(hashmapOffsetTable, numHashCells);
+    cudaDeviceSynchronize();
+    nvtxRangePop();
+    
+    m_numberOfPhotonsLastFrame = scene.numPhotons;
+    //m_numberOfPhotonsInEstimate += m_numberOfPhotonsLastFrame;
+
+    // Update context variables
+
+    m_context["photonsGridCellSize"]->setFloat(cellSize);
+    m_context["photonsGridSize"]->setUint(m_gridSize);
+    m_context["photonsWorldOrigo"]->setFloat(sceneWorldOrigo);
+
+}
+
+void PMOptixRenderer::createUniformGridPhotonMap(float)
+{
+    nvtxRangePushA("Get photon AABB");
+    int deviceNumber = 0;
+    cudaSetDevice(m_optixDeviceOrdinal);
+
+    // Get a device_ptr to our photon list
+    thrust::device_ptr<Photon> photons = getThrustDevicePtr<Photon>(m_photons, deviceNumber);
+
+    // Get the AABB that contains all valid scene photons
+    AABB scene = getPhotonsBoundingBox(photons, NUM_PHOTONS);
+    AABB extendedScene = padAABB(scene);
+    optix::float3 sceneWorldOrigo = extendedScene.first;
+    cudaDeviceSynchronize();
+
+    optix::float3 sceneExtent = getSceneExtent(extendedScene);
+    nvtxRangePop();
+
+    // Get scene wide maximum radius squared to use for the hash map cell size
+
+    float smallestPossibleCellSize = getSmallestPossibleCellSize(sceneExtent, PHOTON_GRID_MAX_SIZE);
+    float cellSize = smallestPossibleCellSize+0.001;
+
+    m_spatialHashMapCellSize = cellSize;
+
+    m_gridSize = calculateGridSize(sceneExtent, cellSize);
+    
+    // Calculate hashes for photons
+    
+    unsigned int numHashCells = m_gridSize.x * m_gridSize.y * m_gridSize.z;
+    m_spatialHashMapNumCells = numHashCells;
+
+    //printf("# CellSize %.3f, %d hash values, smallestPossibleCellSize: %.3f\n", cellSize, numHashCells, smallestPossibleCellSize);
+    //printf("# GridSize %d %d %d\n", gridSize.x, gridSize.y, gridSize.z);
+
+    if(numHashCells > PHOTON_GRID_MAX_SIZE)
+    {
+        throw std::exception("Too many cells in SpatialHash.cu, over defined PHOTON_GRID_MAX_SIZE.");
     }
 
     // Calculate hash values for each photon and build the histogram
@@ -283,7 +357,25 @@ void OptixRenderer::createUniformGridPhotonMap(float ppmRadius)
 
 #elif ACCELERATION_STRUCTURE == ACCELERATION_STRUCTURE_STOCHASTIC_HASH
 
-void OptixRenderer::initializeStochasticHashPhotonMap(float ppmRadius)
+void PPMOptixRenderer::initializeStochasticHashPhotonMap(float ppmRadius)
+{
+    AAB aabb = m_sceneAABB;
+    aabb.addPadding(ppmRadius+0.0001);
+    Vector3 sceneExtent = aabb.getExtent();
+    float cellSize = ppmRadius;
+    m_gridSize = calculateGridSize(sceneExtent, cellSize);
+    m_context["photonsGridCellSize"]->setFloat(cellSize);
+    m_context["photonsGridSize"]->setUint(m_gridSize);
+    m_context["photonsWorldOrigo"]->setFloat(aabb.min);
+
+    // Clear photons
+    {
+        nvtx::ScopedRange r( "OptixEntryPoint::PPM_CLEAR_PHOTONS_UNIFORM_GRID_PASS" );
+        m_context->launch( OptixEntryPoint::PPM_CLEAR_PHOTONS_UNIFORM_GRID_PASS, NUM_PHOTONS);
+    }
+}
+
+void PMOptixRenderer::initializeStochasticHashPhotonMap(float ppmRadius)
 {
     AAB aabb = m_sceneAABB;
     aabb.addPadding(ppmRadius+0.0001);
@@ -328,15 +420,18 @@ static void initializeRandomStateBuffer(optix::Buffer & buffer, int numStates)
     cudaDeviceSynchronize();
 }
 
-void OptixRenderer::initializeRandomStates()
+void PPMOptixRenderer::initializeRandomStates()
 {
-    double t0, t1;
-    sutilCurrentTime( &t0);
-
     RTsize size[2];
     m_randomStatesBuffer->getSize(size[0], size[1]);
     int num = size[0]*size[1];
     initializeRandomStateBuffer(m_randomStatesBuffer, num);
-    sutilCurrentTime( &t1 );
-    printf("Init random states in %.3f sec.\n", t1-t0);
+}
+
+void PMOptixRenderer::initializeRandomStates()
+{
+    RTsize size[2];
+    m_randomStatesBuffer->getSize(size[0], size[1]);
+    int num = size[0]*size[1];
+    initializeRandomStateBuffer(m_randomStatesBuffer, num);
 }
