@@ -5,7 +5,8 @@
 */
 
 #include "StandaloneRenderManager.hxx"
-#include "renderer/OptixRenderer.h"
+#include "renderer/PPMOptixRenderer.h"
+#include "renderer/PMOptixRenderer.h"
 #include <QThread>
 #include "renderer/Camera.h"
 #include <QTime>
@@ -17,7 +18,7 @@
 
 StandaloneRenderManager::StandaloneRenderManager(QApplication & qApplication, Application & application, const ComputeDevice& device) :
     m_device(device),
-    m_renderer(OptixRenderer()), 
+    m_renderer(new PMOptixRenderer()), 
     m_nextIterationNumber(0),
     m_outputBuffer(NULL),
     m_currentScene(NULL),
@@ -55,7 +56,7 @@ StandaloneRenderManager::~StandaloneRenderManager()
 void StandaloneRenderManager::start()
 {
     m_application.setRendererStatus(RendererStatus::INITIALIZING_ENGINE);
-	m_renderer.initialize(m_device, &m_logger);
+	m_renderer->initialize(m_device, &m_logger);
 }
 
 void StandaloneRenderManager::onContinueRayTracing()
@@ -75,7 +76,7 @@ void StandaloneRenderManager::renderNextIteration()
             if(m_compileScene)
             {
                 m_application.setRendererStatus(RendererStatus::INITIALIZING_SCENE);
-                m_renderer.initScene(*m_currentScene);
+                m_renderer->initScene(*m_currentScene);
                 m_compileScene = false;
                 m_application.setRendererStatus(RendererStatus::RENDERING);
             }
@@ -92,7 +93,7 @@ void StandaloneRenderManager::renderNextIteration()
 
             RenderServerRenderRequest renderRequest (m_application.getSequenceNumber(), iterationNumbers, ppmRadii, details);
 
-            m_renderer.renderNextIteration(m_nextIterationNumber, m_nextIterationNumber, m_PPMRadius, shouldOutputIteration, renderRequest.getDetails());
+            m_renderer->renderNextIteration(m_nextIterationNumber, m_nextIterationNumber, m_PPMRadius, shouldOutputIteration, renderRequest.getDetails());
             const double ppmRadiusSquared = m_PPMRadius*m_PPMRadius;
             const double ppmRadiusSquaredNew = ppmRadiusSquared*(m_nextIterationNumber+PPMAlpha)/double(m_nextIterationNumber+1);
             m_PPMRadius = sqrt(ppmRadiusSquaredNew);
@@ -105,12 +106,13 @@ void StandaloneRenderManager::renderNextIteration()
                 {
                     m_outputBuffer = new float[2000*2000*3];
                 }
-                m_renderer.getOutputBuffer(m_outputBuffer);
+                m_renderer->getOutputBuffer(m_outputBuffer);
                 emit newFrameReadyForDisplay(m_outputBuffer, m_nextIterationNumber);
             }
 
             fillRenderStatistics();
             m_nextIterationNumber++;
+			//m_application.setRunningStatus(RunningStatus::PAUSE);
         }
     }
     catch(const std::exception & E)
@@ -134,8 +136,8 @@ void StandaloneRenderManager::fillRenderStatistics()
 
     if(m_application.getRenderMethod() == RenderMethod::PROGRESSIVE_PHOTON_MAPPING)
     {
-        m_application.getRenderStatisticsModel().setNumEmittedPhotonsPerIteration(OptixRenderer::EMITTED_PHOTONS_PER_ITERATION);
-        m_application.getRenderStatisticsModel().setNumEmittedPhotons(OptixRenderer::EMITTED_PHOTONS_PER_ITERATION*m_nextIterationNumber);
+        m_application.getRenderStatisticsModel().setNumEmittedPhotonsPerIteration(PMOptixRenderer::EMITTED_PHOTONS_PER_ITERATION);
+        m_application.getRenderStatisticsModel().setNumEmittedPhotons(PMOptixRenderer::EMITTED_PHOTONS_PER_ITERATION*m_nextIterationNumber);
     }
     else
     {

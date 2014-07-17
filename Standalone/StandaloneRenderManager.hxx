@@ -51,7 +51,7 @@ private:
     Application & m_application;
     unsigned long long m_nextIterationNumber;
 
-    OptixRenderer m_renderer;
+    OptixRenderer *m_renderer;
     Camera m_camera;
     QTime renderTime;
     float* m_outputBuffer;
