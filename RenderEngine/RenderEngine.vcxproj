@@ -83,11 +83,14 @@
     <ClInclude Include="math\AAB.h" />
     <ClInclude Include="math\Sphere.h" />
     <ClInclude Include="math\Vector3.h" />
+    <ClInclude Include="renderer\AABB.h" />
     <ClInclude Include="renderer\helpers\camera.h" />
     <ClInclude Include="renderer\helpers\samplers.h" />
     <ClInclude Include="renderer\helpers\optix.h" />
     <ClInclude Include="renderer\helpers\store_photon.h" />
     <ClInclude Include="renderer\helpers\vector_types.h" />
+    <ClInclude Include="renderer\PMOptixRenderer.h" />
+    <ClInclude Include="renderer\PPMOptixRenderer.h" />
     <ClInclude Include="renderer\TransmissionPRD.h" />
     <ClInclude Include="util\imageformats\libtga\tga.h" />
     <ClInclude Include="util\imageformats\libtga\tgaconfig.h" />
@@ -149,6 +152,8 @@
     <ClCompile Include="logging\SignalLogger.cpp" />
     <ClCompile Include="math\AAB.cpp" />
     <ClCompile Include="math\Sphere.cpp" />
+    <ClCompile Include="renderer\PMOptixRenderer.cpp" />
+    <ClCompile Include="renderer\PPMOptixRenderer.cpp" />
     <ClCompile Include="util\imageformats\libtga\tga.c" />
     <ClCompile Include="util\imageformats\libtga\tgaread.c" />
     <ClCompile Include="util\imageformats\libtga\tgawrite.c" />
@@ -194,6 +199,11 @@
     <CudaCompile Include="material\DiffuseEmitter.cu" />
     <CudaCompile Include="material\Mirror.cu" />
     <CudaCompile Include="material\Texture.cu" />
+    <CudaCompile Include="renderer\pm\PMDirectRadianceEstimation.cu" />
+    <CudaCompile Include="renderer\pm\PMIndirectRadianceEstimation.cu" />
+    <CudaCompile Include="renderer\pm\PMOutput.cu" />
+    <CudaCompile Include="renderer\pm\PMPhotonGenerator.cu" />
+    <CudaCompile Include="renderer\pm\PMRayGenerator.cu" />
     <CudaCompile Include="renderer\ppm\IndirectRadianceEstimation.cu" />
     <CudaCompile Include="material\Diffuse.cu">
       <AdditionalCompilerOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">-use_fast_math</AdditionalCompilerOptions>

@@ -26,7 +26,6 @@
     <ClCompile Include="clientserver\RenderServerRenderRequest.cpp" />
     <ClCompile Include="util\BenchmarkTimer.cpp" />
     <ClCompile Include="renderer\OptixRenderer.cpp" />
-    <ClCompile Include="renderer\OptixRenderer_CPUKdTree.cpp" />
     <ClCompile Include="clientserver\RenderServerRenderRequestDetails.cpp" />
     <ClCompile Include="material\Mirror.cpp" />
     <ClCompile Include="renderer\Camera.cpp" />
@@ -56,6 +55,9 @@
     <ClCompile Include="logging\DummyLogger.cpp" />
     <ClCompile Include="logging\SignalLogger.cpp" />
     <ClCompile Include="logging\moc_SignalLogger.cpp" />
+    <ClCompile Include="renderer\PPMOptixRenderer.cpp" />
+    <ClCompile Include="renderer\PMOptixRenderer.cpp" />
+    <ClCompile Include="renderer\OptixRenderer_CPUKdTree.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="select.h" />
@@ -139,6 +141,9 @@
     <ClInclude Include="logging\Logger.h" />
     <ClInclude Include="logging\DummyLogger.h" />
     <ClInclude Include="logging\SignalLogger.hxx" />
+    <ClInclude Include="renderer\PPMOptixRenderer.h" />
+    <ClInclude Include="renderer\PMOptixRenderer.h" />
+    <ClInclude Include="renderer\AABB.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="sutil">
@@ -185,7 +190,6 @@
     <CudaCompile Include="renderer\ppm\PhotonGenerator.cu" />
     <CudaCompile Include="renderer\ppm\RayGeneratorPPM.cu" />
     <CudaCompile Include="renderer\pt\RayGeneratorPT.cu" />
-    <CudaCompile Include="renderer\OptixRenderer_SpatialHash.cu" />
     <CudaCompile Include="material\Mirror.cu" />
     <CudaCompile Include="renderer\ppm\VolumetricPhotonInitialize.cu" />
     <CudaCompile Include="renderer\ppm\VolumetricPhotonSphereRadiance.cu" />
@@ -199,5 +203,11 @@
       <Filter>geometry</Filter>
     </CudaCompile>
     <CudaCompile Include="renderer\ppm\UniformGridPhotonInitialize.cu" />
+    <CudaCompile Include="renderer\OptixRenderer_SpatialHash.cu" />
+    <CudaCompile Include="renderer\pm\PMDirectRadianceEstimation.cu" />
+    <CudaCompile Include="renderer\pm\PMIndirectRadianceEstimation.cu" />
+    <CudaCompile Include="renderer\pm\PMOutput.cu" />
+    <CudaCompile Include="renderer\pm\PMPhotonGenerator.cu" />
+    <CudaCompile Include="renderer\pm\PMRayGenerator.cu" />
   </ItemGroup>
 </Project>
