@@ -602,7 +602,7 @@ void Scene::walkNode(aiNode *node, int depth)
 {
 	if(!node)
 		return;
-	for(unsigned int i = 0; i < depth; ++i)
+	for(int i = 0; i < depth; ++i)
 	{
 		putchar(' ');
 	}
