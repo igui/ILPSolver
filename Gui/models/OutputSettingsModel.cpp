@@ -7,7 +7,7 @@
 #include "OutputSettingsModel.hxx"
 
 OutputSettingsModel::OutputSettingsModel(void)
-    : m_width(0), m_height(0), m_gamma(2.2)
+    : m_width(0.0f), m_height(0.0f), m_gamma(2.2f)
 {
 
 }
