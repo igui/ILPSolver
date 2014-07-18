@@ -32,6 +32,7 @@ public:
 signals:
     void renderRestart();
     void renderStatusToggle();
+	void recentFilesChanged();
 
 private slots:
     GUI_EXPORT_API_QT void onSetCameraToDefault();
@@ -49,8 +50,14 @@ private slots:
     void onApplicationError(QString);
     void onActionOpenBuiltInScene();
     void onActionSaveImagePPM();
+	void onRecentFilesChanged();
+	void onOpenRecentFile();
+	void onSceneUpdated();
 
 private:
+	// max recent files in the File menu
+	static const int maxRecentFiles;
+
     void loadSceneByName( QString &fileName );
     RenderWidget* m_renderWidget;
     ConsoleDock* m_consoleDock;
@@ -61,4 +68,7 @@ private:
     unsigned int m_renderHeight;
     QFileInfo m_lastOpenedSceneFile;
     Camera & m_camera;
+
+	QAction *m_recentActionsSeparator;
+	QList<QAction *> m_recentFileActions;
 };

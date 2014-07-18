@@ -27,6 +27,8 @@
 #include <qlineedit.h>
 #include "gui/ui/resources.h"
 
+const int MainWindowBase::maxRecentFiles = 5;
+
 MainWindowBase::MainWindowBase(Application& application)
     : m_application(application),
       m_camera(application.getCamera())
@@ -101,8 +103,26 @@ MainWindowBase::MainWindowBase(Application& application)
     connect(this, SIGNAL(renderRestart()), &m_application, SLOT(onRenderRestart()));
     connect(this, SIGNAL(renderStatusToggle()), &m_application, SLOT(onRenderStatusToggle()));
 
+
+	// recent files
+	for (int i = 0; i < maxRecentFiles; ++i) {
+		QAction *action = new QAction(this);
+		action->setVisible(false);
+		connect(action, SIGNAL(triggered()),
+				this, SLOT(onOpenRecentFile()));
+		menuFile->insertAction(actionQuit, action);
+		m_recentFileActions.append(action);
+	}
+	m_recentActionsSeparator = new QAction(this);
+	m_recentActionsSeparator->setSeparator(true);
+	menuFile->insertAction(actionQuit, m_recentActionsSeparator);
+
+	connect(this, SIGNAL(recentFilesChanged()), this, SLOT(onRecentFilesChanged()));
+	connect(&application.getSceneManager(), SIGNAL(sceneUpdated()), this, SLOT(onSceneUpdated()));
+
     onRunningStatusChanged();
     onRenderMethodChanged();
+	onRecentFilesChanged();
 }
 
 void MainWindowBase::closeEvent( QCloseEvent* event )
@@ -310,4 +330,46 @@ QString MainWindowBase::getApplicationStatusString(const Application & applicati
 void MainWindowBase::onActionSaveImagePPM()
 {
     printf("Save image as PPM!");
+}
+
+void MainWindowBase::onRecentFilesChanged()
+{	
+     QStringList files = QSettings().value("recentFileList").toStringList();
+
+     int numRecentFiles = qMin(files.size(), maxRecentFiles);
+
+     for (int i = 0; i < numRecentFiles; ++i) {
+		 QString strippedName = QFileInfo(files[i]).fileName();
+
+         QString text = tr("&%1 %2").arg(i + 1).arg(strippedName);
+		 m_recentFileActions[i]->setText(text);
+         m_recentFileActions[i]->setData(files[i]);
+         m_recentFileActions[i]->setVisible(true);
+     }
+     for (int j = numRecentFiles; j < maxRecentFiles; ++j)
+         m_recentFileActions[j]->setVisible(false);
+
+	 m_recentActionsSeparator->setVisible(numRecentFiles > 0);
+}
+
+void MainWindowBase::onOpenRecentFile()
+ {
+     QAction *action = qobject_cast<QAction *>(sender());
+     if (action){
+         QString fileName = action->data().toString();
+		 loadSceneByName(fileName);
+	 }
+ }
+
+void MainWindowBase::onSceneUpdated()
+{
+	QString fileName = m_application.getSceneManager().getScene()->getSceneName();
+	QSettings settings;
+	QStringList files = settings.value("recentFileList").toStringList();
+	files.removeAll(fileName);
+	files.prepend(fileName);
+	while (files.size() > maxRecentFiles)
+		files.removeLast();
+	settings.setValue("recentFileList", files);
+	emit onRecentFilesChanged();
 }
