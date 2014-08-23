@@ -30,7 +30,7 @@ Application::Application(QApplication & qApplication) :
     
     m_outputSettingsModel.setWidth(1280);
     m_outputSettingsModel.setHeight(720);
-    m_outputSettingsModel.setGamma(2.2f);
+    m_outputSettingsModel.setGamma(1.0f);
     m_PPMSettingsModel.setPPMInitialRadius(0.20);
 
     connect(&m_outputSettingsModel, SIGNAL(resolutionUpdated()), this, SLOT(onOutputSettingsUpdated()));
