@@ -20,7 +20,6 @@ using namespace optix;
 rtDeclareVariable(rtObject, sceneRootObject, , );
 rtBuffer<Hitpoint, 2> raytracePassOutputBuffer;
 rtBuffer<RandomState, 2> randomStates;
-rtDeclareVariable(float, ppmDefaultRadius2, , );
 rtDeclareVariable(Camera, camera, , );
 rtDeclareVariable(float, camera_aperture, , );
 rtDeclareVariable(uint2, launchIndex, rtLaunchIndex, );

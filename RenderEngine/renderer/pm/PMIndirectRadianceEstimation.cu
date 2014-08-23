@@ -29,7 +29,6 @@ rtDeclareVariable(float, alpha, , );
 rtDeclareVariable(float, emittedPhotonsPerIterationFloat, , );
 rtDeclareVariable(float, ppmRadius, ,);
 rtDeclareVariable(float, ppmRadiusSquared, ,);
-rtDeclareVariable(float, ppmRadiusSquaredNew, ,);
 
 rtDeclareVariable(uint3, photonsGridSize, , );
 rtDeclareVariable(float3, photonsWorldOrigo, ,);

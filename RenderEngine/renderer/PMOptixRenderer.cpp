@@ -104,8 +104,6 @@ void PMOptixRenderer::initialize(const ComputeDevice & device, Logger *logger)
     m_context["localIterationNumber"]->setUint(0);
     m_context["ppmRadius"]->setFloat(0.f);
     m_context["ppmRadiusSquared"]->setFloat(0.f);
-    m_context["ppmRadiusSquaredNew"]->setFloat(0.f);
-    m_context["ppmDefaultRadius2"]->setFloat(0.f);
     m_context["emittedPhotonsPerIteration"]->setUint(EMITTED_PHOTONS_PER_ITERATION);
     m_context["emittedPhotonsPerIterationFloat"]->setFloat(float(EMITTED_PHOTONS_PER_ITERATION));
     m_context["photonLaunchWidth"]->setUint(PHOTON_LAUNCH_WIDTH);
