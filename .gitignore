@@ -23,5 +23,6 @@ ui_*.h
 *.idb
 *.suo
 *.vcxproj.user
+*.unsuccessfulbuild
 /Debug
 /x64
