@@ -81,9 +81,6 @@ void StandaloneRenderManager::renderNextIteration()
                 m_application.setRendererStatus(RendererStatus::RENDERING);
             }
 
-            // We only diplay one every X frames on screen (to make fair comparison with distributed renderer)
-            bool shouldOutputIteration = m_nextIterationNumber % 1 == 0;
-
             const double PPMAlpha = 2.0/3.0;
             QVector<unsigned long long> iterationNumbers;
             QVector<double> ppmRadii;
@@ -93,24 +90,17 @@ void StandaloneRenderManager::renderNextIteration()
 
             RenderServerRenderRequest renderRequest (m_application.getSequenceNumber(), iterationNumbers, ppmRadii, details);
 
-            m_renderer->renderNextIteration(m_nextIterationNumber, m_nextIterationNumber, m_PPMRadius, shouldOutputIteration, renderRequest.getDetails());
-            const double ppmRadiusSquared = m_PPMRadius*m_PPMRadius;
-            const double ppmRadiusSquaredNew = ppmRadiusSquared*(m_nextIterationNumber+PPMAlpha)/double(m_nextIterationNumber+1);
-            m_PPMRadius = sqrt(ppmRadiusSquaredNew);
+            m_renderer->renderNextIteration(0, 0, m_PPMRadius, true, renderRequest.getDetails());
 
             // Transfer the output buffer to CPU and signal ready for display
-
-            if(shouldOutputIteration)
+            if(m_outputBuffer == NULL)
             {
-                if(m_outputBuffer == NULL)
-                {
-                    m_outputBuffer = new float[2000*2000*3];
-                }
-                m_renderer->getOutputBuffer(m_outputBuffer);
-                emit newFrameReadyForDisplay(m_outputBuffer, m_nextIterationNumber);
+                m_outputBuffer = new float[2000*2000*3];
             }
+            m_renderer->getOutputBuffer(m_outputBuffer);
+            emit newFrameReadyForDisplay(m_outputBuffer, m_nextIterationNumber);
 
-            fillRenderStatistics();
+            //fillRenderStatistics();
             m_nextIterationNumber++;
 			//m_application.setRunningStatus(RunningStatus::PAUSE);
         }
