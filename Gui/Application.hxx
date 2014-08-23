@@ -81,6 +81,9 @@ signals:
     void sequenceNumberIncremented();
     void applicationError(QString);
 
+protected:
+	virtual void incrementSequenceNumber();
+
 private:
     QThread* m_sceneManagerThread;
     RunningStatus::E m_runningStatus;
@@ -93,7 +96,6 @@ private:
     Camera m_camera;
     Camera m_defaultCamera;
     unsigned long long m_sequenceNumber;
-    void incrementSequenceNumber();
     void resetRenderTime();
     void pauseRenderTime();
     void resumeRenderTime();
