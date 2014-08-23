@@ -49,6 +49,7 @@ private:
     void createUniformGridPhotonMap(float ppmRadius);
     void initializeStochasticHashPhotonMap(float ppmRadius);
     void createPhotonKdTreeOnCPU();
+	void markOutputBufferCross(optix::float3 *mappedOutputBuffer, optix::uint2 position, optix::float3 color, int circleSize);
 
     optix::Buffer m_outputBuffer;
     optix::Buffer m_photons;
