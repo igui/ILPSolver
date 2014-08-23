@@ -271,14 +271,23 @@ void Scene::loadLightSources()
     for(unsigned int i = 0; i < m_scene->mNumLights; i++)
     {
         aiLight* lightPtr = m_scene->mLights[i];
+
+		float powerMultiplier = lightPtr->mAttenuationLinear +
+			lightPtr->mAttenuationQuadratic * lightPtr->mAttenuationQuadratic;
+
+		if(powerMultiplier <= 0)
+		{
+			powerMultiplier = 1;
+		}
+			
         if(lightPtr->mType == aiLightSource_POINT)
         {
-            Light light ( toFloat3(lightPtr->mColorDiffuse), toFloat3(lightPtr->mPosition));
+            Light light ((1.0f / powerMultiplier) * toFloat3(lightPtr->mColorDiffuse), toFloat3(lightPtr->mPosition));
             m_lights.push_back(light);
         }
         else if(lightPtr->mType == aiLightSource_SPOT)
         {
-            Light light (toFloat3(lightPtr->mColorDiffuse), toFloat3(lightPtr->mPosition), toFloat3(lightPtr->mDirection), lightPtr->mAngleInnerCone);
+            Light light (powerMultiplier * toFloat3(lightPtr->mColorDiffuse), toFloat3(lightPtr->mPosition), toFloat3(lightPtr->mDirection), lightPtr->mAngleInnerCone);
             m_lights.push_back(light);
         }
     }
