@@ -600,17 +600,6 @@ void PPMOptixRenderer::renderNextIteration(unsigned long long iterationNumber, u
         }
 
         double traceTime = sutilCurrentTime() -traceStartTime;
-
-		// print scene meshes count
-		int sceneNMeshes = m_context["sceneNMeshes"]->getInt();
-		optix::Buffer hitsPerMeshBuffer = m_context["hitsPerMeshBuffer"]->getBuffer();
-		unsigned int* bufferHost = (unsigned int*)hitsPerMeshBuffer->map();
-		for(int i = 0; i < sceneNMeshes; i++)
-		{
-			if(bufferHost[i] > 0)
-				m_logger->log("hitsPerMesh [%i] = %u\n", i, bufferHost[i]);
-		}
-		hitsPerMeshBuffer->unmap();
     }
     catch(const optix::Exception & e)
     {
