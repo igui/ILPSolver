@@ -48,6 +48,8 @@ private:
     void fillRenderStatistics();
     void continueRayTracingIfRunningAsync();
 
+	void calculateOptimalNumEmmitedPhotons();
+
     Application & m_application;
     unsigned long long m_nextIterationNumber;
 
