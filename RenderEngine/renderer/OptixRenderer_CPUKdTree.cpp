@@ -163,8 +163,6 @@ void PMOptixRenderer::createPhotonKdTreeOnCPU()
 
     // Now build KD tree
     buildKDTree( photons_host, 0, numValidPhotons, 0, photonKdTree_host, 0, bbmin, bbmax );
-
-    m_numberOfPhotonsLastFrame = numValidPhotons;
     m_photonKdTree->unmap();
     m_photons->unmap();
 }

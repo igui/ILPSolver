@@ -344,7 +344,6 @@ void PMOptixRenderer::createUniformGridPhotonMap(float)
     cudaDeviceSynchronize();
     nvtxRangePop();
     
-    m_numberOfPhotonsLastFrame = scene.numPhotons;
     //m_numberOfPhotonsInEstimate += m_numberOfPhotonsLastFrame;
 
     // Update context variables

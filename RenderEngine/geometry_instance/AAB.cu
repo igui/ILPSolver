@@ -14,12 +14,7 @@ rtDeclareVariable(float3, cuboidMin, , );
 rtDeclareVariable(float3, cuboidMax, , );
 rtDeclareVariable(float3, geometricNormal, attribute geometricNormal, ); 
 rtDeclareVariable(float3, shadingNormal, attribute shadingNormal, ); 
-rtDeclareVariable(optix::Ray, ray, rtCurrentRay, );
-
-namespace materialProperties
-{
-    rtDeclareVariable(int, participatingMedium, , );
-}    
+rtDeclareVariable(optix::Ray, ray, rtCurrentRay, );  
 
 RT_PROGRAM void intersect(int primIdx)
 {
