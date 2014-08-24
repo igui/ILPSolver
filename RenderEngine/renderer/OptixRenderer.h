@@ -24,7 +24,7 @@ public:
     RENDER_ENGINE_EXPORT_API virtual void initialize(const ComputeDevice & device, Logger *logger) = 0;
 
     RENDER_ENGINE_EXPORT_API virtual void renderNextIteration(unsigned long long iterationNumber, unsigned long long localIterationNumber, 
-        float PPMRadius, bool createOutput, const RenderServerRenderRequestDetails & details) = 0;
+        float PPMRadius, const RenderServerRenderRequestDetails & details) = 0;
     RENDER_ENGINE_EXPORT_API virtual void getOutputBuffer(void* data) = 0;
     RENDER_ENGINE_EXPORT_API virtual unsigned int getWidth() const = 0;
     RENDER_ENGINE_EXPORT_API virtual unsigned int getHeight() const = 0;

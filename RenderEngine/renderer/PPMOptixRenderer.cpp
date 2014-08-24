@@ -425,7 +425,7 @@ void PPMOptixRenderer::compile()
 }
 
 void PPMOptixRenderer::renderNextIteration(unsigned long long iterationNumber, unsigned long long localIterationNumber, float PPMRadius, 
-                                        bool createOutput, const RenderServerRenderRequestDetails & details)
+                                           const RenderServerRenderRequestDetails & details)
 {
 	m_logger->log("----------------------- %d Local: %d\n", iterationNumber, localIterationNumber);
     if(!m_initialized)

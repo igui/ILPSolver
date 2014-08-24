@@ -30,7 +30,7 @@ public:
     void createGpuDebugBuffers();
 
     RENDER_ENGINE_EXPORT_API void renderNextIteration(unsigned long long iterationNumber, unsigned long long localIterationNumber, 
-        float PPMRadius, bool createOutput, const RenderServerRenderRequestDetails & details);
+        float PPMRadius, const RenderServerRenderRequestDetails & details);
     RENDER_ENGINE_EXPORT_API void getOutputBuffer(void* data);
     RENDER_ENGINE_EXPORT_API unsigned int getWidth() const;
     RENDER_ENGINE_EXPORT_API unsigned int getHeight() const;
