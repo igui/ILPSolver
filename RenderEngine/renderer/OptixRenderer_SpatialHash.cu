@@ -291,7 +291,7 @@ void PMOptixRenderer::createUniformGridPhotonMap(float)
     thrust::device_ptr<Photon> photons = getThrustDevicePtr<Photon>(m_photons, deviceNumber);
 
     // Get the AABB that contains all valid scene photons
-    AABB scene = getPhotonsBoundingBox(photons, NUM_PHOTONS);
+	AABB scene = getPhotonsBoundingBox(photons, getNumPhotons());
     AABB extendedScene = padAABB(scene);
     optix::float3 sceneWorldOrigo = extendedScene.first;
     cudaDeviceSynchronize();
@@ -328,14 +328,14 @@ void PMOptixRenderer::createUniformGridPhotonMap(float)
     thrust::device_ptr<unsigned int> hashmapOffsetTable = getThrustDevicePtr<unsigned int>(m_hashmapOffsetTable, deviceNumber);
     thrust::fill(hashmapOffsetTable, hashmapOffsetTable+numHashCells, 0);
     thrust::device_ptr<unsigned int> photonsHashCell = getThrustDevicePtr<unsigned int>(m_photonsHashCells, deviceNumber);
-    calculateHashCells(photons, photonsHashCell, hashmapOffsetTable, NUM_PHOTONS, m_gridSize, sceneWorldOrigo, cellSize, invalidHashCellValue);
+	calculateHashCells(photons, photonsHashCell, hashmapOffsetTable, getNumPhotons(), m_gridSize, sceneWorldOrigo, cellSize, invalidHashCellValue);
     cudaDeviceSynchronize();
     nvtxRangePop();
 
     // Sort the photons by their hash value
 
     nvtxRangePushA("Sort photons by hash");
-    sortPhotonsByHash(photons, photonsHashCell, NUM_PHOTONS);
+    sortPhotonsByHash(photons, photonsHashCell, getNumPhotons());
     nvtxRangePop();
 
     // Calculate the offset table from the histogram

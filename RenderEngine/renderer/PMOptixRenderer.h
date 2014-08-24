@@ -12,10 +12,12 @@
 #include "OptixRenderer.h"
 #include "math/AAB.h"
 #include "logging/Logger.h"
+#include <vector>
 
 class ComputeDevice;
 class RenderServerRenderRequestDetails;
 class IScene;
+class Camera;
 
 class PMOptixRenderer: public OptixRenderer
 {
@@ -27,19 +29,18 @@ public:
     RENDER_ENGINE_EXPORT_API void initScene(IScene & scene);
     RENDER_ENGINE_EXPORT_API void initialize(const ComputeDevice & device, Logger *logger);
 
-    void createGpuDebugBuffers();
-
     RENDER_ENGINE_EXPORT_API void renderNextIteration(unsigned long long iterationNumber, unsigned long long localIterationNumber, 
-        float PPMRadius, bool createOutput, const RenderServerRenderRequestDetails & details);
+        float PPMRadius, const RenderServerRenderRequestDetails & details);
+	RENDER_ENGINE_EXPORT_API void render(unsigned int photonLaunchWidth, unsigned int height, unsigned int width, const Camera camera, bool calculateRadiance);
+	RENDER_ENGINE_EXPORT_API void genPhotonMap(unsigned int photonLaunchWidth);
     RENDER_ENGINE_EXPORT_API void getOutputBuffer(void* data);
+	RENDER_ENGINE_EXPORT_API std::vector<unsigned int> getHitCount();
     RENDER_ENGINE_EXPORT_API unsigned int getWidth() const;
     RENDER_ENGINE_EXPORT_API unsigned int getHeight() const;
     RENDER_ENGINE_EXPORT_API unsigned int getScreenBufferSizeBytes() const;
 
-    const static unsigned int NUM_PHOTONS;
     const static float PPM_INITIAL_RADIUS;
     const static unsigned int PHOTON_GRID_MAX_SIZE;
-    RENDER_ENGINE_EXPORT_API const static unsigned int EMITTED_PHOTONS_PER_ITERATION;
 
 private:
     void initDevice(const ComputeDevice & device);
@@ -49,7 +50,7 @@ private:
     void createUniformGridPhotonMap(float ppmRadius);
     void initializeStochasticHashPhotonMap(float ppmRadius);
     void createPhotonKdTreeOnCPU();
-	void markOutputBufferCross(optix::float3 *mappedOutputBuffer, optix::uint2 position, optix::float3 color, int circleSize);
+	unsigned int getNumPhotons() const;
 
     optix::Buffer m_outputBuffer;
     optix::Buffer m_photons;
@@ -64,30 +65,24 @@ private:
     optix::Buffer m_lightBuffer;
     optix::Buffer m_randomStatesBuffer;
 
-    unsigned int m_photonKdTreeSize;
-    unsigned long long m_numberOfPhotonsLastFrame;
     float m_spatialHashMapCellSize;
     AAB m_sceneAABB;
+	float m_scenePPMRadius;
     optix::uint3 m_gridSize;
     unsigned int m_spatialHashMapNumCells;
 
     unsigned int m_width;
     unsigned int m_height;
+	unsigned int m_photonWidth;
 
     bool m_initialized;
 
     const static unsigned int MAX_BOUNCES;
     const static unsigned int MAX_PHOTON_COUNT;
-    const static unsigned int PHOTON_LAUNCH_WIDTH;
-    const static unsigned int PHOTON_LAUNCH_HEIGHT;
-   
-    void resizeBuffers(unsigned int width, unsigned int height);
-    void debugOutputPhotonTracing();
+
+	void resizeBuffers(unsigned int width, unsigned int height, unsigned int generateOutput);
     optix::Context m_context;
     int m_optixDeviceOrdinal;
-
-    // Volumetric
-    optix::GeometryGroup m_volumetricPhotonsRoot;
 
 	Logger *m_logger;
 };
