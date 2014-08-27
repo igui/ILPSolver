@@ -11,7 +11,8 @@
 
 SceneManager::SceneManager(void)
     : m_scene(NULL),
-      m_status(SceneManagerStatus::NO_SCENE)
+      m_status(SceneManagerStatus::NO_SCENE),
+	  m_logger(NULL)
 {
 
 }
@@ -40,7 +41,7 @@ void SceneManager::onLoadNewScene( QString sceneName )
     try
     {
         Scene* oldScene = m_scene;
-		m_scene =  Scene::createFromFile(sceneName.toLatin1().constData());
+		m_scene =  Scene::createFromFile(m_logger, sceneName.toLatin1().constData());
         emit sceneUpdated();
         delete oldScene;
         m_status = SceneManagerStatus::HAS_SCENE;
@@ -55,4 +56,9 @@ void SceneManager::onLoadNewScene( QString sceneName )
 SceneManagerStatus::E SceneManager::getStatus() const
 {
     return m_status;
+}
+
+void SceneManager::setLogger(Logger *logger)
+{
+	m_logger = logger;
 }

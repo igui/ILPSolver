@@ -9,6 +9,7 @@
 #include "scene/Scene.h"
 #include <QObject>
 #include "gui_export_api.h"
+#include "logging/Logger.h"
 
 namespace SceneManagerStatus
 {
@@ -24,6 +25,7 @@ public:
     ~SceneManager(void);
     GUI_EXPORT_API_QT Scene* getScene() const;
     GUI_EXPORT_API_QT void setScene(const char* sceneName);
+	GUI_EXPORT_API_QT void setLogger(Logger *logger);
     SceneManagerStatus::E getStatus() const;
 signals:
     void sceneLoadingNew();
@@ -34,4 +36,5 @@ private slots:
 private:
     SceneManagerStatus::E m_status;
     Scene* m_scene;
+	Logger *m_logger;
 };

@@ -16,6 +16,7 @@
 #include "render_engine_export_api.h"
 #include "math/AAB.h"
 
+
 struct aiScene;
 struct aiMesh;
 class Material;
@@ -23,6 +24,7 @@ struct aiNode;
 class DiffuseEmitter;
 struct aiColor3D;
 class QFileInfo;
+class Logger;
 
 namespace Assimp
 {
@@ -32,9 +34,9 @@ namespace Assimp
 class Scene
 {
 public:
-    Scene(void);
     RENDER_ENGINE_EXPORT_API virtual ~Scene(void);
     RENDER_ENGINE_EXPORT_API static Scene* createFromFile(const char* file);
+	RENDER_ENGINE_EXPORT_API static Scene* createFromFile(Logger *logger, const char* file);
     virtual optix::Group getSceneRootGroup(optix::Context & context);
     void loadDefaultSceneCamera();
     virtual const QVector<Light> & getSceneLights() const;
@@ -46,6 +48,7 @@ public:
 	RENDER_ENGINE_EXPORT_API float getSceneInitialPPMRadiusEstimate() const;
 
 private:
+	Scene(Logger *logger);
     optix::Geometry Scene::createGeometryFromMesh(uint meshId, aiMesh* mesh, optix::Context & context);
     void loadMeshLightSource( aiMesh* mesh, DiffuseEmitter* diffuseEmitter );
     optix::Group getGroupFromNode(optix::Context & context, aiNode* node, QVector<optix::Geometry> & geometries, QVector<Material*> & materials);
@@ -53,7 +56,7 @@ private:
     bool colorHasAnyComponent(const aiColor3D & color);
     void loadSceneMaterials();
     void loadLightSources();
-	static void walkNode(aiNode *node, int depth);
+	void walkNode(aiNode *node, int depth);
 
     QVector<Material*> m_materials;
     QVector<Light> m_lights;
@@ -66,4 +69,5 @@ private:
     Camera m_defaultCamera;
     AAB m_sceneAABB;
     unsigned int m_numTriangles;
+	Logger *m_logger;
 };

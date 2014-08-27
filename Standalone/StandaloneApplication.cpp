@@ -27,7 +27,8 @@ StandaloneApplication::StandaloneApplication(QApplication & qApplication, const 
     connect(&m_renderManager, SIGNAL(renderManagerError(QString)), 
         this, SIGNAL(applicationError(QString)),
         Qt::QueuedConnection);
-
+	
+	getSceneManager().setLogger(&m_renderManager.logger());
 }
 
 StandaloneApplication::~StandaloneApplication(void)

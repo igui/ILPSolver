@@ -22,20 +22,21 @@
 #include "material/ParticipatingMedium.h"
 #include "geometry_instance/AABInstance.h"
 #include "config.h"
+#include "logging/DummyLogger.h"
 #include <cstdio>
 
-Scene::Scene(void)
+Scene::Scene(Logger *logger)
     : m_scene(NULL),
       m_importer(new Assimp::Importer()),
       m_numTriangles(0),
-      m_sceneFile(NULL)
+      m_sceneFile(NULL),
+	  m_logger(logger)
 {
 
 }
 
 Scene::~Scene(void)
 {
-    printf("Delete scene\n");
     // deleting m_importer also deletes the scene
     delete m_importer;
     for(int i = 0; i < m_materials.size(); i++)
@@ -70,7 +71,12 @@ static void maxCoordinates(Vector3 & max, const aiVector3D & vector)
     max.z = optix::fmaxf(max.z, vector.z);
 }
 
-Scene* Scene::createFromFile( const char* filename )
+Scene* Scene::createFromFile(const char* filename)
+{
+	return createFromFile(new DummyLogger(), filename);
+}
+
+Scene* Scene::createFromFile(Logger *logger, const char* filename )
 {
     if(!QFile::exists(filename))
     {
@@ -81,7 +87,7 @@ Scene* Scene::createFromFile( const char* filename )
 	QTime timerTotal;
 	timerTotal.start();
 
-    QScopedPointer<Scene> scenePtr (new Scene);
+	QScopedPointer<Scene> scenePtr (new Scene(logger));
     scenePtr->m_sceneFile = new QFileInfo(filename);
 
     // Remove point and lines from the model
@@ -105,7 +111,7 @@ Scene* Scene::createFromFile( const char* filename )
         aiProcess_GenSmoothNormals                              
         );
 
-	printf("Scene createFromFile ReadFile: ellapsed %5.2fs\n", readFileTimer.elapsed() / 1000.0f);
+	logger->log("Scene createFromFile ReadFile: ellapsed %5.2fs\n", readFileTimer.elapsed() / 1000.0f);
         
     if(!scenePtr->m_scene)
     {
@@ -126,7 +132,7 @@ Scene* Scene::createFromFile( const char* filename )
     Vector3 sceneAABBMin (1e33f);
     Vector3 sceneAABBMax (-1e33f);
 
-	walkNode(scenePtr->m_scene->mRootNode, 0);
+	scenePtr->walkNode(scenePtr->m_scene->mRootNode, 0);
 
     for(unsigned int i = 0; i < scenePtr->m_scene->mNumMeshes; i++)
     {
@@ -170,20 +176,20 @@ Scene* Scene::createFromFile( const char* filename )
 
     scenePtr->m_sceneName = QByteArray(scenePtr->m_sceneFile->absoluteFilePath().toLatin1().constData());
 
-	printf("Scene createFromFile Total: ellapsed %5.2fs\n", timerTotal.elapsed() / 1000.0f);
+	logger->log("Scene createFromFile Total: ellapsed %5.2fs\n", timerTotal.elapsed() / 1000.0f);
 
     return scenePtr.take();
 }
 
 void Scene::loadSceneMaterials()
 {
-    //printf("NUM MATERIALS: %d\n", m_scene->mNumMaterials);
+    //m_logger->log("NUM MATERIALS: %d\n", m_scene->mNumMaterials);
     for(unsigned int i = 0; i < m_scene->mNumMaterials; i++)
     {
         aiMaterial* material = m_scene->mMaterials[i];
         aiString name;
         material->Get(AI_MATKEY_NAME, name);
-        //printf("Material %d, %s:\n", i, name.C_Str());
+        //m_logger->log("Material %d, %s:\n", i, name.C_Str());
 
         // Check if this is an Emitter
         aiColor3D emissivePower;
@@ -213,7 +219,7 @@ void Scene::loadSceneMaterials()
             Material* matl;
             if(material->Get(AI_MATKEY_TEXTURE(aiTextureType_NORMALS, 0), normalsName) == AI_SUCCESS)
             {
-                printf("Found normal map %s!\n", normalsName.C_Str());
+                m_logger->log(QString(""), "Found normal map %s!\n", normalsName.C_Str());
                 QString normalsAbsoluteFilePath = QString("%1/%2").arg(m_sceneFile->absoluteDir().absolutePath(), normalsName.C_Str());
                 matl = new Texture(textureAbsoluteFilePath, normalsAbsoluteFilePath);
             }
@@ -231,7 +237,7 @@ void Scene::loadSceneMaterials()
         float indexOfRefraction;
         if(material->Get(AI_MATKEY_REFRACTI, indexOfRefraction) == AI_SUCCESS && indexOfRefraction > 1.0f)
         {
-            //printf("\tGlass: IOR: %g\n", indexOfRefraction);
+            //m_logger->log("\tGlass: IOR: %g\n", indexOfRefraction);
             Material* material = new Glass(indexOfRefraction, optix::make_float3(1,1,1));
             m_materials.push_back(material);
             continue;
@@ -242,7 +248,7 @@ void Scene::loadSceneMaterials()
         if(material->Get(AI_MATKEY_COLOR_REFLECTIVE, reflectiveColor) == AI_SUCCESS
             && colorHasAnyComponent(reflectiveColor))
         {
-            //printf("\tReflective color: %.2f %.2f %.2f\n", reflectiveColor.r, reflectiveColor.g, reflectiveColor.b);
+            //m_logger->log("\tReflective color: %.2f %.2f %.2f\n", reflectiveColor.r, reflectiveColor.g, reflectiveColor.b);
             Material* material = new Mirror(toFloat3(reflectiveColor));
             m_materials.push_back(material);
             continue;
@@ -253,7 +259,7 @@ void Scene::loadSceneMaterials()
         aiColor3D diffuseColor;
         if(material->Get(AI_MATKEY_COLOR_DIFFUSE, diffuseColor) == AI_SUCCESS)
         {
-            //printf("\tDiffuse %.2f %.2f %.2f\n", diffuseColor.r, diffuseColor.g, diffuseColor.b);
+            //m_logger->log("\tDiffuse %.2f %.2f %.2f\n", diffuseColor.r, diffuseColor.g, diffuseColor.b);
             Material* material = new Diffuse(toFloat3(diffuseColor));
             m_materials.push_back(material);
             continue;
@@ -261,7 +267,7 @@ void Scene::loadSceneMaterials()
 
         // Fall back to a red diffuse material
 
-        printf("\tError: Found no material instance to create for material index: %d\n", i);
+        m_logger->log("\tError: Found no material instance to create for material index: %d\n", i);
         m_materials.push_back(new Diffuse(optix::make_float3(1,0,0)));
     }
 }
@@ -292,7 +298,7 @@ void Scene::loadMeshLightSource( aiMesh* mesh, DiffuseEmitter* diffuseEmitter )
     {
         aiString name;
         m_scene->mMaterials[mesh->mMaterialIndex]->Get(AI_MATKEY_NAME, name);
-        printf("Material %s: Does only support quadrangle light source NumFaces: %d.\n", name.C_Str(), mesh->mNumFaces);
+        m_logger->log(QString(""), "Material %s: Does only support quadrangle light source NumFaces: %d.\n", name.C_Str(), mesh->mNumFaces);
     }
 
     aiFace face = mesh->mFaces[0];
@@ -354,7 +360,7 @@ optix::Group Scene::getSceneRootGroup( optix::Context & context )
     rootNodeGroup->setAcceleration( acceleration );
     acceleration->markDirty();
 
-	printf("Scene getSceneRootGroup: ellapsed %5.2fs\n", timer.elapsed() / 1000.0f);
+	m_logger->log("Scene getSceneRootGroup: ellapsed %5.2fs\n", timer.elapsed() / 1000.0f);
     return rootNodeGroup;
 }
 
@@ -606,9 +612,9 @@ void Scene::walkNode(aiNode *node, int depth)
 		return;
 	for(int i = 0; i < depth; ++i)
 	{
-		putchar(' ');
+		m_logger->log(" ");
 	}
-	printf("%s\n", node->mName.C_Str());
+	m_logger->log(QString(""), "%s\n", node->mName.C_Str());
 	for(unsigned int i = 0; i < node->mNumChildren; ++i)
 	{
 		walkNode(node->mChildren[i], depth+1);
