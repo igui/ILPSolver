@@ -69,7 +69,7 @@ extern "C" {
    **
    ***********************************/
 
-  void SUTILAPI sutilReportError(const char* message);
+ 
   void SUTILAPI sutilHandleError(RTcontext context, RTresult code, const char* file, int line);
   void SUTILAPI sutilHandleErrorNoExit(RTcontext context, RTresult code, const char* file, int line);
   void SUTILAPI sutilHandleErrorNoContext(RTresult code, const char* file, int line);
