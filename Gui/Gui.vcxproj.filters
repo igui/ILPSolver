@@ -28,7 +28,6 @@
     <ClCompile Include="models\PPMSettingsModel.cpp" />
     <ClCompile Include="models\RenderStatisticsModel.cpp" />
     <ClCompile Include="moc_Application.cpp" />
-    <ClCompile Include="scene\SceneFactory.cpp" />
     <ClCompile Include="scene\SceneManager.cpp" />
     <ClCompile Include="gui\main.cpp" />
     <ClCompile Include="main.cpp" />
@@ -63,7 +62,6 @@
     <ClInclude Include="models\PPMSettingsModel.hxx" />
     <ClInclude Include="models\RenderStatisticsModel.hxx" />
     <ClInclude Include="scene\SceneManager.hxx" />
-    <ClInclude Include="scene\SceneFactory.h" />
     <ClInclude Include="RendererStatus.h" />
     <ClInclude Include="gui\docks\ui\ui_CameraDock.h" />
     <ClInclude Include="gui\docks\ui\ui_SceneDock.h" />

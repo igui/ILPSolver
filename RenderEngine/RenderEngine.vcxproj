@@ -130,7 +130,6 @@
     <ClInclude Include="renderer\RadiancePRD.h" />
     <ClInclude Include="renderer\RayType.h" />
     <ClInclude Include="renderer\RenderMethod.h" />
-    <ClInclude Include="scene\IScene.h" />
     <ClInclude Include="select.h" />
     <ClInclude Include="renderer\ShadowPRD.h" />
     <ClInclude Include="renderer\ppm\PhotonGrid.h" />
@@ -180,7 +179,6 @@
     <ClCompile Include="clientserver\RenderServerRenderRequest.cpp" />
     <ClCompile Include="scene\Scene.cpp" />
     <ClCompile Include="renderer\OptixRenderer.cpp" />
-    <ClCompile Include="scene\IScene.cpp" />
     <ClCompile Include="util\Mouse.cpp" />
     <ClCompile Include="util\sutil.c" />
     <ClCompile Include="math\Vector3.cpp" />

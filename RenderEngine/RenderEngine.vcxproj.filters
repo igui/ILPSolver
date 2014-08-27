@@ -20,7 +20,6 @@
     <ClCompile Include="util\sutil.c" />
     <ClCompile Include="ComputeDeviceRepository.cpp" />
     <ClCompile Include="material\DiffuseEmitter.cpp" />
-    <ClCompile Include="scene\IScene.cpp" />
     <ClCompile Include="scene\Scene.cpp" />
     <ClCompile Include="clientserver\RenderResultPacket.cpp" />
     <ClCompile Include="clientserver\RenderServerRenderRequest.cpp" />
@@ -88,7 +87,6 @@
     <ClInclude Include="ComputeDeviceRepository.h" />
     <ClInclude Include="material\DiffuseEmitter.h" />
     <ClInclude Include="render_engine_export_api.h" />
-    <ClInclude Include="scene\IScene.h" />
     <ClInclude Include="scene\Scene.h" />
     <ClInclude Include="clientserver\RenderResultPacket.h" />
     <ClInclude Include="clientserver\RenderServerRenderRequest.h" />

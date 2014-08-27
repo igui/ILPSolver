@@ -13,7 +13,7 @@
 #include "renderer/Camera.h"
 #include "logging/SignalLogger.hxx"
 
-class IScene;
+class Scene;
 class Application;
 class QApplication;
 class ComputeDevice;
@@ -57,7 +57,7 @@ private:
     Camera m_camera;
     QTime renderTime;
     float* m_outputBuffer;
-    IScene* m_currentScene;
+    Scene* m_currentScene;
     const ComputeDevice & m_device;
     double m_PPMRadius;
     bool m_compileScene;

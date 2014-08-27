@@ -20,7 +20,6 @@
 #include "gui/docks/SceneDock.hxx"
 #include "gui/docks/ConsoleDock.hxx"
 #include "ComputeDeviceRepository.h"
-#include "scene/SceneFactory.h"
 #include "config.h"
 #include <qfiledialog.h>
 #include <qinputdialog.h>

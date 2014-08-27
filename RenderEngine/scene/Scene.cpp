@@ -70,7 +70,7 @@ static void maxCoordinates(Vector3 & max, const aiVector3D & vector)
     max.z = optix::fmaxf(max.z, vector.z);
 }
 
-IScene* Scene::createFromFile( const char* filename )
+Scene* Scene::createFromFile( const char* filename )
 {
     if(!QFile::exists(filename))
     {
@@ -99,7 +99,7 @@ IScene* Scene::createFromFile( const char* filename )
         aiProcess_TransformUVCoords      |
         //aiProcess_FindInstances          |
         aiProcess_JoinIdenticalVertices  |
-        aiProcess_OptimizeGraph          | 
+        //aiProcess_OptimizeGraph          | 
         aiProcess_OptimizeMeshes         |
         aiProcess_PreTransformVertices   |
         aiProcess_GenSmoothNormals                              
@@ -271,23 +271,14 @@ void Scene::loadLightSources()
     for(unsigned int i = 0; i < m_scene->mNumLights; i++)
     {
         aiLight* lightPtr = m_scene->mLights[i];
-
-		float powerMultiplier = lightPtr->mAttenuationLinear +
-			lightPtr->mAttenuationQuadratic * lightPtr->mAttenuationQuadratic;
-
-		if(powerMultiplier <= 0)
-		{
-			powerMultiplier = 1;
-		}
-			
         if(lightPtr->mType == aiLightSource_POINT)
         {
-            Light light ((1.0f / powerMultiplier) * toFloat3(lightPtr->mColorDiffuse), toFloat3(lightPtr->mPosition));
+            Light light ( toFloat3(lightPtr->mColorDiffuse), toFloat3(lightPtr->mPosition));
             m_lights.push_back(light);
         }
         else if(lightPtr->mType == aiLightSource_SPOT)
         {
-            Light light (powerMultiplier * toFloat3(lightPtr->mColorDiffuse), toFloat3(lightPtr->mPosition), toFloat3(lightPtr->mDirection), lightPtr->mAngleInnerCone);
+            Light light (toFloat3(lightPtr->mColorDiffuse), toFloat3(lightPtr->mPosition), toFloat3(lightPtr->mDirection), lightPtr->mAngleInnerCone);
             m_lights.push_back(light);
         }
     }
@@ -622,4 +613,14 @@ void Scene::walkNode(aiNode *node, int depth)
 	{
 		walkNode(node->mChildren[i], depth+1);
 	}
+}
+
+float Scene::getSceneInitialPPMRadiusEstimate() const
+{
+    Vector3 sceneExtent = getSceneAABB().getExtent();
+    float volume = sceneExtent.x*sceneExtent.y*sceneExtent.z;
+    float cubelength = pow(volume, 1.f/3.f);
+    float A = 6*cubelength*cubelength;
+    float radius = A*0.0004f;
+    return radius;
 }

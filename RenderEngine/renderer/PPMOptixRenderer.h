@@ -15,7 +15,7 @@
 
 class ComputeDevice;
 class RenderServerRenderRequestDetails;
-class IScene;
+class Scene;
 
 class PPMOptixRenderer: public OptixRenderer
 {
@@ -24,7 +24,7 @@ public:
     RENDER_ENGINE_EXPORT_API PPMOptixRenderer();
     RENDER_ENGINE_EXPORT_API ~PPMOptixRenderer();
 
-    RENDER_ENGINE_EXPORT_API void initScene(IScene & scene);
+    RENDER_ENGINE_EXPORT_API void initScene(Scene & scene);
     RENDER_ENGINE_EXPORT_API void initialize(const ComputeDevice & device, Logger *logger);
 
     void createGpuDebugBuffers();

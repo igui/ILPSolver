@@ -7,6 +7,7 @@
 #include "SceneManager.hxx"
 #include <QMetaObject>
 #include <QString>
+#include "scene\Scene.h"
 
 SceneManager::SceneManager(void)
     : m_scene(NULL),
@@ -20,7 +21,7 @@ SceneManager::~SceneManager(void)
     delete m_scene;
 }
 
-IScene* SceneManager::getScene() const
+Scene* SceneManager::getScene() const
 {
     return m_scene;
 }
@@ -38,8 +39,8 @@ void SceneManager::onLoadNewScene( QString sceneName )
     m_status = SceneManagerStatus::IMPORTING;
     try
     {
-        IScene* oldScene = m_scene;
-        m_scene = m_factory.getSceneByName(sceneName.toLatin1().constData());
+        Scene* oldScene = m_scene;
+		m_scene =  Scene::createFromFile(sceneName.toLatin1().constData());
         emit sceneUpdated();
         delete oldScene;
         m_status = SceneManagerStatus::HAS_SCENE;

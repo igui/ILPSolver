@@ -25,7 +25,7 @@
 #include "clientserver/RenderServerRenderRequest.h"
 #include <exception>
 #include "util/sutil.h"
-#include "scene/IScene.h"
+#include "scene/Scene.h"
 #include "renderer/helpers/nsight.h"
 
 const unsigned int PMOptixRenderer::PHOTON_GRID_MAX_SIZE = 100*100*100;
@@ -247,7 +247,7 @@ void PMOptixRenderer::initDevice(const ComputeDevice & device)
     }
 }
 
-void PMOptixRenderer::initScene( IScene & scene )
+void PMOptixRenderer::initScene( Scene & scene )
 {
     if(!m_initialized)
     {

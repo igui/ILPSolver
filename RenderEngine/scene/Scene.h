@@ -6,11 +6,14 @@
 
 #pragma once
 
-#include "IScene.h"
 #include "renderer/Light.h"
 #include "render_engine_export_api.h"
 #include <QVector>
 #include <QByteArray>
+#include <optixu/optixpp_namespace.h>
+#include "renderer/Camera.h"
+#include "renderer/Light.h"
+#include "render_engine_export_api.h"
 #include "math/AAB.h"
 
 struct aiScene;
@@ -26,12 +29,12 @@ namespace Assimp
     class Importer;
 }
 
-class Scene : public IScene
+class Scene
 {
 public:
     Scene(void);
     RENDER_ENGINE_EXPORT_API virtual ~Scene(void);
-    RENDER_ENGINE_EXPORT_API static IScene* createFromFile(const char* file);
+    RENDER_ENGINE_EXPORT_API static Scene* createFromFile(const char* file);
     virtual optix::Group getSceneRootGroup(optix::Context & context);
     void loadDefaultSceneCamera();
     virtual const QVector<Light> & getSceneLights() const;
@@ -40,6 +43,7 @@ public:
     virtual AAB getSceneAABB() const ;
     RENDER_ENGINE_EXPORT_API virtual unsigned int getNumTriangles() const;
 	RENDER_ENGINE_EXPORT_API virtual unsigned int getNumMeshes() const;
+	RENDER_ENGINE_EXPORT_API float getSceneInitialPPMRadiusEstimate() const;
 
 private:
     optix::Geometry Scene::createGeometryFromMesh(uint meshId, aiMesh* mesh, optix::Context & context);

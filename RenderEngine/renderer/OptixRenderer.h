@@ -11,7 +11,7 @@
 
 class ComputeDevice;
 class RenderServerRenderRequestDetails;
-class IScene;
+class Scene;
 
 class OptixRenderer
 {
@@ -20,7 +20,7 @@ protected:
 public:
     RENDER_ENGINE_EXPORT_API virtual ~OptixRenderer();
 
-    RENDER_ENGINE_EXPORT_API virtual void initScene(IScene & scene) = 0;
+    RENDER_ENGINE_EXPORT_API virtual void initScene(Scene & scene) = 0;
     RENDER_ENGINE_EXPORT_API virtual void initialize(const ComputeDevice & device, Logger *logger) = 0;
 
     RENDER_ENGINE_EXPORT_API virtual void renderNextIteration(unsigned long long iterationNumber, unsigned long long localIterationNumber, 

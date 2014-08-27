@@ -18,7 +18,7 @@
 
 StandaloneRenderManager::StandaloneRenderManager(QApplication & qApplication, Application & application, const ComputeDevice& device) :
     m_device(device),
-    m_renderer(new PMOptixRenderer()), 
+    m_renderer(new PPMOptixRenderer()), 
     m_nextIterationNumber(0),
     m_outputBuffer(NULL),
     m_currentScene(NULL),
@@ -85,7 +85,8 @@ void StandaloneRenderManager::renderNextIteration()
                 m_application.setRendererStatus(RendererStatus::RENDERING);
             }
 
-            const double PPMAlpha = 2.0/3.0;
+
+			const double PPMAlpha = 2.0/3.0;
             QVector<unsigned long long> iterationNumbers;
             QVector<double> ppmRadii;
 
@@ -95,6 +96,9 @@ void StandaloneRenderManager::renderNextIteration()
             RenderServerRenderRequest renderRequest (m_application.getSequenceNumber(), iterationNumbers, ppmRadii, details);
 
             m_renderer->renderNextIteration(m_nextIterationNumber, m_nextIterationNumber, m_PPMRadius, renderRequest.getDetails());
+            const double ppmRadiusSquared = m_PPMRadius*m_PPMRadius;
+            const double ppmRadiusSquaredNew = ppmRadiusSquared*(m_nextIterationNumber+PPMAlpha)/double(m_nextIterationNumber+1);
+            m_PPMRadius = sqrt(ppmRadiusSquaredNew);
 
             // Transfer the output buffer to CPU and signal ready for display
             if(m_outputBuffer == NULL)
@@ -158,7 +162,7 @@ void StandaloneRenderManager::onSceneLoadingNew()
 
 void StandaloneRenderManager::onSceneUpdated()
 {
-    IScene* scene = m_application.getSceneManager().getScene();
+    Scene* scene = m_application.getSceneManager().getScene();
     if(scene != m_currentScene)
     {
         m_compileScene = true;

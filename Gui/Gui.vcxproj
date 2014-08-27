@@ -94,7 +94,6 @@
     <ClInclude Include="models\RenderStatisticsModel.hxx" />
     <ClInclude Include="RendererStatus.h" />
     <ClInclude Include="RunningStatus.h" />
-    <ClInclude Include="scene\SceneFactory.h" />
     <ClInclude Include="scene\SceneManager.hxx" />
   </ItemGroup>
   <ItemGroup>
@@ -131,7 +130,6 @@
     <ClCompile Include="models\PPMSettingsModel.cpp" />
     <ClCompile Include="models\RenderStatisticsModel.cpp" />
     <ClCompile Include="scene\moc_SceneManager.cpp" />
-    <ClCompile Include="scene\SceneFactory.cpp" />
     <ClCompile Include="scene\SceneManager.cpp" />
   </ItemGroup>
   <ItemGroup>

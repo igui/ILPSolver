@@ -16,7 +16,7 @@
 
 class ComputeDevice;
 class RenderServerRenderRequestDetails;
-class IScene;
+class Scene;
 class Camera;
 
 class PMOptixRenderer: public OptixRenderer
@@ -26,7 +26,7 @@ public:
     RENDER_ENGINE_EXPORT_API PMOptixRenderer();
     RENDER_ENGINE_EXPORT_API ~PMOptixRenderer();
 
-    RENDER_ENGINE_EXPORT_API void initScene(IScene & scene);
+    RENDER_ENGINE_EXPORT_API void initScene(Scene & scene);
     RENDER_ENGINE_EXPORT_API void initialize(const ComputeDevice & device, Logger *logger);
 
     RENDER_ENGINE_EXPORT_API void renderNextIteration(unsigned long long iterationNumber, unsigned long long localIterationNumber, 

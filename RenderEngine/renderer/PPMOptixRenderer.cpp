@@ -25,7 +25,7 @@
 #include "clientserver/RenderServerRenderRequest.h"
 #include <exception>
 #include "util/sutil.h"
-#include "scene/IScene.h"
+#include "scene/Scene.h"
 #include "renderer/helpers/nsight.h"
 
 #if ACCELERATION_STRUCTURE == ACCELERATION_STRUCTURE_UNIFORM_GRID
@@ -365,7 +365,7 @@ void PPMOptixRenderer::initDevice(const ComputeDevice & device)
     }
 }
 
-void PPMOptixRenderer::initScene( IScene & scene )
+void PPMOptixRenderer::initScene( Scene & scene )
 {
     if(!m_initialized)
     {

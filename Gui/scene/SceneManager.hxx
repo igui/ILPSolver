@@ -6,8 +6,7 @@
 
 #pragma once
 
-#include "scene/IScene.h"
-#include "SceneFactory.h"
+#include "scene/Scene.h"
 #include <QObject>
 #include "gui_export_api.h"
 
@@ -23,7 +22,7 @@ class SceneManager : public QObject
 public:
     SceneManager(void);
     ~SceneManager(void);
-    GUI_EXPORT_API_QT IScene* getScene() const;
+    GUI_EXPORT_API_QT Scene* getScene() const;
     GUI_EXPORT_API_QT void setScene(const char* sceneName);
     SceneManagerStatus::E getStatus() const;
 signals:
@@ -33,7 +32,6 @@ signals:
 private slots:
     void onLoadNewScene(QString sceneName);
 private:
-    SceneFactory m_factory;
     SceneManagerStatus::E m_status;
-    IScene* m_scene;
+    Scene* m_scene;
 };
