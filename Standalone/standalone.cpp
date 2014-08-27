@@ -12,7 +12,7 @@
 #include "ComputeDeviceRepository.h"
 #include <QThread>
 #include <QTextStream>
-#include <qmessagebox.h>
+#include <QMessageBox>
 
 int main( int argc, char** argv );
 
@@ -42,31 +42,14 @@ int main( int argc, char** argv )
 
 		if(repo.empty())
 		{
-			out << "You must have a CUDA enabled GPU to run this application." 
-				<< endl << "Press ENTER to quit." << endl;
-			in.read(1);
+			QMessageBox::critical(NULL, "No computing device found", 
+				"You must have a CUDA enabled GPU to run this application. "
+				"The <a href='https://developer.nvidia.com/cuda-gpus'>CUDA GPUs</a> nVidia developer page has the "
+				"a list of all supported devices. Application will now quit.");
 			return 1;
 		}
 
-		out << "Available compute devices:" << endl;
-
-        for(int i = 0; i < repo.size(); i++)
-        {
-            const ComputeDevice & device = repo.at(i);
-            out << "   " <<  i << ": " << device.getName() << " (CC " << device.getComputeCapability() << " PCI Bus "<< device.getPCIBusId() <<")" << endl;
-        }
-
-        int deviceNumber = repo.size() == 1 ? 0 : -1;
-
-        while (deviceNumber >= repo.size() || deviceNumber < 0)
-        {
-            out << "Select 0-" << repo.size()-1 << ":" << endl;
-            in >> deviceNumber;
-        }
-
-        out << deviceNumber << endl;
-
-        ComputeDevice device = repo.at(deviceNumber);
+		ComputeDevice device = repo.front();
 
         StandaloneApplication application = StandaloneApplication(qApplication, device);
 
@@ -79,6 +62,17 @@ int main( int argc, char** argv )
         mainWindow.showMaximized();
 
 		application.rendererManager().logger().setSignalReceiver((QObject *) mainWindow.consoleDock());
+
+
+		application.rendererManager().logger().log("Available compute devices:\n");
+
+        for(int i = 0; i < repo.size(); i++)
+        {
+            const ComputeDevice & device = repo.at(i);
+			application.rendererManager().logger().log("   %d: %s (CC %s PCI Bus %d)\n", i, device.getName(), device.getComputeCapability(), device.getPCIBusId() );
+        }
+
+		application.rendererManager().logger().log("Selected device 0\n"); // for now the app will use the first device
 
 		if(argc >= 2)
 		{
