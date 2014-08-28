@@ -15,21 +15,16 @@
 #include "renderer/Light.h"
 #include "render_engine_export_api.h"
 #include "math/AAB.h"
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/material.h>
+#include <assimp/postprocess.h>
 
-
-struct aiScene;
-struct aiMesh;
 class Material;
-struct aiNode;
 class DiffuseEmitter;
-struct aiColor3D;
 class QFileInfo;
 class Logger;
 
-namespace Assimp
-{
-    class Importer;
-}
 
 class Scene
 {
@@ -57,13 +52,19 @@ private:
     void loadSceneMaterials();
     void loadLightSources();
 	void walkNode(aiNode *node, int depth);
+	aiMatrix4x4 getTransformation(aiNode *node);
+	void printMatrix(const aiMatrix4x4 &matrix);
+	static aiMatrix4x4 getCenteredMatrix(const aiMatrix4x4 &matrix);
+	static void normalizeMeshes(aiScene *scene);
+	static void normalizeMeshes(aiScene *scene, aiMatrix4x4 transformation, aiNode *node);
+	static void normalizeMesh(aiMesh *mesh, aiMatrix4x4 transformation);
 
     QVector<Material*> m_materials;
     QVector<Light> m_lights;
     QByteArray m_sceneName;
     QFileInfo* m_sceneFile; 
     Assimp::Importer* m_importer;
-    const aiScene* m_scene;
+    aiScene* m_scene;
     optix::Program m_intersectionProgram;
     optix::Program m_boundingBoxProgram;
     Camera m_defaultCamera;

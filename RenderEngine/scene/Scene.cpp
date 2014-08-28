@@ -10,10 +10,6 @@
 #include <QScopedPointer>
 #include <QDir>
 #include <QTime>
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/material.h>
-#include <assimp/postprocess.h>
 #include "material/Diffuse.h"
 #include "material/DiffuseEmitter.h"
 #include "material/Glass.h"
@@ -97,7 +93,7 @@ Scene* Scene::createFromFile(Logger *logger, const char* filename )
 	QTime readFileTimer;
 	readFileTimer.start();
 
-    scenePtr->m_scene = scenePtr->m_importer->ReadFile( filename,
+    scenePtr->m_scene = (aiScene *) scenePtr->m_importer->ReadFile( filename,
         aiProcess_Triangulate            |
         aiProcess_CalcTangentSpace       | 
         aiProcess_FindInvalidData        |
@@ -107,7 +103,7 @@ Scene* Scene::createFromFile(Logger *logger, const char* filename )
         aiProcess_JoinIdenticalVertices  |
         //aiProcess_OptimizeGraph          | 
         aiProcess_OptimizeMeshes         |
-        aiProcess_PreTransformVertices   |
+        //aiProcess_PreTransformVertices   |
         aiProcess_GenSmoothNormals                              
         );
 
@@ -118,6 +114,8 @@ Scene* Scene::createFromFile(Logger *logger, const char* filename )
         QString error = QString("An error occurred in Assimp during reading of this file: %1").arg(scenePtr->m_importer->GetErrorString());
         throw std::exception(error.toUtf8().constData());
     }
+
+	normalizeMeshes(scenePtr->m_scene);
 
     // Load materials
 
@@ -277,14 +275,27 @@ void Scene::loadLightSources()
     for(unsigned int i = 0; i < m_scene->mNumLights; i++)
     {
         aiLight* lightPtr = m_scene->mLights[i];
+
+		aiNode *lightNode = m_scene->mRootNode->FindNode(lightPtr->mName);
+		aiMatrix4x4 transformation;
+		aiMatrix4x4 centeredTransformation;
+		if(lightNode != NULL)
+		{
+			transformation = getTransformation(lightNode);
+			centeredTransformation = getCenteredMatrix(transformation);
+		}
+		
         if(lightPtr->mType == aiLightSource_POINT)
         {
-            Light light ( toFloat3(lightPtr->mColorDiffuse), toFloat3(lightPtr->mPosition));
+			Light light ( toFloat3(lightPtr->mColorDiffuse), toFloat3(transformation * lightPtr->mPosition));
             m_lights.push_back(light);
         }
         else if(lightPtr->mType == aiLightSource_SPOT)
         {
-            Light light (toFloat3(lightPtr->mColorDiffuse), toFloat3(lightPtr->mPosition), toFloat3(lightPtr->mDirection), lightPtr->mAngleInnerCone);
+			Light light (toFloat3(lightPtr->mColorDiffuse),
+				toFloat3(transformation * lightPtr->mPosition),
+				toFloat3(centeredTransformation * lightPtr->mDirection),
+				lightPtr->mAngleInnerCone);
             m_lights.push_back(light);
         }
     }
@@ -477,9 +488,15 @@ void Scene::loadDefaultSceneCamera()
     aiNode* cameraNode = m_scene->mRootNode->FindNode(m_scene->mCameras[0]->mName);
     aiCamera* camera = m_scene->mCameras[0];
 
-    aiVector3D eye = camera->mPosition;
-    aiVector3D lookAt = eye + camera->mLookAt;
-    aiVector3D up = camera->mUp;
+	aiMatrix4x4 cameraTransformation = getTransformation(cameraNode);
+	aiMatrix4x4 centeredCameraTransformation = getCenteredMatrix(cameraTransformation);
+
+    aiVector3D eye = cameraTransformation * camera->mPosition;
+    aiVector3D lookAt = eye + centeredCameraTransformation * camera->mLookAt;
+    aiVector3D up = centeredCameraTransformation * camera->mUp;
+
+	m_logger->log("Camera: eye: %0.2f  %0.2f %0.2f, lookAt %0.2f %0.2f %0.2f, up %0.2f %0.2f %0.2f\n",
+		eye.x, eye.y, eye.z, lookAt.x, lookAt.y, lookAt.z, up.x, up.y, up.z);
 
     m_defaultCamera = Camera(Vector3(eye.x, eye.y, eye.z),
         Vector3(lookAt.x, lookAt.y, lookAt.z),
@@ -615,6 +632,9 @@ void Scene::walkNode(aiNode *node, int depth)
 		m_logger->log(" ");
 	}
 	m_logger->log(QString(""), "%s\n", node->mName.C_Str());
+	
+	printMatrix(node->mTransformation);
+
 	for(unsigned int i = 0; i < node->mNumChildren; ++i)
 	{
 		walkNode(node->mChildren[i], depth+1);
@@ -629,4 +649,74 @@ float Scene::getSceneInitialPPMRadiusEstimate() const
     float A = 6*cubelength*cubelength;
     float radius = A*0.0004f;
     return radius;
+}
+
+void Scene::normalizeMeshes(aiScene *scene)
+{
+	normalizeMeshes(scene, aiMatrix4x4(), scene->mRootNode);
+}
+
+void Scene::normalizeMeshes(aiScene *scene, aiMatrix4x4 transformation, aiNode *node)
+{
+	if(node == NULL)
+		return;
+
+	transformation = transformation * node->mTransformation;
+	
+	for(unsigned int i = 0; i < node->mNumMeshes; ++i)
+	{
+		normalizeMesh(scene->mMeshes[node->mMeshes[i]], transformation);
+	}
+
+	for(unsigned int i = 0; i < node->mNumChildren; ++i)
+	{
+		normalizeMeshes(scene, transformation, node->mChildren[i]);
+	}
+}
+
+void Scene::normalizeMesh(aiMesh *mesh, aiMatrix4x4 transformation)
+{
+	aiMatrix4x4 centeredTransformation = getCenteredMatrix(transformation);
+
+	for(unsigned int i = 0; i < mesh->mNumVertices; ++i)
+	{
+		mesh->mVertices[i] = transformation * mesh->mVertices[i];
+	}
+	
+	if(mesh->HasNormals())
+	{
+		for(unsigned int i = 0; i < mesh->mNumVertices; ++i)
+		{
+			mesh->mNormals[i] = centeredTransformation * mesh->mNormals[i];
+			if(mesh->mTangents != NULL)
+			{
+				mesh->mTangents[i] = centeredTransformation * mesh->mTangents[i];
+				mesh->mBitangents[i] = centeredTransformation * mesh->mBitangents[i];
+			}
+		}
+	}
+}
+
+aiMatrix4x4 Scene::getTransformation(aiNode *node)
+{
+	if(node == NULL)
+		return aiMatrix4x4();
+	else
+		return getTransformation(node->mParent) * node->mTransformation;
+}
+
+aiMatrix4x4 Scene::getCenteredMatrix(const aiMatrix4x4 &matrix)
+{
+	aiMatrix4x4 res(matrix);
+	res.a4 = res.b4 = res.c4 = 0.0f;
+	return res;
+}
+
+void Scene::printMatrix(const aiMatrix4x4& matrix)
+{
+	m_logger->log("%5.2f %5.2f %5.2f %5.2f\n%5.2f %5.2f %5.2f %5.2f\n%5.2f %5.2f %5.2f %5.2f\n%5.2f %5.2f %5.2f %5.2f\n",
+		matrix.a1, matrix.a2, matrix.a3, matrix.a4, 
+		matrix.b1, matrix.b2, matrix.b3, matrix.b4, 
+		matrix.c1, matrix.c2, matrix.c3, matrix.c4, 
+		matrix.d1, matrix.d2, matrix.d3, matrix.d4);
 }
