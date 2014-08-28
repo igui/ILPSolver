@@ -11,6 +11,6 @@ optix::GeometryInstance GeometryInstance::getOptixGeometryInstance( optix::Conte
     optix::Geometry sphereGeometry = this->getOptixGeometry(context);
     optix::Material omaterial = this->m_material.getOptixMaterial(context);
     optix::GeometryInstance gi = context->createGeometryInstance( sphereGeometry, &omaterial, &omaterial+1 );
-    this->m_material.registerGeometryInstanceValues(gi);
+	this->m_material.registerInstanceValues(gi);
     return gi;
 }

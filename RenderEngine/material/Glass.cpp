@@ -52,3 +52,9 @@ void Glass::registerGeometryInstanceValues(optix::GeometryInstance & instance )
     instance["Kd"]->setFloat( 0, 0 , 0 );
     instance["Ks"]->setFloat(this->Ks);
 }
+
+
+Material* Glass::clone()
+{
+	return new Glass(*this);
+}

@@ -10,6 +10,7 @@
 #include "render_engine_export_api.h"
 #include <QVector>
 #include <QByteArray>
+#include <QMap>
 #include <optixu/optixpp_namespace.h>
 #include "renderer/Camera.h"
 #include "renderer/Light.h"
@@ -39,12 +40,11 @@ public:
     virtual const char* getSceneName() const;
     virtual AAB getSceneAABB() const ;
     RENDER_ENGINE_EXPORT_API virtual unsigned int getNumTriangles() const;
-	RENDER_ENGINE_EXPORT_API virtual unsigned int getNumMeshes() const;
 	RENDER_ENGINE_EXPORT_API float getSceneInitialPPMRadiusEstimate() const;
 
 private:
 	Scene(Logger *logger);
-    optix::Geometry Scene::createGeometryFromMesh(uint meshId, aiMesh* mesh, optix::Context & context);
+    optix::Geometry Scene::createGeometryFromMesh(aiMesh* mesh, optix::Context & context);
     void loadMeshLightSource( aiMesh* mesh, DiffuseEmitter* diffuseEmitter );
     optix::Group getGroupFromNode(optix::Context & context, aiNode* node, QVector<optix::Geometry> & geometries, QVector<Material*> & materials);
     optix::GeometryInstance getGeometryInstance( optix::Context & context, optix::Geometry & geometry, Material* material );
@@ -52,6 +52,7 @@ private:
     void loadSceneMaterials();
     void loadLightSources();
 	void walkNode(aiNode *node, int depth);
+	void mapNodeObjectId(aiNode *node, unsigned int& objectIdCumulative);
 	aiMatrix4x4 getTransformation(aiNode *node);
 	void printMatrix(const aiMatrix4x4 &matrix);
 	static aiMatrix4x4 getCenteredMatrix(const aiMatrix4x4 &matrix);
@@ -71,4 +72,6 @@ private:
     AAB m_sceneAABB;
     unsigned int m_numTriangles;
 	Logger *m_logger;
+	QMap<aiNode *, unsigned int> m_nodeToObjectId;
+	QMap<unsigned int, QString> m_objectIdToNodeName;
 };

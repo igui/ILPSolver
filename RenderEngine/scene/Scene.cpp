@@ -115,6 +115,11 @@ Scene* Scene::createFromFile(Logger *logger, const char* filename )
         throw std::exception(error.toUtf8().constData());
     }
 
+	{
+		unsigned int cumulativeObjectId = 0;
+		scenePtr->mapNodeObjectId(scenePtr->m_scene->mRootNode, cumulativeObjectId);
+	}
+
 	normalizeMeshes(scenePtr->m_scene);
 
     // Load materials
@@ -344,7 +349,7 @@ optix::Group Scene::getSceneRootGroup( optix::Context & context )
     QVector<optix::Geometry> geometries;
     for(unsigned int i = 0; i < m_scene->mNumMeshes; i++)
     {
-        optix::Geometry geometry = createGeometryFromMesh(i, m_scene->mMeshes[i], context);
+        optix::Geometry geometry = createGeometryFromMesh(m_scene->mMeshes[i], context);
         geometries.push_back(geometry);
     }
 
@@ -375,7 +380,7 @@ optix::Group Scene::getSceneRootGroup( optix::Context & context )
     return rootNodeGroup;
 }
 
-optix::Geometry Scene::createGeometryFromMesh(uint meshId, aiMesh* mesh, optix::Context & context)
+optix::Geometry Scene::createGeometryFromMesh(aiMesh* mesh, optix::Context & context)
 {
     unsigned int numFaces = mesh->mNumFaces;
     unsigned int numVertices = mesh->mNumVertices;
@@ -476,9 +481,6 @@ optix::Geometry Scene::createGeometryFromMesh(uint meshId, aiMesh* mesh, optix::
     }
 
     indexBuffer->unmap();
-
-	geometry["meshId"]->setUint(meshId);
-
     return geometry;
 
 }
@@ -494,9 +496,6 @@ void Scene::loadDefaultSceneCamera()
     aiVector3D eye = cameraTransformation * camera->mPosition;
     aiVector3D lookAt = eye + centeredCameraTransformation * camera->mLookAt;
     aiVector3D up = centeredCameraTransformation * camera->mUp;
-
-	m_logger->log("Camera: eye: %0.2f  %0.2f %0.2f, lookAt %0.2f %0.2f %0.2f, up %0.2f %0.2f %0.2f\n",
-		eye.x, eye.y, eye.z, lookAt.x, lookAt.y, lookAt.z, up.x, up.y, up.z);
 
     m_defaultCamera = Camera(Vector3(eye.x, eye.y, eye.z),
         Vector3(lookAt.x, lookAt.y, lookAt.z),
@@ -520,15 +519,18 @@ optix::Group Scene::getGroupFromNode(optix::Context & context, aiNode* node, QVe
             unsigned int meshIndex = node->mMeshes[i];
             aiMesh* mesh = m_scene->mMeshes[meshIndex];
             unsigned int materialIndex = mesh->mMaterialIndex;
-            Material* geometryMaterial = materials.at(materialIndex);
-            optix::GeometryInstance instance = getGeometryInstance(context, geometries[meshIndex], geometryMaterial);
+			Material* geometryMaterial = materials.at(materialIndex)->clone();
+			geometryMaterial->setObjectId(m_nodeToObjectId[node]);
+			optix::GeometryInstance instance = getGeometryInstance(context, geometries[meshIndex], geometryMaterial);
             geometryGroup->setChild(i, instance);
-
+			
             if(dynamic_cast<DiffuseEmitter*>(geometryMaterial) != NULL)
             {
                 DiffuseEmitter* emitterMaterial = (DiffuseEmitter*)(geometryMaterial);
                 loadMeshLightSource(mesh, emitterMaterial);
             }
+
+			delete geometryMaterial;
         }
 
         {
@@ -585,7 +587,7 @@ optix::GeometryInstance Scene::getGeometryInstance( optix::Context & context, op
 {
     optix::Material optix_material = material->getOptixMaterial(context);
     optix::GeometryInstance instance = context->createGeometryInstance( geometry, &optix_material, &optix_material+1 );
-    material->registerGeometryInstanceValues(instance);
+    material->registerInstanceValues(instance);
     return instance;
 }
 
@@ -613,10 +615,6 @@ unsigned int Scene::getNumTriangles() const
 {
     return m_numTriangles;
 }
-unsigned int Scene::getNumMeshes() const
-{
-	return m_scene->mNumMeshes;
-}
 
 AAB Scene::getSceneAABB() const
 {
@@ -633,7 +631,7 @@ void Scene::walkNode(aiNode *node, int depth)
 	}
 	m_logger->log(QString(""), "%s\n", node->mName.C_Str());
 	
-	printMatrix(node->mTransformation);
+	//printMatrix(node->mTransformation);
 
 	for(unsigned int i = 0; i < node->mNumChildren; ++i)
 	{
@@ -719,4 +717,17 @@ void Scene::printMatrix(const aiMatrix4x4& matrix)
 		matrix.b1, matrix.b2, matrix.b3, matrix.b4, 
 		matrix.c1, matrix.c2, matrix.c3, matrix.c4, 
 		matrix.d1, matrix.d2, matrix.d3, matrix.d4);
+}
+
+void Scene::mapNodeObjectId(aiNode *node, unsigned int& objectIdCumulative)
+{
+	if(node == NULL)
+		return;
+	m_nodeToObjectId[node] = objectIdCumulative;
+	m_objectIdToNodeName[objectIdCumulative] = node->mName.C_Str();
+	++objectIdCumulative;
+	for(unsigned int i = 0; i < node->mNumChildren; ++i)
+	{
+		mapNodeObjectId(node->mChildren[i], objectIdCumulative);
+	}
 }

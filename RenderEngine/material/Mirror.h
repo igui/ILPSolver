@@ -14,6 +14,7 @@ public:
     Mirror(const Vector3 & Kr);
     virtual optix::Material getOptixMaterial(optix::Context & context);
     virtual void registerGeometryInstanceValues(optix::GeometryInstance & instance);
+	virtual Material* clone();
 private:
     Vector3 Kr;
     static bool m_optixMaterialIsCreated;

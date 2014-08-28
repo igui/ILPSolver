@@ -262,14 +262,6 @@ void PMOptixRenderer::initScene( Scene & scene )
 
     try
     {
-		int sceneNMeshes = scene.getNumMeshes();
-		optix::Buffer hitsPerMeshBuffer = m_context->createBuffer(RT_BUFFER_INPUT_OUTPUT, RT_FORMAT_UNSIGNED_INT, sceneNMeshes);
-		unsigned int* bufferHost = (unsigned int*)hitsPerMeshBuffer->map();
-		memset(bufferHost, 0, sizeof(unsigned int) * sceneNMeshes);
-		hitsPerMeshBuffer->unmap();
-		m_context["hitsPerMeshBuffer"]->setBuffer(hitsPerMeshBuffer);
-
-
         m_sceneRootGroup = scene.getSceneRootGroup(m_context);
         m_context["sceneRootObject"]->set(m_sceneRootGroup);
         m_sceneAABB = scene.getSceneAABB();
@@ -347,16 +339,6 @@ void PMOptixRenderer::render(unsigned int photonLaunchWidth, unsigned int height
 	}
     m_lightBuffer->unmap(); */
 
-
-	// reset hit Count
-	{
-		optix::Buffer hitsPerMeshBuffer = m_context["hitsPerMeshBuffer"]->getBuffer();
-		RTsize sceneNMeshes;
-		hitsPerMeshBuffer->getSize(sceneNMeshes);
-		unsigned int* bufferHost = (unsigned int*)hitsPerMeshBuffer->map();
-		memset(bufferHost, 0, sizeof(unsigned int) * sceneNMeshes);
-		hitsPerMeshBuffer->unmap();
-	}
 
     try
     {
@@ -503,15 +485,7 @@ void PMOptixRenderer::getOutputBuffer( void* data )
 
 std::vector<unsigned int> PMOptixRenderer::getHitCount()
 {
-	optix::Buffer hitsPerMeshBuffer = m_context["hitsPerMeshBuffer"]->getBuffer();
-	RTsize size;
-	hitsPerMeshBuffer->getSize(size);
-	std::vector<unsigned int> res(size, 0);
-
-	unsigned int* bufferHost = (unsigned int*)hitsPerMeshBuffer->map();
-	memcpy(res.data(), bufferHost, sizeof(unsigned int) * size);
-	hitsPerMeshBuffer->unmap();
-	return res;
+	return std::vector<unsigned int>();
 }
 
 unsigned int PMOptixRenderer::getScreenBufferSizeBytes() const

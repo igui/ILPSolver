@@ -18,4 +18,5 @@ public:
     Diffuse(const Vector3 & Kd);
     virtual optix::Material getOptixMaterial(optix::Context & context);
     virtual void registerGeometryInstanceValues(optix::GeometryInstance & instance);
+	virtual Material* clone();
 };

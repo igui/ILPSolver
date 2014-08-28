@@ -42,3 +42,8 @@ void Diffuse::registerGeometryInstanceValues(optix::GeometryInstance & instance 
 {
     instance["Kd"]->setFloat(this->Kd);
 }
+
+Material* Diffuse::clone()
+{
+	return new Diffuse(*this);
+}

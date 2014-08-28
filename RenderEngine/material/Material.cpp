@@ -10,9 +10,25 @@
 bool Material::m_hasLoadedOptixAnyHitProgram = false;
 optix::Program Material::m_optixAnyHitProgram;
 
+Material::Material():
+	m_objectId(-1)
+{
+}
+
 Material::~Material()
 {
 
+}
+
+void  Material::registerInstanceValues(optix::GeometryInstance & instance)
+{
+	instance["objectId"]->setUint(this->m_objectId);
+	this->registerGeometryInstanceValues(instance);
+}
+
+void Material::setObjectId(unsigned int objectId)
+{
+	this->m_objectId = objectId;
 }
 
 void Material::registerMaterialWithShadowProgram( optix::Context & context, optix::Material & material )

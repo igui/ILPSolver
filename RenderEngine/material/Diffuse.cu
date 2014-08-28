@@ -34,6 +34,7 @@ rtBuffer<Hitpoint, 2> raytracePassOutputBuffer;
 rtDeclareVariable(rtObject, sceneRootObject, , );
 rtDeclareVariable(uint, maxPhotonDepositsPerEmitted, , );
 rtDeclareVariable(float3, Kd, , );
+rtDeclareVariable(unsigned int, objectId, , );
 
 #if ACCELERATION_STRUCTURE == ACCELERATION_STRUCTURE_STOCHASTIC_HASH
 rtDeclareVariable(uint3, photonsGridSize, , );
@@ -75,7 +76,7 @@ RT_PROGRAM void closestHitPhoton()
 
     if(photonPrd.depth >= 1 && photonPrd.numStoredPhotons < maxPhotonDepositsPerEmitted)
     {
-        Photon photon (photonPrd.power, hitPoint, ray.direction, worldShadingNormal);
+        Photon photon (photonPrd.power, hitPoint, ray.direction, objectId);
         STORE_PHOTON(photon);
     }
 

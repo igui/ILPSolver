@@ -124,3 +124,8 @@ optix::Buffer Texture::createBufferFromImage(optix::Context & context, const Ima
     buffer->unmap();
     return buffer;
 }
+
+Material* Texture::clone()
+{
+	return new Texture(*this);
+}

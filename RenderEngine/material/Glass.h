@@ -19,4 +19,5 @@ public:
     Glass(float indexOfRefraction, const Vector3 & Ks);
     virtual optix::Material getOptixMaterial(optix::Context & context);
     virtual void registerGeometryInstanceValues(optix::GeometryInstance & instance);
+	virtual Material* clone();
 };

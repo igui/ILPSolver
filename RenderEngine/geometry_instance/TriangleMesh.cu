@@ -13,7 +13,6 @@
 using namespace optix;
 
 // for mesh intesection count
-rtDeclareVariable(uint, meshId, , );
 rtBuffer<uint, 1> hitsPerMeshBuffer;
 
 rtBuffer<float3> vertexBuffer;     
@@ -87,8 +86,6 @@ RT_PROGRAM void mesh_intersect(int primIdx)
                 float2 t2 = texCoordBuffer[index.z];
                 textureCoordinate = t1*beta + t2*gamma + t0*(1.0f-beta-gamma);
             }
-
-			atomicAdd(&hitsPerMeshBuffer[meshId], 1);
             rtReportIntersection(0);
         }
     }

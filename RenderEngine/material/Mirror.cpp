@@ -36,3 +36,8 @@ void Mirror::registerGeometryInstanceValues(optix::GeometryInstance & instance )
 {
     instance["Kr"]->setFloat(this->Kr);
 }
+
+Material* Mirror::clone()
+{
+	return new Mirror(*this);
+}

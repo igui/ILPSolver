@@ -16,6 +16,7 @@ public:
     virtual ~Texture();
     virtual optix::Material getOptixMaterial(optix::Context & context);
     virtual void registerGeometryInstanceValues(optix::GeometryInstance & instance);
+	virtual Material* clone();
 
 private:
     void loadDiffuseImage( const QString & textureAbsoluteFilePath );

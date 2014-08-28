@@ -35,6 +35,7 @@ rtBuffer<Photon, 1> photons;
 rtTextureSampler<uchar4, 2, cudaReadModeNormalizedFloat> diffuseSampler;
 rtTextureSampler<uchar4, 2, cudaReadModeNormalizedFloat> normalMapSampler;
 rtDeclareVariable(unsigned int, hasNormals, , );
+rtDeclareVariable(unsigned int, objectId, , );
 rtDeclareVariable(uint, maxPhotonDepositsPerEmitted, , );
 
 #if ACCELERATION_STRUCTURE == ACCELERATION_STRUCTURE_STOCHASTIC_HASH
@@ -110,7 +111,7 @@ RT_PROGRAM void closestHitPhoton()
     // Record hit if it has bounced at least once
     if(photonPrd.depth >= 1)
     {
-        Photon photon (photonPrd.power, hitPoint, ray.direction, worldShadingNormal);
+        Photon photon (photonPrd.power, hitPoint, ray.direction, objectId);
         STORE_PHOTON(photon);
     }
 

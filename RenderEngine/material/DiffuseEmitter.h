@@ -22,4 +22,5 @@ public:
     virtual void registerGeometryInstanceValues(optix::GeometryInstance & instance);
     Vector3 getPower() const;
     void setInverseArea(float inverseArea);
+	virtual Material* clone();
 };

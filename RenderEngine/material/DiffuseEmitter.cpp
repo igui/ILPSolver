@@ -61,3 +61,8 @@ void DiffuseEmitter::setInverseArea( float inverseArea )
 {
     m_inverseArea = inverseArea;
 }
+
+Material* DiffuseEmitter::clone()
+{
+	return new DiffuseEmitter(*this);
+}

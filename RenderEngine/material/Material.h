@@ -9,13 +9,18 @@
 class Material
 {
 public:
-    Material(){}
+	Material();
     virtual ~Material();
     virtual optix::Material getOptixMaterial(optix::Context & context) = 0;
-    virtual void registerGeometryInstanceValues( optix::GeometryInstance & instance ) = 0;
+	virtual Material* clone() = 0;
+	void registerInstanceValues(optix::GeometryInstance & instance);
+
+	void setObjectId(unsigned int objectId);
 protected:
+	virtual void registerGeometryInstanceValues( optix::GeometryInstance & instance ) = 0;
     static void registerMaterialWithShadowProgram(optix::Context & context, optix::Material & material);
 private:
     static bool m_hasLoadedOptixAnyHitProgram;
     static optix::Program m_optixAnyHitProgram;
+	unsigned int m_objectId;
 };

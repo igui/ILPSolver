@@ -48,3 +48,8 @@ void ParticipatingMedium::registerGeometryInstanceValues(optix::GeometryInstance
     instance["sigma_s"]->setFloat(m_sigma_s);
 
 }
+
+Material* ParticipatingMedium::clone()
+{
+	return new ParticipatingMedium(*this);
+}
