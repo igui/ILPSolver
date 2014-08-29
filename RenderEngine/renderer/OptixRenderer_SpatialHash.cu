@@ -434,3 +434,41 @@ void PMOptixRenderer::initializeRandomStates()
     int num = size[0]*size[1];
     initializeRandomStateBuffer(m_randomStatesBuffer, num);
 }
+
+
+__global__ void sumPhotonsHitCount(Photon* photons, unsigned int numPhotons, unsigned int *hitCount, unsigned int )
+{
+	unsigned int index = blockIdx.x*blockDim.x + threadIdx.x;
+    if(index < numPhotons)
+    {
+        Photon & photon = photons[index];
+        if(fmaxf(photon.power) > 0)
+        {
+			atomicAdd(hitCount + photon.objectId, 1);
+        }
+    }
+}
+
+void PMOptixRenderer::countHitCountPerObject()
+{
+	nvtxRangePushA("countHitCountPerObject");
+    int deviceNumber = 0;
+    cudaSetDevice(m_optixDeviceOrdinal);
+
+	thrust::device_ptr<unsigned int> hitCount = getThrustDevicePtr<unsigned int>(m_hitCountBuffer, deviceNumber);
+	thrust::fill(hitCount, hitCount + m_sceneObjects, 0);
+
+	unsigned int numPhotons = getNumPhotons();
+	const unsigned int blockSize = 512;
+    unsigned int numBlocks = numPhotons/blockSize + (numPhotons%blockSize == 0 ? 0 : 1);
+
+	// Get a device_ptr to our photon list
+    thrust::device_ptr<Photon> photons = getThrustDevicePtr<Photon>(m_photons, deviceNumber);
+    Photon* photonsPtr = thrust::raw_pointer_cast(&photons[0]);
+	unsigned int *hitCountPtr = thrust::raw_pointer_cast(&hitCount[0]);
+
+	sumPhotonsHitCount<<<numBlocks, blockSize>>> (photonsPtr, numPhotons, hitCountPtr, m_sceneObjects);
+	cudaDeviceSynchronize();
+
+	nvtxRangePop();
+}
