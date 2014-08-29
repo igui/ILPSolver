@@ -143,6 +143,11 @@ void PMOptixRenderer::initialize(const ComputeDevice & device, Logger *logger)
     m_hashmapOffsetTable->setSize( PHOTON_GRID_MAX_SIZE+1 );
     m_context["hashmapOffsetTable"]->set( m_hashmapOffsetTable );
 
+	m_hitCountBuffer = m_context->createBuffer(RT_BUFFER_INPUT_OUTPUT);
+	m_hitCountBuffer->setFormat(RT_FORMAT_UNSIGNED_INT);
+	m_hitCountBuffer->setSize(10);
+    m_context["hitCount"]->set( m_hitCountBuffer );
+
 
     //
     // Indirect Radiance Estimation Buffer
@@ -273,8 +278,16 @@ void PMOptixRenderer::initScene( Scene & scene )
 		m_context["ppmRadius"]->setFloat(ppmRadius);
         m_context["ppmRadiusSquared"]->setFloat(ppmRadius * ppmRadius);
 
-        // Add the lights from the scene to the light buffer
+		auto objectIdToName = scene.getObjectIdToNameMap();
+		m_sceneObjects = objectIdToName.size();
+		m_objectIdToName.resize(m_sceneObjects, "");
+		for(unsigned int i = 0; i < m_sceneObjects; ++i)
+		{
+			m_objectIdToName.at(i) = objectIdToName.at(i).toLocal8Bit().constData();
+		}
+		m_hitCountBuffer->setSize(m_sceneObjects);
 
+        // Add the lights from the scene to the light buffer
         m_lightBuffer->setSize(lights.size());
         Light* lights_host = (Light*)m_lightBuffer->map();
         memcpy(lights_host, scene.getSceneLights().constData(), sizeof(Light)*lights.size());
@@ -351,7 +364,7 @@ void PMOptixRenderer::render(unsigned int photonLaunchWidth, unsigned int height
         double traceStartTime = sutilCurrentTime();
         m_context["camera"]->setUserData( sizeof(Camera), &camera );
 
-		int numSteps = generateOutput ? 6 : 2;
+		int numSteps = generateOutput ? 7 : 3;
 
         //
         // Photon Tracing
@@ -377,6 +390,19 @@ void PMOptixRenderer::render(unsigned int photonLaunchWidth, unsigned int height
 			//m_logger->log("2/%d Creating photon map time: %1.3fs\n", numSteps, time);
         }
 
+
+		//
+        // Get hit count
+        //
+        {
+			double start = sutilCurrentTime();
+            nvtx::ScopedRange r( "Counting hit count" );
+			countHitCountPerObject();
+			double time = sutilCurrentTime() - start;
+			//m_logger->log("3/%d Creating photon map time: %1.3fs\n", numSteps, time);
+        }
+
+
         //
         // Transfer any data from the photon acceleration structure build to the GPU (trigger an empty launch)
         //
@@ -394,7 +420,7 @@ void PMOptixRenderer::render(unsigned int photonLaunchWidth, unsigned int height
                 static_cast<unsigned int>(m_width),
                 static_cast<unsigned int>(m_height) );
 			double time = sutilCurrentTime() - start;
-			//m_logger->log("3/%d RAYTRACE_PASS time: %1.3fs\n", numSteps, time);
+			//m_logger->log("4/%d RAYTRACE_PASS time: %1.3fs\n", numSteps, time);
         }
     
         //
@@ -406,7 +432,7 @@ void PMOptixRenderer::render(unsigned int photonLaunchWidth, unsigned int height
             m_context->launch(OptixEntryPoint::PPM_INDIRECT_RADIANCE_ESTIMATION_PASS,
                 m_width, m_height);
 			double time = sutilCurrentTime() - start;
-			//m_logger->log("4/%d INDIRECT_RADIANCE_ESTIMATION time: %1.3fs\n", numSteps, time);
+			//m_logger->log("5/%d INDIRECT_RADIANCE_ESTIMATION time: %1.3fs\n", numSteps, time);
         }
 
         //
@@ -418,7 +444,7 @@ void PMOptixRenderer::render(unsigned int photonLaunchWidth, unsigned int height
             m_context->launch(OptixEntryPoint::PPM_DIRECT_RADIANCE_ESTIMATION_PASS,
                 m_width, m_height);
 			double time = sutilCurrentTime() - start;
-			//m_logger->log("5/%d DIRECT_RADIANCE_ESTIMATION_PASS time: %1.3fs\n", numSteps, time);
+			//m_logger->log("6/%d DIRECT_RADIANCE_ESTIMATION_PASS time: %1.3fs\n", numSteps, time);
         }
 
         //
@@ -430,9 +456,8 @@ void PMOptixRenderer::render(unsigned int photonLaunchWidth, unsigned int height
 			m_context->launch(OptixEntryPoint::PPM_OUTPUT_PASS,
 				m_width, m_height);
 			double time = sutilCurrentTime() - start;
-			//m_logger->log("6/%d OUTPUT_PASS time: %1.3fs\n", numSteps, time);
+			//m_logger->log("7/%d OUTPUT_PASS time: %1.3fs\n", numSteps, time);
 		}
-
 
         double traceTime = sutilCurrentTime() -traceStartTime;
 
@@ -485,7 +510,16 @@ void PMOptixRenderer::getOutputBuffer( void* data )
 
 std::vector<unsigned int> PMOptixRenderer::getHitCount()
 {
-	return std::vector<unsigned int>();
+	std::vector<unsigned int> res(m_sceneObjects, 0);
+
+	unsigned int* buffer = reinterpret_cast<unsigned int*>( m_hitCountBuffer->map() );
+	for(unsigned int i = 0; i < m_sceneObjects; ++i)
+	{
+		res[i] = buffer[i];
+	}
+    m_hitCountBuffer->unmap();
+
+	return res;
 }
 
 unsigned int PMOptixRenderer::getScreenBufferSizeBytes() const
@@ -496,4 +530,16 @@ unsigned int PMOptixRenderer::getScreenBufferSizeBytes() const
 unsigned int PMOptixRenderer::getNumPhotons() const
 {
 	return m_photonWidth * m_photonWidth * MAX_PHOTON_COUNT;
+}
+
+
+std::string PMOptixRenderer::idToObjectName(unsigned int objectId) const
+{
+	if(objectId < m_objectIdToName.size())
+	{
+		return m_objectIdToName.at(objectId);
+	} else
+	{
+		return "???";
+	}
 }

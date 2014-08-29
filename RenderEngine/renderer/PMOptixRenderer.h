@@ -13,6 +13,7 @@
 #include "math/AAB.h"
 #include "logging/Logger.h"
 #include <vector>
+#include <string>
 
 class ComputeDevice;
 class RenderServerRenderRequestDetails;
@@ -38,11 +39,13 @@ public:
     RENDER_ENGINE_EXPORT_API unsigned int getWidth() const;
     RENDER_ENGINE_EXPORT_API unsigned int getHeight() const;
     RENDER_ENGINE_EXPORT_API unsigned int getScreenBufferSizeBytes() const;
+	RENDER_ENGINE_EXPORT_API std::string  idToObjectName(unsigned int objectId) const;
 
-    const static float PPM_INITIAL_RADIUS;
     const static unsigned int PHOTON_GRID_MAX_SIZE;
-
 private:
+	const static unsigned int MAX_BOUNCES;
+    const static unsigned int MAX_PHOTON_COUNT;
+
     void initDevice(const ComputeDevice & device);
 	void compile();
     void loadObjGeometry( const std::string& filename, optix::Aabb& bbox );
@@ -51,7 +54,10 @@ private:
     void initializeStochasticHashPhotonMap(float ppmRadius);
     void createPhotonKdTreeOnCPU();
 	unsigned int getNumPhotons() const;
-
+	void resizeBuffers(unsigned int width, unsigned int height, unsigned int generateOutput);
+	void countHitCountPerObject();
+	
+	optix::Context m_context;
     optix::Buffer m_outputBuffer;
     optix::Buffer m_photons;
     optix::Buffer m_photonKdTree;
@@ -64,25 +70,18 @@ private:
     optix::Buffer m_volumetricPhotonsBuffer;
     optix::Buffer m_lightBuffer;
     optix::Buffer m_randomStatesBuffer;
-
+	optix::Buffer m_hitCountBuffer;
+	optix::uint3 m_gridSize;
     float m_spatialHashMapCellSize;
     AAB m_sceneAABB;
 	float m_scenePPMRadius;
-    optix::uint3 m_gridSize;
     unsigned int m_spatialHashMapNumCells;
-
     unsigned int m_width;
     unsigned int m_height;
 	unsigned int m_photonWidth;
-
+	unsigned int m_sceneObjects;
     bool m_initialized;
-
-    const static unsigned int MAX_BOUNCES;
-    const static unsigned int MAX_PHOTON_COUNT;
-
-	void resizeBuffers(unsigned int width, unsigned int height, unsigned int generateOutput);
-    optix::Context m_context;
     int m_optixDeviceOrdinal;
-
+	std::vector<std::string> m_objectIdToName;
 	Logger *m_logger;
 };
