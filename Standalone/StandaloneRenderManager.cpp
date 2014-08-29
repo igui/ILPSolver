@@ -79,7 +79,6 @@ void StandaloneRenderManager::renderNextIteration()
                 m_renderer->initScene(*m_currentScene);
                 m_compileScene = false;
 
-				m_logger.log("Calculating optimal photons emmited per iteration\n");
 				calculateOptimalNumEmmitedPhotons();
 
                 m_application.setRendererStatus(RendererStatus::RENDERING);
@@ -220,7 +219,7 @@ void StandaloneRenderManager::calculateOptimalNumEmmitedPhotons()
 {
 	static const unsigned int photonWidthSizes[] = { 32, 64, 128, 256, 512, 1024, 2048 };
 	static const unsigned int numPhotonWidthSizes = sizeof(photonWidthSizes) / sizeof(photonWidthSizes[0]);
-	static const unsigned int nPasses = 10;
+	static const unsigned int nPasses = 30;
 	static const float acceptableAvgError = 0.05f;
 
 	PMOptixRenderer *renderer = dynamic_cast<PMOptixRenderer *>(m_renderer);
@@ -230,7 +229,16 @@ void StandaloneRenderManager::calculateOptimalNumEmmitedPhotons()
 		return;
 	}
 
+	m_logger.log("Calculating optimal photons emmited per iteration\n");
+
 	const int nMeshes = renderer->getHitCount().size();
+
+	for(int i = 0; i < nMeshes; ++i)
+	{
+		m_logger.log("%d -> %s ", i, renderer->idToObjectName(i).c_str()); 
+	}
+	m_logger.log("\n");
+
 	int optimalPhotonSize = photonWidthSizes[numPhotonWidthSizes-1];
 
 	for(unsigned int i = 0; i < numPhotonWidthSizes; ++i)
@@ -257,8 +265,14 @@ void StandaloneRenderManager::calculateOptimalNumEmmitedPhotons()
 		{
 			for(int mesh = 0; mesh < nMeshes; ++mesh)
 			{
-				averageError.at(mesh) += fabsf(hitCounts.at(pass).at(mesh) - averages.at(mesh)) / (averages.at(mesh) * nPasses);
+				if(averages.at(mesh) != 0.0f)
+					averageError.at(mesh) += fabsf(hitCounts.at(pass).at(mesh) - averages.at(mesh)) / (averages.at(mesh) * nPasses);
 			}
+		}
+
+		if(averageError.empty())
+		{
+			break;
 		}
 
 		auto minMaxAvg = MinMaxAvg<float>::forVector(averageError);
