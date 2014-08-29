@@ -21,10 +21,10 @@
 #include <assimp/material.h>
 #include <assimp/postprocess.h>
 
-class Material;
 class DiffuseEmitter;
 class QFileInfo;
 class Logger;
+class Material;
 
 
 class Scene
@@ -41,6 +41,7 @@ public:
     virtual AAB getSceneAABB() const ;
     RENDER_ENGINE_EXPORT_API virtual unsigned int getNumTriangles() const;
 	RENDER_ENGINE_EXPORT_API float getSceneInitialPPMRadiusEstimate() const;
+	RENDER_ENGINE_EXPORT_API QVector<QString> getObjectIdToNameMap() const;
 
 private:
 	Scene(Logger *logger);
@@ -52,7 +53,7 @@ private:
     void loadSceneMaterials();
     void loadLightSources();
 	void walkNode(aiNode *node, int depth);
-	void mapNodeObjectId(aiNode *node, unsigned int& objectIdCumulative);
+	void mapNodeObjectId(aiNode *node, unsigned int& objectIdCumulative, QMap<unsigned int, QString> &objectIdToNodeName);
 	aiMatrix4x4 getTransformation(aiNode *node);
 	void printMatrix(const aiMatrix4x4 &matrix);
 	static aiMatrix4x4 getCenteredMatrix(const aiMatrix4x4 &matrix);
@@ -73,5 +74,5 @@ private:
     unsigned int m_numTriangles;
 	Logger *m_logger;
 	QMap<aiNode *, unsigned int> m_nodeToObjectId;
-	QMap<unsigned int, QString> m_objectIdToNodeName;
+	QVector<QString> m_objectIdToNodeName;
 };

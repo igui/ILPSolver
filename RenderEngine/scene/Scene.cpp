@@ -115,9 +115,16 @@ Scene* Scene::createFromFile(Logger *logger, const char* filename )
         throw std::exception(error.toUtf8().constData());
     }
 
+	// gets the mapping from object id to node names and viceversa
 	{
-		unsigned int cumulativeObjectId = 0;
-		scenePtr->mapNodeObjectId(scenePtr->m_scene->mRootNode, cumulativeObjectId);
+		QMap<unsigned int, QString> objectIdToNodeName;
+		unsigned int nObjects = 0;
+		scenePtr->mapNodeObjectId(scenePtr->m_scene->mRootNode, nObjects, objectIdToNodeName);
+		scenePtr->m_objectIdToNodeName.resize(nObjects);
+		for(unsigned int objectId = 0; objectId < nObjects; ++objectId)
+		{
+			scenePtr->m_objectIdToNodeName[objectId] = objectIdToNodeName[objectId];
+		}
 	}
 
 	normalizeMeshes(scenePtr->m_scene);
@@ -719,15 +726,28 @@ void Scene::printMatrix(const aiMatrix4x4& matrix)
 		matrix.d1, matrix.d2, matrix.d3, matrix.d4);
 }
 
-void Scene::mapNodeObjectId(aiNode *node, unsigned int& objectIdCumulative)
+void Scene::mapNodeObjectId(aiNode *node, unsigned int& objectIdCumulative, QMap<unsigned int, QString> &objectIdToNodeName)
 {
 	if(node == NULL)
 		return;
-	m_nodeToObjectId[node] = objectIdCumulative;
-	m_objectIdToNodeName[objectIdCumulative] = node->mName.C_Str();
-	++objectIdCumulative;
+	if(node->mNumMeshes == 0) // Don't care for nodes with no meshes 
+	{
+		m_nodeToObjectId[node] = -1;
+	}
+	else
+	{
+		m_nodeToObjectId[node] = objectIdCumulative;
+		objectIdToNodeName[objectIdCumulative] = node->mName.C_Str();
+		++objectIdCumulative;
+	}
+
 	for(unsigned int i = 0; i < node->mNumChildren; ++i)
 	{
-		mapNodeObjectId(node->mChildren[i], objectIdCumulative);
+		mapNodeObjectId(node->mChildren[i], objectIdCumulative, objectIdToNodeName);
 	}
+}
+
+QVector<QString> Scene::getObjectIdToNameMap() const
+{
+	return m_objectIdToNodeName;
 }
