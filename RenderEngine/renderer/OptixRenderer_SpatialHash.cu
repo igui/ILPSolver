@@ -410,8 +410,6 @@ static void __global__ initRandomStateBuffer(RandomState* states, unsigned int s
 static void initializeRandomStateBuffer(optix::Buffer & buffer, int numStates)
 {
     unsigned int seed = 574133*(unsigned int)clock() + 47844152748*(unsigned int)time(NULL);
-    printf("Seeding on %d clock: %d time: %d \n", seed, (unsigned int)clock(), (unsigned int)time(NULL));
-
     RandomState* states = getDevicePtr<RandomState>(buffer, 0);
     const int blockSize = 256;
     int numBlocks = numStates/blockSize + (numStates % blockSize == 0 ? 0 : 1);
