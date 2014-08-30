@@ -23,13 +23,11 @@
     <ClCompile Include="scene\Scene.cpp" />
     <ClCompile Include="clientserver\RenderResultPacket.cpp" />
     <ClCompile Include="clientserver\RenderServerRenderRequest.cpp" />
-    <ClCompile Include="util\BenchmarkTimer.cpp" />
     <ClCompile Include="renderer\OptixRenderer.cpp" />
     <ClCompile Include="clientserver\RenderServerRenderRequestDetails.cpp" />
     <ClCompile Include="material\Mirror.cpp" />
     <ClCompile Include="renderer\Camera.cpp" />
     <ClCompile Include="renderer\Light.cpp" />
-    <ClCompile Include="main.cpp" />
     <ClCompile Include="material\Texture.cpp" />
     <ClCompile Include="util\imageformats\libtga\tga.c" />
     <ClCompile Include="util\imageformats\libtga\tgaread.c" />
@@ -90,7 +88,6 @@
     <ClInclude Include="scene\Scene.h" />
     <ClInclude Include="clientserver\RenderResultPacket.h" />
     <ClInclude Include="clientserver\RenderServerRenderRequest.h" />
-    <ClInclude Include="util\BenchmarkTimer.h" />
     <ClInclude Include="renderer\ppm\Photon.h" />
     <ClInclude Include="renderer\ppm\PhotonPRD.h" />
     <ClInclude Include="renderer\Hitpoint.h" />

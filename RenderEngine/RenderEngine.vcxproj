@@ -100,7 +100,6 @@
     <ClInclude Include="renderer\helpers\light.h" />
     <ClInclude Include="clientserver\RenderServerRenderRequestDetails.h" />
     <ClInclude Include="renderer\ppm\VolumetricRadiancePRD.h" />
-    <ClInclude Include="util\BenchmarkTimer.h" />
     <ClInclude Include="clientserver\RenderResultPacket.h" />
     <ClInclude Include="renderer\helpers\random.h" />
     <ClInclude Include="render_engine_export_api.h" />
@@ -157,10 +156,8 @@
     <ClCompile Include="util\imageformats\libtga\tgaread.c" />
     <ClCompile Include="util\imageformats\libtga\tgawrite.c" />
     <ClCompile Include="util\Image.cpp" />
-    <ClCompile Include="main.cpp" />
     <ClCompile Include="material\Mirror.cpp" />
     <ClCompile Include="material\Texture.cpp" />
-    <ClCompile Include="util\BenchmarkTimer.cpp" />
     <ClCompile Include="clientserver\RenderResultPacket.cpp" />
     <ClCompile Include="ComputeDevice.cpp" />
     <ClCompile Include="ComputeDeviceRepository.cpp" />
