@@ -42,6 +42,7 @@ public:
     RENDER_ENGINE_EXPORT_API virtual unsigned int getNumTriangles() const;
 	RENDER_ENGINE_EXPORT_API float getSceneInitialPPMRadiusEstimate() const;
 	RENDER_ENGINE_EXPORT_API QVector<QString> getObjectIdToNameMap() const;
+	RENDER_ENGINE_EXPORT_API float getObjectArea(int objectId) const;
 
 private:
 	Scene(Logger *logger);
@@ -52,10 +53,11 @@ private:
     bool colorHasAnyComponent(const aiColor3D & color);
     void loadSceneMaterials();
     void loadLightSources();
-	void walkNode(aiNode *node, int depth);
+	void walkNode(const aiScene *scene, const aiNode *node, int depth);
 	void mapNodeObjectId(aiNode *node, unsigned int& objectIdCumulative, QMap<unsigned int, QString> &objectIdToNodeName);
 	aiMatrix4x4 getTransformation(aiNode *node);
 	void printMatrix(const aiMatrix4x4 &matrix);
+	float getNodeArea(const aiScene *scene, const aiNode *node);
 	static aiMatrix4x4 getCenteredMatrix(const aiMatrix4x4 &matrix);
 	static void normalizeMeshes(aiScene *scene);
 	static void normalizeMeshes(aiScene *scene, aiMatrix4x4 transformation, aiNode *node);
@@ -75,4 +77,5 @@ private:
 	Logger *m_logger;
 	QMap<aiNode *, unsigned int> m_nodeToObjectId;
 	QVector<QString> m_objectIdToNodeName;
+	QVector<float> m_objectArea;
 };

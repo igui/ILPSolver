@@ -137,13 +137,15 @@ Scene* Scene::createFromFile(Logger *logger, const char* filename )
 
     scenePtr->loadLightSources();
 
-    // Find scene AABB and load any emitters
 
     Vector3 sceneAABBMin (1e33f);
     Vector3 sceneAABBMax (-1e33f);
 
-	scenePtr->walkNode(scenePtr->m_scene->mRootNode, 0);
+	// walks to calculate area
+	scenePtr->m_objectArea.resize(scenePtr->m_objectIdToNodeName.size());
+	scenePtr->walkNode(scenePtr->m_scene, scenePtr->m_scene->mRootNode, 0);
 
+	// Find scene AABB and load any emitters
     for(unsigned int i = 0; i < scenePtr->m_scene->mNumMeshes; i++)
     {
         aiMesh* mesh = scenePtr->m_scene->mMeshes[i];
@@ -628,7 +630,7 @@ AAB Scene::getSceneAABB() const
     return m_sceneAABB;
 }
 
-void Scene::walkNode(aiNode *node, int depth)
+void Scene::walkNode(const aiScene *scene, const aiNode *node, int depth)
 {
 	if(!node)
 		return;
@@ -636,14 +638,53 @@ void Scene::walkNode(aiNode *node, int depth)
 	{
 		m_logger->log(" ");
 	}
-	m_logger->log(QString(""), "%s\n", node->mName.C_Str());
 	
-	//printMatrix(node->mTransformation);
+	float area = getNodeArea(scene, node);
+
+	m_logger->log(QString(""), "%s: area %f\n", node->mName.C_Str(), area);
+
+	unsigned int nodeId = m_nodeToObjectId.value((aiNode *) node, UINT_MAX);
+	if(nodeId != UINT_MAX)
+	{
+		m_objectArea[nodeId] = area;
+	}
 
 	for(unsigned int i = 0; i < node->mNumChildren; ++i)
 	{
-		walkNode(node->mChildren[i], depth+1);
+		walkNode(scene, node->mChildren[i], depth+1);
 	}
+}
+
+float Scene::getNodeArea(const aiScene *scene, const aiNode *node)
+{
+	double area = 0;
+
+	for(unsigned int meshIdx = 0; meshIdx < node->mNumMeshes; ++meshIdx)
+	{
+		auto mesh = m_scene->mMeshes[node->mMeshes[meshIdx]];
+		for(unsigned faceIdx = 0; faceIdx < mesh->mNumFaces; ++ faceIdx)
+		{
+			auto face = mesh->mFaces[faceIdx];
+			if(face.mNumIndices != 3)
+				throw std::invalid_argument("Not a triangle face");
+			
+			auto A = mesh->mVertices[face.mIndices[0]];
+			auto B = mesh->mVertices[face.mIndices[1]];
+			auto C = mesh->mVertices[face.mIndices[2]];
+
+			float c = (B - A).Length();
+			float b = (C - A).Length();
+			float a = (C - B).Length();
+
+			float det = 2*b*b*c*c + 2*c*c*a*a + 2*a*a*b*b - a*a*a*a - b*b*b*b - c*c*c*c;
+			if(det >= 0.0)
+			{
+				area += 0.25 * sqrt(det);
+			}
+		}
+	}
+
+	return area;
 }
 
 float Scene::getSceneInitialPPMRadiusEstimate() const
