@@ -40,6 +40,7 @@ public:
     RENDER_ENGINE_EXPORT_API unsigned int getHeight() const;
     RENDER_ENGINE_EXPORT_API unsigned int getScreenBufferSizeBytes() const;
 	RENDER_ENGINE_EXPORT_API std::string  idToObjectName(unsigned int objectId) const;
+	RENDER_ENGINE_EXPORT_API std::vector<float> getRadiance();
 
     const static unsigned int PHOTON_GRID_MAX_SIZE;
 private:
@@ -71,6 +72,7 @@ private:
     optix::Buffer m_lightBuffer;
     optix::Buffer m_randomStatesBuffer;
 	optix::Buffer m_hitCountBuffer;
+	optix::Buffer m_rawRadianceBuffer;
 	optix::uint3 m_gridSize;
     float m_spatialHashMapCellSize;
     AAB m_sceneAABB;

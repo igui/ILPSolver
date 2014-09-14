@@ -148,6 +148,11 @@ void PMOptixRenderer::initialize(const ComputeDevice & device, Logger *logger)
 	m_hitCountBuffer->setSize(10);
     m_context["hitCount"]->set( m_hitCountBuffer );
 
+	m_rawRadianceBuffer = m_context->createBuffer(RT_BUFFER_INPUT_OUTPUT);
+	m_rawRadianceBuffer->setFormat(RT_FORMAT_FLOAT);
+	m_rawRadianceBuffer->setSize(10);
+    m_context["rawRadiance"]->set( m_rawRadianceBuffer );
+
 
     //
     // Indirect Radiance Estimation Buffer
@@ -286,6 +291,7 @@ void PMOptixRenderer::initScene( Scene & scene )
 			m_objectIdToName.at(i) = objectIdToName.at(i).toLocal8Bit().constData();
 		}
 		m_hitCountBuffer->setSize(m_sceneObjects);
+		m_rawRadianceBuffer->setSize(m_sceneObjects);
 
         // Add the lights from the scene to the light buffer
         m_lightBuffer->setSize(lights.size());
@@ -518,6 +524,20 @@ std::vector<unsigned int> PMOptixRenderer::getHitCount()
 		res[i] = buffer[i];
 	}
     m_hitCountBuffer->unmap();
+
+	return res;
+}
+
+std::vector<float> PMOptixRenderer::getRadiance()
+{
+	std::vector<float> res(m_sceneObjects, 0);
+
+	float* buffer = reinterpret_cast<float*>( m_rawRadianceBuffer->map() );
+	for(unsigned int i = 0; i < m_sceneObjects; ++i)
+	{
+		res[i] = buffer[i];
+	}
+    m_rawRadianceBuffer->unmap();
 
 	return res;
 }
