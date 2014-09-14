@@ -6,6 +6,8 @@
     <DllFiles Include="$(QTDIR)\bin\Qt5Networkd.dll"/>
     <DllFiles Include="$(QTDIR)\bin\Qt5OpenGLd.dll"/>
     <DllFiles Include="$(QTDIR)\bin\Qt5Widgetsd.dll"/>
+    <DllFiles Include="$(QTDIR)\bin\Qt5Xmld.dll"/>
+    <DllFiles Include="$(QTDIR)\bin\Qt5XmlPatternsd.dll"/>
     <DllFiles Include="$(QTDIR)\bin\icudt51.dll"/>
     <DllFiles Include="$(QTDIR)\bin\icuin51.dll"/>
     <DllFiles Include="$(QTDIR)\bin\icuuc51.dll"/>

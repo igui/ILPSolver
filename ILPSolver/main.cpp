@@ -1,18 +1,20 @@
 /* 
- * Copyright (c) 2014 Opposite Renderer
+ * Copyright (c) 2014 Ignacio Avas
  * For the full copyright and license information, please view the LICENSE.txt
  * file that was distributed with this source code.
 */
 
 #include <iostream>
 #include <cstdio>
+#include <ctime>
+#include <algorithm>
 #include <QCoreApplication>
 #include <QCommandLineParser>
 #include "ComputeDeviceRepository.h"
 #include "renderer/PMOptixRenderer.h"
 #include "logging/DummyLogger.h"
 #include "scene/Scene.h"
-#include "MinMaxAvg.h"
+#include "ILP.h"
 
 void listDevices()
 {
@@ -29,76 +31,48 @@ void listDevices()
 	}
 }
 
-void calculateOptimalNumEmmitedPhotons(Logger& logger, PMOptixRenderer *renderer)
+
+unsigned int calculateOptimalNumEmmitedPhotons(Logger& logger, PMOptixRenderer *renderer)
 {
-	static const unsigned int photonWidthSizes[] = { 32, 64, 128, 256, 512, 1024, 2048 };
-	static const unsigned int numPhotonWidthSizes = sizeof(photonWidthSizes) / sizeof(photonWidthSizes[0]);
-	static const unsigned int nPasses = 30;
-	static const float acceptableAvgError = 0.05f;
+	static const unsigned int photonMapWidth = 2048;
+	static const unsigned int photonMapSize = photonMapWidth * photonMapWidth;
 
-	const int nMeshes = renderer->getHitCount().size();
-
-	for(int i = 0; i < nMeshes; ++i)
+	clock_t start = clock();
+	renderer->genPhotonMap(photonMapWidth);
+	auto hitCount = renderer->getHitCount();
+	auto optimalN = hitCount;
+	for(auto it = optimalN.begin(); it != optimalN.end(); ++it)
 	{
-		logger.log("%d -> %s ", i, renderer->idToObjectName(i).c_str()); 
+		static const float k = 6146.566f; // 4*(z^2)/(0.05^2) where z is 1.96
+
+		if(*it == 0)
+		{
+			*it = 0;
+		}
+		else
+		{
+			float p = *it / (float)photonMapSize;
+			*it = ceilf(k * (1.0f - p) / p);
+		}
+	}
+	
+
+	double time = (clock() - start) / (double)CLOCKS_PER_SEC;
+	logger.log("Photon map %d took %0.2fs\n", photonMapSize, time);
+	
+	logger.log("Id\tName\tHits\tHits/N\tOptimal N\tsqrt(Optimal N)\n"); 
+	for(unsigned int i = 0; i < hitCount.size(); ++i)
+	{
+		logger.log("%3d %25s %7d %10f %10d %7d\n",
+			i,
+			renderer->idToObjectName(i).c_str(),
+			hitCount.at(i), hitCount.at(i) / (float)photonMapSize,
+			optimalN.at(i),
+			(int)ceilf(sqrtf(optimalN.at(i)))); 
 	}
 	logger.log("\n");
 
-	int optimalPhotonSize = photonWidthSizes[numPhotonWidthSizes-1];
-
-	for(unsigned int i = 0; i < numPhotonWidthSizes; ++i)
-	{
-		std::vector<std::vector<unsigned int>> hitCounts(nPasses, std::vector<unsigned int>(nMeshes, 0));
-		std::vector<float> averages(nMeshes, 0);
-
-		float totalHits = 0.0f;
-
-		// gather hit count and calculate average hits per mesh
-		for(unsigned int pass = 0; pass < nPasses; ++pass)
-		{
-			renderer->genPhotonMap(photonWidthSizes[i]);
-			hitCounts[pass] = renderer->getHitCount();
-			for(int mesh = 0; mesh < nMeshes; ++mesh)
-			{
-				averages.at(mesh) += hitCounts.at(pass).at(mesh) / (float)nPasses;
-			}
-		}
-
-		// calculate average absolute error (average - observed hit count)
-		std::vector<float> averageError(nMeshes, 0);
-		for(unsigned int pass = 0; pass < nPasses; ++pass)
-		{
-			for(int mesh = 0; mesh < nMeshes; ++mesh)
-			{
-				if(averages.at(mesh) != 0.0f)
-					averageError.at(mesh) += fabsf(hitCounts.at(pass).at(mesh) - averages.at(mesh)) / (averages.at(mesh) * nPasses);
-			}
-		}
-
-		if(averageError.empty())
-		{
-			break;
-		}
-
-		auto minMaxAvg = MinMaxAvg<float>::forVector(averageError);
-
-		if(minMaxAvg.avg <= acceptableAvgError && photonWidthSizes[i] < optimalPhotonSize)
-		{
-			optimalPhotonSize = photonWidthSizes[i];
-		}
-
-		logger.log("Results for photonWidth = %d: min %0.1f%%, max %0.1f%%, avg %0.1f%%\n",
-			photonWidthSizes[i], minMaxAvg.min * 100.0f, minMaxAvg.max * 100.0f, minMaxAvg.avg * 100.0f);
-				
-		logger.log("Average hit count(error%%): ");
-		for(int mesh = 0; mesh < nMeshes; ++mesh)
-		{
-			logger.log("%0.0f(%0.1f%%) ", averages.at(mesh), averageError.at(mesh) * 100.f);
-		}
-		logger.log("\n");
-	}
-
-	logger.log("Optimal photon width size for average error of %0.0f%%: %d\n", acceptableAvgError * 100.0f, optimalPhotonSize);
+	return 2048;
 }
 
 
@@ -171,14 +145,13 @@ int main(int argc, char **argv)
 	DummyLogger logger;
 	logger.log("Init device\n");
 	renderer.initialize(device, &logger);
+	logger.log("Load definition XML\n");
 	logger.log("Load scene\n");
-	Scene *scene = Scene::createFromFile(&logger, "C:\\Users\\Igui\\Desktop\\cube.dae");
+	ILP::fromFile(&logger, inputPath);
 	logger.log("Renderer init scene\n");
-	renderer.initScene(*scene);
 	logger.log("Calculating optimal photons emmited per iteration\n");
-	calculateOptimalNumEmmitedPhotons(logger, &renderer);
 	logger.log("Done! Cleaning up\n");
-
+	
 	return 0;
 }
 

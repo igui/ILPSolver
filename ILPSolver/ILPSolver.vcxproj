@@ -27,14 +27,14 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(MSBuildProjectDirectory);$(IncludePath);$(OPTIX_PATH)/include;$(CUDA_INC_PATH);$(NVTOOLSEXT_PATH)\include;$(OPTIX_PATH)/include/optixu;$(SolutionDir)/include;$(SolutionDir)/Gui;$(SolutionDir)/RenderEngine/;$(QTDIR)\include;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtOpenGL;%(AdditionalIncludeDirectories);$(CUDA_PATH)\include</IncludePath>
+    <IncludePath>$(MSBuildProjectDirectory);$(IncludePath);$(OPTIX_PATH)/include;$(CUDA_INC_PATH);$(NVTOOLSEXT_PATH)\include;$(OPTIX_PATH)/include/optixu;$(SolutionDir)/include;$(SolutionDir)/Gui;$(SolutionDir)/RenderEngine/;$(QTDIR)\include;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtXml;$(QTDIR)\include\QtXmlPatterns;$(QTDIR)\include\QtOpenGL;%(AdditionalIncludeDirectories);$(CUDA_PATH)\include</IncludePath>
     <LibraryPath>$(OutDir);$(LibraryPath);$(SolutionDir)\lib\;$(NVTOOLSEXT_PATH)\lib\x64;$(CUDA_PATH)\lib\x64;$(QTDIR)\lib</LibraryPath>
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>Qt5OpenGLd.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Widgetsd.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;glu32.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Qt5OpenGLd.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Xmld.lib;Qt5XmlPatternsd.lib;Qt5Widgetsd.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;glu32.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
       <SubSystem>NotSet</SubSystem>
     </Link>
@@ -46,7 +46,10 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ILP.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="OptimizationCondition.cpp" />
+    <ClCompile Include="OptimizationFunction.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RenderEngine\RenderEngine.vcxproj">
@@ -55,9 +58,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ILP.h" />
-    <ClInclude Include="MinMaxAvg.h" />
+    <ClInclude Include="OptimizationCondition.h" />
+    <ClInclude Include="OptimizationFunction.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="..\RenderEngine\BuildRuleCopyDLLs.targets" />
   </ImportGroup>
 </Project>

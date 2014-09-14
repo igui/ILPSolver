@@ -18,12 +18,24 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="OptimizationFunction.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OptimizationCondition.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ILP.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ILP.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MinMaxAvg.h">
+    <ClInclude Include="OptimizationFunction.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OptimizationCondition.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
