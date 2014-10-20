@@ -117,13 +117,13 @@ Scene* Scene::createFromFile(Logger *logger, const char* filename )
 
 	// gets the mapping from object id to node names and viceversa
 	{
-		QMap<unsigned int, QString> objectIdToNodeName;
+		QMap<unsigned int, aiNode *> objectIdToNode;
 		unsigned int nObjects = 0;
-		scenePtr->mapNodeObjectId(scenePtr->m_scene->mRootNode, nObjects, objectIdToNodeName);
-		scenePtr->m_objectIdToNodeName.resize(nObjects);
+		scenePtr->mapNodeObjectId(scenePtr->m_scene->mRootNode, nObjects, objectIdToNode);
+		scenePtr->m_nodes.resize(nObjects);
 		for(unsigned int objectId = 0; objectId < nObjects; ++objectId)
 		{
-			scenePtr->m_objectIdToNodeName[objectId] = objectIdToNodeName[objectId];
+			scenePtr->m_nodes[objectId] = objectIdToNode[objectId];
 		}
 	}
 
@@ -138,48 +138,13 @@ Scene* Scene::createFromFile(Logger *logger, const char* filename )
     scenePtr->loadLightSources();
 
 
-    Vector3 sceneAABBMin (1e33f);
-    Vector3 sceneAABBMax (-1e33f);
-
 	// walks to calculate area
-	scenePtr->m_objectArea.resize(scenePtr->m_objectIdToNodeName.size());
+	scenePtr->m_objectArea.resize(scenePtr->m_nodes.size());
 	scenePtr->walkNode(scenePtr->m_scene, scenePtr->m_scene->mRootNode, 0);
 
-	// Find scene AABB and load any emitters
-    for(unsigned int i = 0; i < scenePtr->m_scene->mNumMeshes; i++)
-    {
-        aiMesh* mesh = scenePtr->m_scene->mMeshes[i];
-
-        // Check if this is a diffuse emitter
-        unsigned int materialIndex = mesh->mMaterialIndex;
-        Material* geometryMaterial = scenePtr->m_materials.at(materialIndex);
-        if(dynamic_cast<DiffuseEmitter*>(geometryMaterial) != NULL)
-        {
-            DiffuseEmitter* emitterMaterial = (DiffuseEmitter*)(geometryMaterial);
-            scenePtr->loadMeshLightSource(mesh, emitterMaterial);
-        }
-
-        // Extend AABB
-        
-        scenePtr->m_numTriangles += mesh->mNumFaces;
-
-        for(unsigned int j = 0; j < mesh->mNumFaces; j++)
-        {
-            aiFace face = mesh->mFaces[j];
-            aiVector3D p1 = mesh->mVertices[face.mIndices[0]];
-            aiVector3D p2 = mesh->mVertices[face.mIndices[0]];
-            aiVector3D p3 = mesh->mVertices[face.mIndices[0]];
-            minCoordinates(sceneAABBMin, p1);
-            minCoordinates(sceneAABBMin, p2);
-            minCoordinates(sceneAABBMin, p3);
-            maxCoordinates(sceneAABBMax, p1);
-            maxCoordinates(sceneAABBMax, p2);
-            maxCoordinates(sceneAABBMax, p3);
-        }
-    }
-
-    scenePtr->m_sceneAABB.min = sceneAABBMin;
-    scenePtr->m_sceneAABB.max = sceneAABBMax;
+	scenePtr->loadDiffuseEmmiters(scenePtr->m_scene->mRootNode);
+	scenePtr->countTriangles();
+	scenePtr->calcAABB();
 
     if(scenePtr->m_scene->mNumCameras > 0)
     {
@@ -301,12 +266,14 @@ void Scene::loadLightSources()
 		
         if(lightPtr->mType == aiLightSource_POINT)
         {
-			Light light ( toFloat3(lightPtr->mColorDiffuse), toFloat3(transformation * lightPtr->mPosition));
+			Light light (lightPtr->mName.C_Str(), toFloat3(lightPtr->mColorDiffuse), toFloat3(transformation * lightPtr->mPosition));
             m_lights.push_back(light);
         }
         else if(lightPtr->mType == aiLightSource_SPOT)
         {
-			Light light (toFloat3(lightPtr->mColorDiffuse),
+			Light light (
+				lightPtr->mName.C_Str(),
+				toFloat3(lightPtr->mColorDiffuse),
 				toFloat3(transformation * lightPtr->mPosition),
 				toFloat3(centeredTransformation * lightPtr->mDirection),
 				lightPtr->mAngleInnerCone);
@@ -315,7 +282,7 @@ void Scene::loadLightSources()
     }
 }
 
-void Scene::loadMeshLightSource( aiMesh* mesh, DiffuseEmitter* diffuseEmitter )
+void Scene::loadMeshLightSource(const aiNode *node, aiMesh* mesh, DiffuseEmitter* diffuseEmitter )
 {
     // Convert mesh into a quad light source
 
@@ -335,13 +302,13 @@ void Scene::loadMeshLightSource( aiMesh* mesh, DiffuseEmitter* diffuseEmitter )
         optix::float3 v1 = p1-anchor;
         optix::float3 v2 = p2-anchor;
 
-        Light light (diffuseEmitter->getPower(), anchor, v1, v2);
+		Light light (node->mName.C_Str(), diffuseEmitter->getPower(), anchor, v1, v2);
         m_lights.push_back(light);
         diffuseEmitter->setInverseArea(light.inverseArea);
     }
 }
 
-optix::Group Scene::getSceneRootGroup( optix::Context & context )
+optix::Group Scene::getSceneRootGroup( optix::Context & context, QMap<QString, optix::Group *> *nameMapping)
 {
     if(!m_intersectionProgram)
     {
@@ -363,7 +330,7 @@ optix::Group Scene::getSceneRootGroup( optix::Context & context )
     }
 
     // Convert nodes into a full scene Group
-    optix::Group rootNodeGroup = getGroupFromNode(context, m_scene->mRootNode, geometries, m_materials);
+	optix::Group rootNodeGroup = getGroupFromNode(context, m_scene->mRootNode, geometries, m_materials, nameMapping);
 
 #if ENABLE_PARTICIPATING_MEDIA
     {
@@ -515,7 +482,7 @@ void Scene::loadDefaultSceneCamera()
         Camera::KeepHorizontal );
 }
 
-optix::Group Scene::getGroupFromNode(optix::Context & context, aiNode* node, QVector<optix::Geometry> & geometries, QVector<Material*> & materials)
+optix::Group Scene::getGroupFromNode(optix::Context & context, aiNode* node, QVector<optix::Geometry> & geometries, QVector<Material*> & materials, QMap<QString, optix::Group *> *nameMapping)
 {
     if(node->mNumMeshes > 0)
     {
@@ -529,14 +496,14 @@ optix::Group Scene::getGroupFromNode(optix::Context & context, aiNode* node, QVe
             aiMesh* mesh = m_scene->mMeshes[meshIndex];
             unsigned int materialIndex = mesh->mMaterialIndex;
 			Material* geometryMaterial = materials.at(materialIndex)->clone();
-			geometryMaterial->setObjectId(m_nodeToObjectId[node]);
+			geometryMaterial->setObjectId(m_nodeToId[node]);
 			optix::GeometryInstance instance = getGeometryInstance(context, geometries[meshIndex], geometryMaterial);
             geometryGroup->setChild(i, instance);
 			
             if(dynamic_cast<DiffuseEmitter*>(geometryMaterial) != NULL)
             {
                 DiffuseEmitter* emitterMaterial = (DiffuseEmitter*)(geometryMaterial);
-                loadMeshLightSource(mesh, emitterMaterial);
+				loadMeshLightSource(node, mesh, emitterMaterial);
             }
 
 			delete geometryMaterial;
@@ -560,6 +527,11 @@ optix::Group Scene::getGroupFromNode(optix::Context & context, aiNode* node, QVe
             group->setAcceleration( acceleration );
         }
 
+		if(nameMapping != NULL)
+		{
+			nameMapping->insert(node->mName.C_Str(), &group);
+		}
+
         return group;
     }
     else if(node->mNumChildren > 0)
@@ -568,26 +540,35 @@ optix::Group Scene::getGroupFromNode(optix::Context & context, aiNode* node, QVe
         for(unsigned int i = 0; i < node->mNumChildren; i++)
         {
             aiNode* childNode = node->mChildren[i];
-            optix::Group childGroup = getGroupFromNode(context, childNode, geometries, materials);
+			optix::Group childGroup = getGroupFromNode(context, childNode, geometries, materials, nameMapping);
             if(childGroup)
             {
                 groups.push_back(childGroup);
             }
         }
 
-        if(groups.size() > 0)
-        {
-            optix::Group group = context->createGroup(groups.begin(), groups.end());
-            optix::Acceleration acceleration = context->createAcceleration("Sbvh", "Bvh");
-            group->setAcceleration( acceleration );
-            return group;
-        }
+        optix::Group group = context->createGroup(groups.begin(), groups.end());
+        optix::Acceleration acceleration = context->createAcceleration("Sbvh", "Bvh");
+        group->setAcceleration( acceleration );
+
+		if(nameMapping != NULL)
+		{
+			nameMapping->insert(node->mName.C_Str(), &group);
+		}
+
+        return group;
     }
 	else
 	{
 		optix::Group emptyGroup = context->createGroup();
 		optix::Acceleration acceleration = context->createAcceleration("NoAccel", "NoAccel");
 		emptyGroup->setAcceleration(acceleration);
+
+		if(nameMapping != NULL)
+		{
+			nameMapping->insert(node->mName.C_Str(), &emptyGroup);
+		}
+
 		return emptyGroup;
 	}
 }
@@ -643,7 +624,7 @@ void Scene::walkNode(const aiScene *scene, const aiNode *node, int depth)
 
 	m_logger->log(QString(""), "%s: area %f\n", node->mName.C_Str(), area);
 
-	unsigned int nodeId = m_nodeToObjectId.value((aiNode *) node, UINT_MAX);
+	unsigned int nodeId = m_nodeToId.value((aiNode *) node, UINT_MAX);
 	if(nodeId != UINT_MAX)
 	{
 		m_objectArea[nodeId] = area;
@@ -767,28 +748,127 @@ void Scene::printMatrix(const aiMatrix4x4& matrix)
 		matrix.d1, matrix.d2, matrix.d3, matrix.d4);
 }
 
-void Scene::mapNodeObjectId(aiNode *node, unsigned int& objectIdCumulative, QMap<unsigned int, QString> &objectIdToNodeName)
+void Scene::mapNodeObjectId(aiNode *node, unsigned int& objectIdCumulative, QMap<unsigned int, aiNode *> &objectIdToNode)
 {
 	if(node == NULL)
 		return;
-	if(node->mNumMeshes == 0) // Don't care for nodes with no meshes 
-	{
-		m_nodeToObjectId[node] = -1;
-	}
-	else
-	{
-		m_nodeToObjectId[node] = objectIdCumulative;
-		objectIdToNodeName[objectIdCumulative] = node->mName.C_Str();
-		++objectIdCumulative;
-	}
+	
+	m_nodeToId[node] = objectIdCumulative;
+	m_nameToId[node->mName.C_Str()] = objectIdCumulative;
+	objectIdToNode[objectIdCumulative] = node;
+	++objectIdCumulative;
+	
 
 	for(unsigned int i = 0; i < node->mNumChildren; ++i)
 	{
-		mapNodeObjectId(node->mChildren[i], objectIdCumulative, objectIdToNodeName);
+		mapNodeObjectId(node->mChildren[i], objectIdCumulative, objectIdToNode);
 	}
 }
 
-QVector<QString> Scene::getObjectIdToNameMap() const
+
+float Scene::getObjectArea(int objectId) const
 {
-	return m_objectIdToNodeName;
+	return m_objectArea.at(objectId);
+}
+
+QVector<Vector3> Scene::getObjectPoints(int objectId) const
+{
+	QVector<Vector3> res;
+	auto node = m_nodes.at(objectId);
+	if(node == NULL)
+	{
+		throw std::invalid_argument("Scene::getObjectName: No such object id");
+	}
+	for(unsigned int meshId = 0; meshId < node->mNumMeshes; ++meshId)
+	{
+		auto mesh = m_scene->mMeshes[node->mMeshes[meshId]];
+		
+		for(unsigned int vertex = 0; vertex < mesh->mNumVertices; ++vertex)
+		{
+			auto aiVertex = mesh->mVertices[vertex];
+			res.append(Vector3(aiVertex.x, aiVertex.y, aiVertex.z));
+		}
+	}
+
+	return res;
+}
+
+unsigned int Scene::getObjectId(const QString& objectName) const
+{
+	return m_nameToId.value(objectName, UINT_MAX);
+}
+
+QString Scene::getObjectName(int objectId) const
+{
+	auto node = m_nodes.at(objectId);
+	if(node == NULL)
+	{
+		throw std::invalid_argument("Scene::getObjectName: No such object id");
+	}
+	return node->mName.C_Str();
+}
+
+void Scene::calcAABB()
+{
+	Vector3 sceneAABBMin (1e33f);
+    Vector3 sceneAABBMax (-1e33f);
+	// Find scene AABB
+    for(unsigned int i = 0; i < m_scene->mNumMeshes; i++)
+    {
+        aiMesh* mesh = m_scene->mMeshes[i];
+
+        m_numTriangles += mesh->mNumFaces;
+
+        for(unsigned int j = 0; j < mesh->mNumFaces; j++)
+        {
+            aiFace face = mesh->mFaces[j];
+            aiVector3D p1 = mesh->mVertices[face.mIndices[0]];
+            aiVector3D p2 = mesh->mVertices[face.mIndices[0]];
+            aiVector3D p3 = mesh->mVertices[face.mIndices[0]];
+            minCoordinates(sceneAABBMin, p1);
+            minCoordinates(sceneAABBMin, p2);
+            minCoordinates(sceneAABBMin, p3);
+            maxCoordinates(sceneAABBMax, p1);
+            maxCoordinates(sceneAABBMax, p2);
+            maxCoordinates(sceneAABBMax, p3);
+        }
+	}
+
+    m_sceneAABB.min = sceneAABBMin;
+    m_sceneAABB.max = sceneAABBMax;
+}
+
+void Scene::countTriangles()
+{
+	m_numTriangles = 0;
+	for(unsigned int i = 0; i < m_scene->mNumMeshes; i++)
+    {
+        aiMesh* mesh = m_scene->mMeshes[i];
+        m_numTriangles += mesh->mNumFaces;
+    }
+}
+
+void Scene::loadDiffuseEmmiters(const aiNode *node)
+{
+	if(!node)
+		return;
+
+	for(unsigned int i = 0; i < node->mNumMeshes; i++)
+    {
+		aiMesh* mesh = m_scene->mMeshes[node->mMeshes[i]];
+
+        // Check if this is a diffuse emitter
+        unsigned int materialIndex = mesh->mMaterialIndex;
+        Material* geometryMaterial = m_materials.at(materialIndex);
+        if(dynamic_cast<DiffuseEmitter*>(geometryMaterial) != NULL)
+        {
+            DiffuseEmitter* emitterMaterial = (DiffuseEmitter*)(geometryMaterial);
+            loadMeshLightSource(node, mesh, emitterMaterial);
+        }
+    }
+
+	for(unsigned int i = 0; i < node->mNumChildren; ++i)
+	{
+		loadDiffuseEmmiters(node->mChildren[i]);
+	}
 }

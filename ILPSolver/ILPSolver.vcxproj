@@ -47,9 +47,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ILP.cpp" />
+    <ClCompile Include="Interval.cpp" />
+    <ClCompile Include="LightInSurface.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="OptimizationCondition.cpp" />
-    <ClCompile Include="OptimizationFunction.cpp" />
+    <ClCompile Include="SurfaceRadiosity.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RenderEngine\RenderEngine.vcxproj">
@@ -58,8 +59,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ILP.h" />
-    <ClInclude Include="OptimizationCondition.h" />
-    <ClInclude Include="OptimizationFunction.h" />
+    <ClInclude Include="Interval.h" />
+    <ClInclude Include="LightInSurface.h" />
+    <ClInclude Include="SurfaceRadiosity.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

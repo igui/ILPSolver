@@ -16,6 +16,7 @@
 #include "renderer/Light.h"
 #include "render_engine_export_api.h"
 #include "math/AAB.h"
+#include "math/Vector3.h"
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/material.h>
@@ -33,7 +34,7 @@ public:
     RENDER_ENGINE_EXPORT_API virtual ~Scene(void);
     RENDER_ENGINE_EXPORT_API static Scene* createFromFile(const char* file);
 	RENDER_ENGINE_EXPORT_API static Scene* createFromFile(Logger *logger, const char* file);
-    virtual optix::Group getSceneRootGroup(optix::Context & context);
+	virtual optix::Group getSceneRootGroup(optix::Context & context, QMap<QString, optix::Group *> *nameMapping = NULL);
     void loadDefaultSceneCamera();
     virtual const QVector<Light> & getSceneLights() const;
     virtual Camera getDefaultCamera() const;
@@ -41,20 +42,24 @@ public:
     virtual AAB getSceneAABB() const ;
     RENDER_ENGINE_EXPORT_API virtual unsigned int getNumTriangles() const;
 	RENDER_ENGINE_EXPORT_API float getSceneInitialPPMRadiusEstimate() const;
-	RENDER_ENGINE_EXPORT_API QVector<QString> getObjectIdToNameMap() const;
+
+	// Scene object information
 	RENDER_ENGINE_EXPORT_API float getObjectArea(int objectId) const;
+	RENDER_ENGINE_EXPORT_API QVector<Vector3> getObjectPoints(int objectId) const;
+	RENDER_ENGINE_EXPORT_API unsigned int getObjectId(const QString& objectName) const;
+	RENDER_ENGINE_EXPORT_API QString getObjectName(int objectId) const;
 
 private:
 	Scene(Logger *logger);
     optix::Geometry Scene::createGeometryFromMesh(aiMesh* mesh, optix::Context & context);
-    void loadMeshLightSource( aiMesh* mesh, DiffuseEmitter* diffuseEmitter );
-    optix::Group getGroupFromNode(optix::Context & context, aiNode* node, QVector<optix::Geometry> & geometries, QVector<Material*> & materials);
+	void loadMeshLightSource(const aiNode *node, aiMesh* mesh, DiffuseEmitter* diffuseEmitter );
+    optix::Group getGroupFromNode(optix::Context & context, aiNode* node, QVector<optix::Geometry> & geometries, QVector<Material*> & materials, QMap<QString, optix::Group *> *nameMapping);
     optix::GeometryInstance getGeometryInstance( optix::Context & context, optix::Geometry & geometry, Material* material );
     bool colorHasAnyComponent(const aiColor3D & color);
     void loadSceneMaterials();
     void loadLightSources();
 	void walkNode(const aiScene *scene, const aiNode *node, int depth);
-	void mapNodeObjectId(aiNode *node, unsigned int& objectIdCumulative, QMap<unsigned int, QString> &objectIdToNodeName);
+	void mapNodeObjectId(aiNode *node, unsigned int& objectIdCumulative, QMap<unsigned int, aiNode *> &objectIdToNode);
 	aiMatrix4x4 getTransformation(aiNode *node);
 	void printMatrix(const aiMatrix4x4 &matrix);
 	float getNodeArea(const aiScene *scene, const aiNode *node);
@@ -62,6 +67,9 @@ private:
 	static void normalizeMeshes(aiScene *scene);
 	static void normalizeMeshes(aiScene *scene, aiMatrix4x4 transformation, aiNode *node);
 	static void normalizeMesh(aiMesh *mesh, aiMatrix4x4 transformation);
+	void countTriangles();
+	void calcAABB();
+	void loadDiffuseEmmiters(const aiNode *fromNode);
 
     QVector<Material*> m_materials;
     QVector<Light> m_lights;
@@ -75,7 +83,10 @@ private:
     AAB m_sceneAABB;
     unsigned int m_numTriangles;
 	Logger *m_logger;
-	QMap<aiNode *, unsigned int> m_nodeToObjectId;
-	QVector<QString> m_objectIdToNodeName;
+
+	// mappings to retrieve object info
+	QMap<aiNode *, unsigned int> m_nodeToId; /// internal, for geometry assignment
+	QMap<QString, unsigned int> m_nameToId;
+	QVector<aiNode *> m_nodes;
 	QVector<float> m_objectArea;
 };

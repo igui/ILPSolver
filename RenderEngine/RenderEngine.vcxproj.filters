@@ -85,7 +85,6 @@
     <ClInclude Include="ComputeDeviceRepository.h" />
     <ClInclude Include="material\DiffuseEmitter.h" />
     <ClInclude Include="render_engine_export_api.h" />
-    <ClInclude Include="scene\Scene.h" />
     <ClInclude Include="clientserver\RenderResultPacket.h" />
     <ClInclude Include="clientserver\RenderServerRenderRequest.h" />
     <ClInclude Include="renderer\ppm\Photon.h" />
@@ -139,6 +138,7 @@
     <ClInclude Include="renderer\PPMOptixRenderer.h" />
     <ClInclude Include="renderer\PMOptixRenderer.h" />
     <ClInclude Include="renderer\AABB.h" />
+    <ClInclude Include="scene\Scene.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="sutil">

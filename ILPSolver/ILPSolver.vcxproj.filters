@@ -18,13 +18,16 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="OptimizationFunction.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="OptimizationCondition.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ILP.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LightInSurface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SurfaceRadiosity.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Interval.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -32,10 +35,13 @@
     <ClInclude Include="ILP.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="OptimizationFunction.h">
+    <ClInclude Include="LightInSurface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="OptimizationCondition.h">
+    <ClInclude Include="SurfaceRadiosity.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Interval.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

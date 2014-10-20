@@ -14,6 +14,7 @@
 #include "logging/Logger.h"
 #include <vector>
 #include <string>
+#include <QMap>
 
 class ComputeDevice;
 class RenderServerRenderRequestDetails;
@@ -39,7 +40,6 @@ public:
     RENDER_ENGINE_EXPORT_API unsigned int getWidth() const;
     RENDER_ENGINE_EXPORT_API unsigned int getHeight() const;
     RENDER_ENGINE_EXPORT_API unsigned int getScreenBufferSizeBytes() const;
-	RENDER_ENGINE_EXPORT_API std::string  idToObjectName(unsigned int objectId) const;
 	RENDER_ENGINE_EXPORT_API std::vector<float> getRadiance();
 
     const static unsigned int PHOTON_GRID_MAX_SIZE;
@@ -85,5 +85,7 @@ private:
     bool m_initialized;
     int m_optixDeviceOrdinal;
 	std::vector<std::string> m_objectIdToName;
+	QMap<QString, optix::Group *> m_groups;
 	Logger *m_logger;
+
 };

@@ -19,6 +19,7 @@
 #include "renderer/ppm/Photon.h"
 #include "Camera.h"
 #include <QThread>
+#include <QMap>
 #include <sstream>
 #include "renderer/RayType.h"
 #include "ComputeDevice.h"
@@ -272,7 +273,9 @@ void PMOptixRenderer::initScene( Scene & scene )
 
     try
     {
-        m_sceneRootGroup = scene.getSceneRootGroup(m_context);
+		m_groups.clear();
+		m_sceneRootGroup = scene.getSceneRootGroup(m_context, &m_groups);
+
         m_context["sceneRootObject"]->set(m_sceneRootGroup);
         m_sceneAABB = scene.getSceneAABB();
         Sphere sceneBoundingSphere = m_sceneAABB.getBoundingSphere();
@@ -282,14 +285,6 @@ void PMOptixRenderer::initScene( Scene & scene )
 		m_scenePPMRadius = ppmRadius;
 		m_context["ppmRadius"]->setFloat(ppmRadius);
         m_context["ppmRadiusSquared"]->setFloat(ppmRadius * ppmRadius);
-
-		auto objectIdToName = scene.getObjectIdToNameMap();
-		m_sceneObjects = objectIdToName.size();
-		m_objectIdToName.resize(m_sceneObjects, "");
-		for(unsigned int i = 0; i < m_sceneObjects; ++i)
-		{
-			m_objectIdToName.at(i) = objectIdToName.at(i).toLocal8Bit().constData();
-		}
 		m_hitCountBuffer->setSize(m_sceneObjects);
 		m_rawRadianceBuffer->setSize(m_sceneObjects);
 
@@ -552,14 +547,3 @@ unsigned int PMOptixRenderer::getNumPhotons() const
 	return m_photonWidth * m_photonWidth * MAX_PHOTON_COUNT;
 }
 
-
-std::string PMOptixRenderer::idToObjectName(unsigned int objectId) const
-{
-	if(objectId < m_objectIdToName.size())
-	{
-		return m_objectIdToName.at(objectId);
-	} else
-	{
-		return "???";
-	}
-}

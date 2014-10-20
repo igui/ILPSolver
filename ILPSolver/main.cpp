@@ -32,48 +32,6 @@ void listDevices()
 }
 
 
-unsigned int calculateOptimalNumEmmitedPhotons(Logger& logger, PMOptixRenderer *renderer)
-{
-	static const unsigned int photonMapWidth = 2048;
-	static const unsigned int photonMapSize = photonMapWidth * photonMapWidth;
-
-	clock_t start = clock();
-	renderer->genPhotonMap(photonMapWidth);
-	auto hitCount = renderer->getHitCount();
-	auto optimalN = hitCount;
-	for(auto it = optimalN.begin(); it != optimalN.end(); ++it)
-	{
-		static const float k = 6146.566f; // 4*(z^2)/(0.05^2) where z is 1.96
-
-		if(*it == 0)
-		{
-			*it = 0;
-		}
-		else
-		{
-			float p = *it / (float)photonMapSize;
-			*it = ceilf(k * (1.0f - p) / p);
-		}
-	}
-	
-
-	double time = (clock() - start) / (double)CLOCKS_PER_SEC;
-	logger.log("Photon map %d took %0.2fs\n", photonMapSize, time);
-	
-	logger.log("Id\tName\tHits\tHits/N\tOptimal N\tsqrt(Optimal N)\n"); 
-	for(unsigned int i = 0; i < hitCount.size(); ++i)
-	{
-		logger.log("%3d %25s %7d %10f %10d %7d\n",
-			i,
-			renderer->idToObjectName(i).c_str(),
-			hitCount.at(i), hitCount.at(i) / (float)photonMapSize,
-			optimalN.at(i),
-			(int)ceilf(sqrtf(optimalN.at(i)))); 
-	}
-	logger.log("\n");
-
-	return 2048;
-}
 
 
 int main(int argc, char **argv)
@@ -147,7 +105,7 @@ int main(int argc, char **argv)
 	renderer.initialize(device, &logger);
 	logger.log("Load definition XML\n");
 	logger.log("Load scene\n");
-	ILP::fromFile(&logger, inputPath);
+	ILP::fromFile(&logger, inputPath, &renderer);
 	logger.log("Renderer init scene\n");
 	logger.log("Calculating optimal photons emmited per iteration\n");
 	logger.log("Done! Cleaning up\n");
