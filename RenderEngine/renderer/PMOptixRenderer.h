@@ -14,12 +14,13 @@
 #include "logging/Logger.h"
 #include <vector>
 #include <string>
-#include <QMap>
+
 
 class ComputeDevice;
 class RenderServerRenderRequestDetails;
 class Scene;
 class Camera;
+template <class Key, class T> class QMap;
 
 class PMOptixRenderer: public OptixRenderer
 {
@@ -85,7 +86,7 @@ private:
     bool m_initialized;
     int m_optixDeviceOrdinal;
 	std::vector<std::string> m_objectIdToName;
-	QMap<QString, optix::Group *> m_groups;
+	QMap<QString, optix::Group *>* m_groups;
 	Logger *m_logger;
 
 };

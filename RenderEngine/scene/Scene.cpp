@@ -872,3 +872,13 @@ void Scene::loadDiffuseEmmiters(const aiNode *node)
 		loadDiffuseEmmiters(node->mChildren[i]);
 	}
 }
+
+QVector<QString> Scene::getObjectIdToNameMap() const
+{
+	QVector<QString> res;
+	for(auto it = m_nodes.begin(); it != m_nodes.end(); ++it)
+	{
+		res.append((*it)->mName.C_Str());
+	}
+	return res;
+}

@@ -42,6 +42,8 @@ public:
     virtual AAB getSceneAABB() const ;
     RENDER_ENGINE_EXPORT_API virtual unsigned int getNumTriangles() const;
 	RENDER_ENGINE_EXPORT_API float getSceneInitialPPMRadiusEstimate() const;
+	RENDER_ENGINE_EXPORT_API QVector<QString> getObjectIdToNameMap() const;
+
 
 	// Scene object information
 	RENDER_ENGINE_EXPORT_API float getObjectArea(int objectId) const;

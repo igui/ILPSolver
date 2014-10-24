@@ -38,7 +38,8 @@ PMOptixRenderer::PMOptixRenderer() :
     m_initialized(false),
     m_width(10),
     m_height(10),
-	m_photonWidth(10)
+	m_photonWidth(10),
+	m_groups(new QMap<QString, Group *>())
 {
     try
     {
@@ -273,8 +274,8 @@ void PMOptixRenderer::initScene( Scene & scene )
 
     try
     {
-		m_groups.clear();
-		m_sceneRootGroup = scene.getSceneRootGroup(m_context, &m_groups);
+		m_groups->clear();
+		m_sceneRootGroup = scene.getSceneRootGroup(m_context, m_groups);
 
         m_context["sceneRootObject"]->set(m_sceneRootGroup);
         m_sceneAABB = scene.getSceneAABB();
@@ -285,6 +286,14 @@ void PMOptixRenderer::initScene( Scene & scene )
 		m_scenePPMRadius = ppmRadius;
 		m_context["ppmRadius"]->setFloat(ppmRadius);
         m_context["ppmRadiusSquared"]->setFloat(ppmRadius * ppmRadius);
+
+		auto objectIdToName = scene.getObjectIdToNameMap();
+		m_sceneObjects = objectIdToName.size();
+		m_objectIdToName.resize(m_sceneObjects, "");
+		for(unsigned int i = 0; i < m_sceneObjects; ++i)
+		{
+			m_objectIdToName.at(i) = objectIdToName.at(i).toLocal8Bit().constData();
+		}
 		m_hitCountBuffer->setSize(m_sceneObjects);
 		m_rawRadianceBuffer->setSize(m_sceneObjects);
 
