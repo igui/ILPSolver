@@ -556,3 +556,46 @@ unsigned int PMOptixRenderer::getNumPhotons() const
 	return m_photonWidth * m_photonWidth * MAX_PHOTON_COUNT;
 }
 
+static void transformBufferMatrix(Buffer buffer, Matrix4x4 matrix)
+{
+	float3 *bufferHost = (float3*) buffer->map();
+	RTsize bufferSize;
+	buffer->getSize(bufferSize);
+
+	for(RTsize i = 0; i < bufferSize; ++i)
+	{
+		float4 homogeneus = matrix * make_float4(bufferHost[i], 1.0f);
+		bufferHost[i] = make_float3(homogeneus / homogeneus.z);
+	}
+	buffer->unmap();
+}
+
+void PMOptixRenderer::transformNode(const QString &nodeName, const float *transformationVertex, const float *transformationNormals)
+{
+	auto group = (*m_groups)[nodeName];
+	if(group == NULL)
+	{
+		throw std::invalid_argument((nodeName + " doesn't exists").toStdString());
+	}
+
+	auto transformationMatrix4x4 = Matrix4x4(transformationVertex);
+	auto transformationNormals4x4 = Matrix4x4(transformationNormals);
+
+	unsigned int childCount = group->get()->getChildCount();
+	if(childCount == 0)
+	{
+		throw std::invalid_argument((nodeName + " has no geometries").toStdString());
+	}
+
+	for(unsigned int childIdx = 0; childIdx < childCount; ++childIdx)
+	{
+		auto geometryInstance = group->get()->getChild<GeometryInstance>(childIdx);
+		auto geometry = geometryInstance.get()->getGeometry();
+		
+		auto vertexBuffer = geometry["vertexBuffer"]->getBuffer();
+		auto normalBuffer = geometry["normalBuffer"]->getBuffer();
+
+		transformBufferMatrix(vertexBuffer, transformationMatrix4x4);
+		transformBufferMatrix(normalBuffer, transformationNormals4x4);
+	}
+}

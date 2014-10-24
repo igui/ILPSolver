@@ -42,6 +42,7 @@ public:
     RENDER_ENGINE_EXPORT_API unsigned int getHeight() const;
     RENDER_ENGINE_EXPORT_API unsigned int getScreenBufferSizeBytes() const;
 	RENDER_ENGINE_EXPORT_API std::vector<float> getRadiance();
+	RENDER_ENGINE_EXPORT_API void PMOptixRenderer::transformNode(const QString &nodeName, const float *transformationVertex, const float *transformationNormals);
 
     const static unsigned int PHOTON_GRID_MAX_SIZE;
 private:
