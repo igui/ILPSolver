@@ -362,20 +362,6 @@ void PMOptixRenderer::render(unsigned int photonLaunchWidth, unsigned int height
 
 	//m_logger->log("Used host memory: %1.1fMib\n", m_context->getUsedHostMemory() / (1024.0f * 1024.0f) );
 
-
-	/*
-    Light* lights_host = (Light*)m_lightBuffer->map();
-	RTsize n_lights;
-	m_lightBuffer->getSize(n_lights);
-
-	for(unsigned int i = 0; i < n_lights; ++i)
-	{
-		float3 newPosition = (m_sceneAABB.max - m_sceneAABB.min) * ((float) rand() / RAND_MAX) + m_sceneAABB.min;
-		lights_host[i].position = newPosition;
-	}
-    m_lightBuffer->unmap(); */
-
-
     try
     {
         // If the width and height of the current render request has changed, we must resize buffers
@@ -590,7 +576,6 @@ void PMOptixRenderer::transformNode(const QString &nodeName, const optix::Matrix
 	{
 		throw std::invalid_argument((nodeName + " doesn't exists").toStdString());
 	}
-
 	unsigned int childCount = group->getChildCount();
 	if(childCount == 0)
 	{
