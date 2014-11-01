@@ -10,6 +10,11 @@
 
 #define LIGHT_MAX_NAMELENGTH 20
 
+namespace optix {
+	template <unsigned int M, unsigned int N> class Matrix;
+	typedef Matrix<4,4> Matrix4x4;
+}
+
 class Light
 {
 public:
@@ -24,6 +29,8 @@ public:
 	// Spot Light
     RENDER_ENGINE_EXPORT_API Light(const char *name, Vector3 power, Vector3 position, Vector3 direction, float angle);
 
+	void initAreaLight(Vector3 v1, Vector3 v2);
+	void transform(const optix::Matrix4x4& transform);
 #endif
 
 	char name[LIGHT_MAX_NAMELENGTH];
