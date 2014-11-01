@@ -22,6 +22,11 @@ class Scene;
 class Camera;
 template <class Key, class T> class QMap;
 
+namespace optix {
+	template <unsigned int M, unsigned int N> class Matrix;
+	typedef Matrix<4,4> Matrix4x4;
+}
+
 class PMOptixRenderer: public OptixRenderer
 {
 public:
@@ -42,7 +47,7 @@ public:
     RENDER_ENGINE_EXPORT_API unsigned int getHeight() const;
     RENDER_ENGINE_EXPORT_API unsigned int getScreenBufferSizeBytes() const;
 	RENDER_ENGINE_EXPORT_API std::vector<float> getRadiance();
-	RENDER_ENGINE_EXPORT_API void PMOptixRenderer::transformNode(const QString &nodeName, const float *transformationVertex, const float *transformationNormals);
+	RENDER_ENGINE_EXPORT_API void transformNode(const QString &nodeName, const optix::Matrix4x4 &transformation);
 
     const static unsigned int PHOTON_GRID_MAX_SIZE;
 private:
@@ -87,7 +92,7 @@ private:
     bool m_initialized;
     int m_optixDeviceOrdinal;
 	std::vector<std::string> m_objectIdToName;
-	QMap<QString, optix::Group *>* m_groups;
+	QMap<QString, optix::Group>* m_groups;
 	Logger *m_logger;
 
 };
