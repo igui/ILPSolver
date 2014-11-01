@@ -20,6 +20,7 @@
 #include "config.h"
 #include "logging/DummyLogger.h"
 #include <cstdio>
+#include <optixu_matrix_namespace.h>
 
 Scene::Scene(Logger *logger)
     : m_scene(NULL),
@@ -308,7 +309,7 @@ void Scene::loadMeshLightSource(const aiNode *node, aiMesh* mesh, DiffuseEmitter
     }
 }
 
-optix::Group Scene::getSceneRootGroup( optix::Context & context, QMap<QString, optix::Group *> *nameMapping)
+optix::Group Scene::getSceneRootGroup( optix::Context & context, QMap<QString, optix::Group> *nameMapping)
 {
     if(!m_intersectionProgram)
     {
@@ -482,7 +483,7 @@ void Scene::loadDefaultSceneCamera()
         Camera::KeepHorizontal );
 }
 
-optix::Group Scene::getGroupFromNode(optix::Context & context, aiNode* node, QVector<optix::Geometry> & geometries, QVector<Material*> & materials, QMap<QString, optix::Group *> *nameMapping)
+optix::Group Scene::getGroupFromNode(optix::Context & context, aiNode* node, QVector<optix::Geometry> & geometries, QVector<Material*> & materials, QMap<QString, optix::Group> *nameMapping)
 {
     if(node->mNumMeshes > 0)
     {
@@ -518,10 +519,13 @@ optix::Group Scene::getGroupFromNode(optix::Context & context, aiNode* node, QVe
         }
 
         // Create group that contains the GeometryInstance
+		optix::Transform transform = context->createTransform();
+		transform->setMatrix(false, optix::Matrix4x4::identity().getData(), NULL); 
+		transform->setChild(geometryGroup);
 
         optix::Group group = context->createGroup();
         group->setChildCount(1);
-        group->setChild(0, geometryGroup);
+		group->setChild(0, transform);
         {
             optix::Acceleration acceleration = context->createAcceleration("NoAccel", "NoAccel");
             group->setAcceleration( acceleration );
@@ -529,31 +533,34 @@ optix::Group Scene::getGroupFromNode(optix::Context & context, aiNode* node, QVe
 
 		if(nameMapping != NULL)
 		{
-			nameMapping->insert(node->mName.C_Str(), &group);
+			nameMapping->insert(node->mName.C_Str(), group);
 		}
 
         return group;
     }
     else if(node->mNumChildren > 0)
     {
-        QVector<optix::Group> groups;
+        QVector<optix::Transform> transforms;
         for(unsigned int i = 0; i < node->mNumChildren; i++)
         {
             aiNode* childNode = node->mChildren[i];
 			optix::Group childGroup = getGroupFromNode(context, childNode, geometries, materials, nameMapping);
             if(childGroup)
             {
-                groups.push_back(childGroup);
+				auto childTransform = context->createTransform();
+				childTransform->setMatrix(false, optix::Matrix4x4::identity().getData(), NULL); 
+				childTransform->setChild(childGroup);
+                transforms.push_back(childTransform);
             }
         }
 
-        optix::Group group = context->createGroup(groups.begin(), groups.end());
+        optix::Group group = context->createGroup(transforms.begin(), transforms.end());
         optix::Acceleration acceleration = context->createAcceleration("Sbvh", "Bvh");
         group->setAcceleration( acceleration );
 
 		if(nameMapping != NULL)
 		{
-			nameMapping->insert(node->mName.C_Str(), &group);
+			nameMapping->insert(node->mName.C_Str(), group);
 		}
 
         return group;
@@ -566,7 +573,7 @@ optix::Group Scene::getGroupFromNode(optix::Context & context, aiNode* node, QVe
 
 		if(nameMapping != NULL)
 		{
-			nameMapping->insert(node->mName.C_Str(), &emptyGroup);
+			nameMapping->insert(node->mName.C_Str(), emptyGroup);
 		}
 
 		return emptyGroup;

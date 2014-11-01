@@ -34,7 +34,7 @@ public:
     RENDER_ENGINE_EXPORT_API virtual ~Scene(void);
     RENDER_ENGINE_EXPORT_API static Scene* createFromFile(const char* file);
 	RENDER_ENGINE_EXPORT_API static Scene* createFromFile(Logger *logger, const char* file);
-	virtual optix::Group getSceneRootGroup(optix::Context & context, QMap<QString, optix::Group *> *nameMapping = NULL);
+	virtual optix::Group getSceneRootGroup(optix::Context & context, QMap<QString, optix::Group> *nameMapping = NULL);
     void loadDefaultSceneCamera();
     virtual const QVector<Light> & getSceneLights() const;
     virtual Camera getDefaultCamera() const;
@@ -55,7 +55,7 @@ private:
 	Scene(Logger *logger);
     optix::Geometry Scene::createGeometryFromMesh(aiMesh* mesh, optix::Context & context);
 	void loadMeshLightSource(const aiNode *node, aiMesh* mesh, DiffuseEmitter* diffuseEmitter );
-    optix::Group getGroupFromNode(optix::Context & context, aiNode* node, QVector<optix::Geometry> & geometries, QVector<Material*> & materials, QMap<QString, optix::Group *> *nameMapping);
+    optix::Group getGroupFromNode(optix::Context & context, aiNode* node, QVector<optix::Geometry> & geometries, QVector<Material*> & materials, QMap<QString, optix::Group> *nameMapping);
     optix::GeometryInstance getGeometryInstance( optix::Context & context, optix::Geometry & geometry, Material* material );
     bool colorHasAnyComponent(const aiColor3D & color);
     void loadSceneMaterials();
