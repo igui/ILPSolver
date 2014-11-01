@@ -93,6 +93,7 @@ private:
     int m_optixDeviceOrdinal;
 	std::vector<std::string> m_objectIdToName;
 	QMap<QString, optix::Group>* m_groups;
+	QMap<QString, QList<int>> *m_lights; // a mapping to Light name to light position into m_lightBuffer
 	Logger *m_logger;
 
 };

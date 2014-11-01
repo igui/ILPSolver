@@ -39,7 +39,8 @@ PMOptixRenderer::PMOptixRenderer() :
     m_width(10),
     m_height(10),
 	m_photonWidth(10),
-	m_groups(new QMap<QString, Group>())
+	m_groups(new QMap<QString, Group>()),
+	m_lights(new QMap<QString, QList<int>>())
 {
     try
     {
@@ -297,11 +298,23 @@ void PMOptixRenderer::initScene( Scene & scene )
 		m_hitCountBuffer->setSize(m_sceneObjects);
 		m_rawRadianceBuffer->setSize(m_sceneObjects);
 
-        // Add the lights from the scene to the light buffer
+		// Add the lights from the scene to the light buffer
         m_lightBuffer->setSize(lights.size());
         Light* lights_host = (Light*)m_lightBuffer->map();
         memcpy(lights_host, scene.getSceneLights().constData(), sizeof(Light)*lights.size());
         m_lightBuffer->unmap();
+
+		m_lights->clear();
+		for(int lightIdx = 0; lightIdx < lights.size(); ++lightIdx)
+		{
+			const char *lightName = lights[lightIdx].name;
+			if(!m_lights->contains(lightName))
+			{
+				(*m_lights)[lightName] = QList<int>();
+			}
+			
+			(*m_lights)[lightName].append(lightIdx);
+		}
 
         compile();
 
@@ -597,4 +610,16 @@ void PMOptixRenderer::transformNode(const QString &nodeName, const optix::Matrix
 	m_context["sceneRootObject"]->getGroup()->getAcceleration()->markDirty();
 	group->getAcceleration()->markDirty();
 
+
+	// update the light buffer if node is a light
+	if(m_lights->contains(nodeName))
+	{
+		auto lightIndexes = (*m_lights)[nodeName];
+		Light* lightsHost = (Light*)m_lightBuffer->map();
+		for(auto lightIndexesIt = lightIndexes.cbegin(); lightIndexesIt != lightIndexes.cend(); ++lightIndexesIt)
+		{
+			lightsHost[*lightIndexesIt].transform(transformation);
+		}
+        m_lightBuffer->unmap();
+	}
 }
