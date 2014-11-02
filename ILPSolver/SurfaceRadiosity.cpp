@@ -10,6 +10,11 @@ SurfaceRadiosity::SurfaceRadiosity(Scene *scene, const QString &surfaceId):
 		throw std::invalid_argument(("There isn't any object named " + surfaceId + " in the scene").toStdString());
 }
 
+bool SurfaceRadiosity::evaluate()
+{
+	return false;
+}
+
 SurfaceRadiosity::~SurfaceRadiosity(void)
 {
 }

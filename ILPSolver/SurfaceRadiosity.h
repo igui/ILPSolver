@@ -9,7 +9,7 @@ class SurfaceRadiosity
 {
 public:
 	SurfaceRadiosity(Scene *scene, const QString &surfaceId);
-	Interval evaluate();
+	bool evaluate();
 	virtual ~SurfaceRadiosity();
 private:
 	QString surfaceId;

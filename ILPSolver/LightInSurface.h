@@ -2,24 +2,28 @@
 
 #include "math/Vector3.h"
 #include "scene/Scene.h"
+#include "renderer/PMOptixRenderer.h"
+#include <optixu_matrix_namespace.h>
 #include <QString>
+#include <QStack>
 
 class LightInSurface
 {
 public:
-	LightInSurface(Scene *scene, const QString& lightId, const QString& surfaceId);
+	LightInSurface(PMOptixRenderer *renderer, Scene *scene, const QString& lightId, const QString& surfaceId);
 
 	QString lightId();
-	Vector3 generatePointNeighbourhood(const Vector3 center, float radius) const;
+	void pushMoveToNeighbourhood(float radius);
+	void popLastMovement();
 	virtual ~LightInSurface();
 private:
 	bool pointInSurface(optix::float2 point) const;
+	optix::float3 generatePointNeighbourhood(optix::float3 center, float radius) const;
 private:
 	QString m_lightId;
 	QString m_surfaceId;
-	int objectId;
-	Scene *scene;
-
+	PMOptixRenderer *renderer;
+	QStack<optix::Matrix4x4> savedMovements;
 	optix::float3 base; // quad origin in world coordinates
 
 	// orthonormal base of the plane containing the surface.

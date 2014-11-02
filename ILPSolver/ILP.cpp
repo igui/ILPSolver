@@ -17,6 +17,7 @@
 #include "logging/Logger.h"
 #include "LightInSurface.h"
 #include "SurfaceRadiosity.h"
+#include "renderer/PMOptixRenderer.h"
 
 ILP::ILP():
 	scene(NULL),
@@ -40,7 +41,6 @@ void ILP::readScene(Logger *logger, QFile &file, const QString& fileName)
     if(count > 1)
 		throw std::invalid_argument("Multiple scenes are not allowed in the input");
 	
-
 	QString scenePath = results.first();
 	QString absoluteScenePath = scenePath;
 	if(!QFileInfo(scenePath).isAbsolute())
@@ -74,7 +74,7 @@ void ILP::readConditions(QDomDocument& xml)
 				throw std::logic_error("surface can't be empty");
 
 			qDebug() << "condition: LightInSurface id: " + id + ", surface: " + surface;
-			conditions.append(new LightInSurface(scene, id, surface));
+			conditions.append(new LightInSurface(renderer, scene, id, surface));
 		}
 	}
 
@@ -84,7 +84,26 @@ void ILP::readConditions(QDomDocument& xml)
 
 void ILP::optimize()
 {
+	float radius = 0.1f;
+	const unsigned int optimizationsRetries = 20;
+	QList<Interval> bestIntervals;
 
+	for(unsigned int retries = 0; retries < optimizationsRetries; ++retries)
+	{
+		for(auto conditionsIt = conditions.cbegin(); conditionsIt != conditions.cend(); ++conditionsIt)
+		{
+			(*conditionsIt)->pushMoveToNeighbourhood(radius);
+		}
+		if(optimizationFunction->evaluate() == true)
+		{
+			retries = -1; // a better solution was found
+			continue;
+		}
+		for(auto conditionsIt = conditions.cbegin(); conditionsIt != conditions.cend(); ++conditionsIt)
+		{
+			(*conditionsIt)->popLastMovement();
+		}
+	}
 }
 
 void ILP::readOptimizationFunction(QDomDocument& xml)

@@ -103,13 +103,11 @@ int main(int argc, char **argv)
 	DummyLogger logger;
 	logger.log("Init device\n");
 	renderer.initialize(device, &logger);
-	logger.log("Load definition XML\n");
-	logger.log("Load scene\n");
-	ILP::fromFile(&logger, inputPath, &renderer);
-	logger.log("Renderer init scene\n");
-	logger.log("Calculating optimal photons emmited per iteration\n");
+	logger.log("Load definition XML & Scene\n");
+	ILP ilp = ILP::fromFile(&logger, inputPath, &renderer);
+	logger.log("Optimizing\n");
+	ilp.optimize();
 	logger.log("Done! Cleaning up\n");
-	
 	return 0;
 }
 

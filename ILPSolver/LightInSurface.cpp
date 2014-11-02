@@ -1,11 +1,12 @@
 #include "LightInSurface.h"
 
 
-LightInSurface::LightInSurface(Scene *scene, const QString& lightId, const QString& surfaceId):
+LightInSurface::LightInSurface(PMOptixRenderer *renderer, Scene *scene, const QString& lightId, const QString& surfaceId):
 	m_surfaceId(surfaceId),
-	objectId(scene->getObjectId(surfaceId)),
-	scene(scene)
+	renderer(renderer)
 {
+	int objectId = scene->getObjectId(surfaceId);
+
 	if(objectId < 0)
 		throw std::invalid_argument(("There isn't any object named " + surfaceId + " in the scene").toStdString());
 
@@ -29,10 +30,32 @@ LightInSurface::LightInSurface(Scene *scene, const QString& lightId, const QStri
 	c = optix::make_float2( dot(u, pointC), dot(v, pointC));
 }
 
-Vector3 LightInSurface::generatePointNeighbourhood(const Vector3 centerWorldCoordinates, float radius) const
+void LightInSurface::pushMoveToNeighbourhood(float radius)
 {
-	optix::float2 center = optix::make_float2(dot(u, centerWorldCoordinates), dot(v, centerWorldCoordinates));
+	auto center4 = optix::make_float4(base, 1.0f);
 
+	for(auto transformationIt = savedMovements.begin(); transformationIt != savedMovements.end(); ++transformationIt)
+	{
+		center4 = (*transformationIt) * center4;
+	}
+
+	auto center = optix::make_float3(center4 / center4.w);
+	auto neighbour = generatePointNeighbourhood(center, radius);
+	
+	// saves last movement
+	auto displacement = neighbour - center;
+	auto displacementTransformation = optix::Matrix4x4().identity().translate(displacement);
+	savedMovements.push(displacementTransformation);
+}
+
+void LightInSurface::popLastMovement()
+{
+	savedMovements.pop();
+}
+
+optix::float3 LightInSurface::generatePointNeighbourhood(optix::float3 centerWorldCoordinates, float radius) const
+{
+	optix::float2 center = optix::make_float2(dot(u, centerWorldCoordinates - base), dot(v, centerWorldCoordinates - base));
 	optix::float2 res;
 
 	do {
@@ -40,27 +63,27 @@ Vector3 LightInSurface::generatePointNeighbourhood(const Vector3 centerWorldCoor
 		res = center + radius * optix::make_float2(cosf(angle), sinf(angle)); // res in uv coordinates
 	} while(!pointInSurface(res));
 
-	return res.x * u + res.y * v; // res in world coordinates
+	return res.x * u + res.y * v + base; // res in world coordinates
 }
 
-static float sign(optix::float2 p1, optix::float2 p2, optix::float2 p3)
+static bool sign(optix::float2 p1, optix::float2 p2, optix::float2 p3)
 {
-  return (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y);
+  return ((p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y)) < 0.0f;
 }
 
 bool LightInSurface::pointInSurface(optix::float2 point) const
 {
 	const static optix::float2 zero = optix::make_float2(0);
 
-	bool b1 = sign(point, zero, a) < 0.0f;
-	bool b2 = sign(point, a, c) < 0.0f;
-	bool b3 = sign(point, c, zero) < 0.0f;
+	bool b1 = sign(point, zero, a);
+	bool b2 = sign(point, a, c);
+	bool b3 = sign(point, c, zero);
 	
-	bool b4 = sign(point, zero, b) < 0.0f;
-	bool b5 = sign(point, b, c) < 0.0f;
+	bool b4 = sign(point, zero, b);
+	bool b5 = sign(point, b, c);
 	bool b6 = b3;
 
-	return (b1 == b2) && (b2 == b3) || (b4 == b5) && (b5 && b6);
+	return (b1 == b2) && (b2 == b3) || (b4 == b5) && (b5 == b6);
 }
 
 
