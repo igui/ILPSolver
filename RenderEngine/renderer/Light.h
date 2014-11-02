@@ -31,14 +31,17 @@ public:
 
 	void initAreaLight(Vector3 v1, Vector3 v2);
 	void transform(const optix::Matrix4x4& transform);
+	void setTransform(const optix::Matrix4x4& transform);
 #endif
 
 	char name[LIGHT_MAX_NAMELENGTH];
     optix::float3 power;
+
+	// current values (for transformed lights)
     optix::float3 position;
     optix::float3 v1;
     optix::float3 v2;
-    
+
     float inverseArea;
     union
     {
@@ -52,5 +55,14 @@ public:
         optix::float3 direction; // spot
     };
 
+	// original constructed values (for nonTransformed lights values are equal)
+	optix::float3 originalPosition;
+    optix::float3 originalV1;
+    optix::float3 originalV2;
+	optix::float3 originalDirection;
+
     LightType lightType;
+
+private:
+	void transformImpl(const optix::Matrix4x4& transform, bool preMultiply);
 };
