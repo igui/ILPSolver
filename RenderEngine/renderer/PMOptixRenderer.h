@@ -48,6 +48,7 @@ public:
     RENDER_ENGINE_EXPORT_API unsigned int getScreenBufferSizeBytes() const;
 	RENDER_ENGINE_EXPORT_API std::vector<float> getRadiance();
 	RENDER_ENGINE_EXPORT_API void transformNode(const QString &nodeName, const optix::Matrix4x4 &transformation);
+	RENDER_ENGINE_EXPORT_API void setNodeTransformation(const QString &nodeName, const optix::Matrix4x4 &transformation);
 
     const static unsigned int PHOTON_GRID_MAX_SIZE;
 private:
@@ -64,6 +65,7 @@ private:
 	unsigned int getNumPhotons() const;
 	void resizeBuffers(unsigned int width, unsigned int height, unsigned int generateOutput);
 	void countHitCountPerObject();
+	void transformNodeImpl(const QString &nodeName, const optix::Matrix4x4 &transformation, bool preMultiply);
 	
 	optix::Context m_context;
     optix::Buffer m_outputBuffer;

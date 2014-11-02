@@ -571,6 +571,18 @@ static void transformBufferMatrix(Buffer buffer, const Matrix4x4& matrix)
 
 void PMOptixRenderer::transformNode(const QString &nodeName, const optix::Matrix4x4 &transformation)
 {
+	transformNodeImpl(nodeName, transformation, true);
+}
+
+
+void PMOptixRenderer::setNodeTransformation(const QString &nodeName, const optix::Matrix4x4 &transformation)
+{
+	transformNodeImpl(nodeName, transformation, false);
+}
+
+
+void PMOptixRenderer::transformNodeImpl(const QString &nodeName, const optix::Matrix4x4 &transformation, bool preMultiply)
+{
 	auto group = (*m_groups)[nodeName];
 	if(group == NULL)
 	{
@@ -586,11 +598,21 @@ void PMOptixRenderer::transformNode(const QString &nodeName, const optix::Matrix
 	for(unsigned int childIdx = 0; childIdx < childCount; ++childIdx)
 	{
 		auto transform = group->getChild<Transform>(childIdx);
-		float transformMatrixData[16];
-		transform->getMatrix(false, transformMatrixData, NULL);
-		Matrix4x4 transformMatrix(transformMatrixData);
-		Matrix4x4 resMatrix = transformation * transformMatrix;
-		transform->setMatrix(false, resMatrix.getData(), NULL);
+		
+		// if premultiply is true it takes into account the previous transformation
+		// otherwise it simply overwrites it
+		if(preMultiply)
+		{
+			float transformMatrixData[16];
+			transform->getMatrix(false, transformMatrixData, NULL);
+			Matrix4x4 transformMatrix(transformMatrixData);
+			Matrix4x4 resMatrix = transformation * transformMatrix;
+			transform->setMatrix(false, resMatrix.getData(), NULL);
+		} 
+		else 
+		{
+			transform->setMatrix(false, transformation.getData(), NULL);
+		}
 	}
 	m_context["sceneRootObject"]->getGroup()->getAcceleration()->markDirty();
 	group->getAcceleration()->markDirty();
@@ -603,7 +625,14 @@ void PMOptixRenderer::transformNode(const QString &nodeName, const optix::Matrix
 		Light* lightsHost = (Light*)m_lightBuffer->map();
 		for(auto lightIndexesIt = lightIndexes.cbegin(); lightIndexesIt != lightIndexes.cend(); ++lightIndexesIt)
 		{
-			lightsHost[*lightIndexesIt].transform(transformation);
+			if(preMultiply)
+			{
+				lightsHost[*lightIndexesIt].transform(transformation);
+			}
+			else
+			{
+				lightsHost[*lightIndexesIt].setTransform(transformation);
+			}
 		}
         m_lightBuffer->unmap();
 	}
