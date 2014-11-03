@@ -637,3 +637,13 @@ void PMOptixRenderer::transformNodeImpl(const QString &nodeName, const optix::Ma
         m_lightBuffer->unmap();
 	}
 }
+
+int PMOptixRenderer::deviceOrdinal() const
+{
+	return m_optixDeviceOrdinal;
+}
+
+Buffer PMOptixRenderer::outputBuffer()
+{
+	return m_outputBuffer;
+}
