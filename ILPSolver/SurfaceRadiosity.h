@@ -1,19 +1,33 @@
 #pragma once
 
 #include <QString>
-#include <scene/Scene.h>
 #include <vector_types.h>
-#include "Interval.h"
+
+class Logger;
+class PMOptixRenderer;
+class Scene;
+class Camera;
 
 class SurfaceRadiosity
 {
 public:
-	SurfaceRadiosity(Scene *scene, const QString &surfaceId);
+	SurfaceRadiosity(Logger *logger, PMOptixRenderer *renderer, Scene *scene, const QString &surfaceId);
 	bool evaluate();
 	virtual ~SurfaceRadiosity();
 private:
+	static const unsigned int sampleImageWidth;
+	static const unsigned int sampleImageHeight;
+	static const unsigned int defaultPhotonWidth;
+
+	void saveImage();
+
 	QString surfaceId;
 	int objectId;
-	Scene *scene;
+	PMOptixRenderer *renderer;
+	Logger *logger;
+
+	// for sampling images
+	Camera *sampleCamera; 
+	float *sampleOutputBuffer;
 };
 

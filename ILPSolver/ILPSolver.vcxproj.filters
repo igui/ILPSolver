@@ -45,4 +45,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="SurfaceRadiosity.cu">
+      <Filter>Source Files</Filter>
+    </CudaCompile>
+  </ItemGroup>
 </Project>

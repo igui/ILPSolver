@@ -24,17 +24,18 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 6.0.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>$(MSBuildProjectDirectory);$(IncludePath);$(OPTIX_PATH)/include;$(CUDA_INC_PATH);$(NVTOOLSEXT_PATH)\include;$(OPTIX_PATH)/include/optixu;$(SolutionDir)/include;$(SolutionDir)/Gui;$(SolutionDir)/RenderEngine/;$(QTDIR)\include;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtXml;$(QTDIR)\include\QtXmlPatterns;$(QTDIR)\include\QtOpenGL;%(AdditionalIncludeDirectories);$(CUDA_PATH)\include</IncludePath>
-    <LibraryPath>$(OutDir);$(LibraryPath);$(SolutionDir)\lib\;$(NVTOOLSEXT_PATH)\lib\x64;$(CUDA_PATH)\lib\x64;$(QTDIR)\lib</LibraryPath>
+    <LibraryPath>$(LibraryPath);$(SolutionDir)\lib;$(NVTOOLSEXT_PATH)\lib\x64;$(CUDA_PATH)\lib\x64;$(QTDIR)\lib;$(OPTIX_PATH)\lib64</LibraryPath>
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>Qt5OpenGLd.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Xmld.lib;Qt5XmlPatternsd.lib;Qt5Widgetsd.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;glu32.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>cudart.lib;Qt5OpenGLd.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Xmld.lib;Qt5XmlPatternsd.lib;Qt5Widgetsd.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;optix.1.lib;cuda.lib;optixu.1.lib;glu32.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
       <SubSystem>NotSet</SubSystem>
     </Link>
@@ -44,6 +45,16 @@
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;_USE_MATH_DEFINES;NOMINMAX;GLUT_FOUND;GLUT_NO_LIB_PRAGMA;sutil_EXPORTS;RELEASE_PUBLIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Optimization>Disabled</Optimization>
     </ClCompile>
+    <CudaCompile>
+      <TargetMachinePlatform>64</TargetMachinePlatform>
+      <NvccCompilation>ptx</NvccCompilation>
+      <KeepDir>$(IntDir)</KeepDir>
+      <CompileOut>$(OutDir)%(Filename)%(Extension).ptx</CompileOut>
+      <GPUDebugInfo>false</GPUDebugInfo>
+      <CodeGeneration>compute_20,sm_20</CodeGeneration>
+      <HostDebugInfo>false</HostDebugInfo>
+      <FastMath>true</FastMath>
+    </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ILP.cpp" />
@@ -63,8 +74,14 @@
     <ClInclude Include="LightInSurface.h" />
     <ClInclude Include="SurfaceRadiosity.h" />
   </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="SurfaceRadiosity.cu">
+      <NvccCompilation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">compile</NvccCompilation>
+    </CudaCompile>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="..\RenderEngine\BuildRuleCopyDLLs.targets" />
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 6.0.targets" />
   </ImportGroup>
 </Project>
