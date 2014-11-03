@@ -32,13 +32,14 @@ LightInSurface::LightInSurface(PMOptixRenderer *renderer, Scene *scene, const QS
 
 void LightInSurface::pushMoveToNeighbourhood(float radius)
 {
-	auto center4 = optix::make_float4(base, 1.0f);
+	auto currentTransformation = optix::Matrix4x4::identity();
 
 	for(auto transformationIt = savedMovements.begin(); transformationIt != savedMovements.end(); ++transformationIt)
 	{
-		center4 = (*transformationIt) * center4;
+		currentTransformation = (*transformationIt) * currentTransformation;
 	}
 
+	auto center4 = currentTransformation * optix::make_float4(base, 1.0f);
 	auto center = optix::make_float3(center4 / center4.w);
 	auto neighbour = generatePointNeighbourhood(center, radius);
 	
@@ -46,11 +47,22 @@ void LightInSurface::pushMoveToNeighbourhood(float radius)
 	auto displacement = neighbour - center;
 	auto displacementTransformation = optix::Matrix4x4().identity().translate(displacement);
 	savedMovements.push(displacementTransformation);
+
+	// applies currentTransformation to the renderer
+	currentTransformation = displacementTransformation * currentTransformation;
+	renderer->setNodeTransformation(m_surfaceId, currentTransformation);
 }
 
 void LightInSurface::popLastMovement()
 {
 	savedMovements.pop();
+
+	auto currentTransformation = optix::Matrix4x4::identity();
+	for(auto transformationIt = savedMovements.begin(); transformationIt != savedMovements.end(); ++transformationIt)
+	{
+		currentTransformation = (*transformationIt) * currentTransformation;
+	}
+	renderer->setNodeTransformation(m_surfaceId, currentTransformation);
 }
 
 optix::float3 LightInSurface::generatePointNeighbourhood(optix::float3 centerWorldCoordinates, float radius) const
