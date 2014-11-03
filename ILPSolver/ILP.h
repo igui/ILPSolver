@@ -24,8 +24,8 @@ public:
 private:
 	ILP();
 	void readScene(Logger *logger, QFile &file, const QString& fileName);
-	void readConditions(QDomDocument& doc);
-	void readOptimizationFunction(QDomDocument& doc);
+	void readConditions(Logger *logger, QDomDocument& doc);
+	void readOptimizationFunction(Logger *logger, QDomDocument& doc);
 
 	Scene *scene;
 	QVector<LightInSurface *> conditions;

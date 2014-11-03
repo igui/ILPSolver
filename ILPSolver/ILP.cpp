@@ -50,7 +50,7 @@ void ILP::readScene(Logger *logger, QFile &file, const QString& fileName)
 	scene = Scene::createFromFile(logger, absoluteScenePath.toStdString().c_str());
 }
 
-void ILP::readConditions(QDomDocument& xml)
+void ILP::readConditions(Logger *logger, QDomDocument& xml)
 {
 	auto nodes = xml.documentElement().childNodes();
 	for(int i = 0; i < nodes.length(); ++i)
@@ -86,7 +86,6 @@ void ILP::optimize()
 {
 	float radius = 0.1f;
 	const unsigned int optimizationsRetries = 20;
-	QList<Interval> bestIntervals;
 
 	for(unsigned int retries = 0; retries < optimizationsRetries; ++retries)
 	{
@@ -106,7 +105,7 @@ void ILP::optimize()
 	}
 }
 
-void ILP::readOptimizationFunction(QDomDocument& xml)
+void ILP::readOptimizationFunction(Logger *logger, QDomDocument& xml)
 {
 	auto nodes = xml.documentElement().childNodes();
 	for(int i = 0; i < nodes.length(); ++i)
@@ -130,7 +129,7 @@ void ILP::readOptimizationFunction(QDomDocument& xml)
 			if(surface.isEmpty())
 				throw std::logic_error("surface can't be empty");
 
-			optimizationFunction = new SurfaceRadiosity(scene, surface);
+			optimizationFunction = new SurfaceRadiosity(logger, renderer, scene, surface);
 
 			qDebug() << "objective: SurfaceRadiosity on " + surface;
 		}
@@ -165,8 +164,8 @@ ILP ILP::fromFile(Logger *logger, const QString& filePath, PMOptixRenderer *rend
 
 	res.renderer = renderer;
 	res.readScene(logger, file, filePath);
-	res.readConditions(xml);
-	res.readOptimizationFunction(xml);
+	res.readConditions(logger, xml);
+	res.readOptimizationFunction(logger, xml);
 	res.renderer->initScene(*res.scene);
 
 	return res;
