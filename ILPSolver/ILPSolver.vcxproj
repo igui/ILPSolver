@@ -60,7 +60,7 @@
     <ClCompile Include="ILP.cpp" />
     <ClCompile Include="Interval.cpp" />
     <ClCompile Include="LightInSurface.cpp" />
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="Main.cpp" />
     <ClCompile Include="SurfaceRadiosity.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -72,6 +72,7 @@
     <ClInclude Include="ILP.h" />
     <ClInclude Include="Interval.h" />
     <ClInclude Include="LightInSurface.h" />
+    <ClInclude Include="Main.hxx" />
     <ClInclude Include="SurfaceRadiosity.h" />
   </ItemGroup>
   <ItemGroup>
@@ -83,5 +84,7 @@
   <ImportGroup Label="ExtensionTargets">
     <Import Project="..\RenderEngine\BuildRuleCopyDLLs.targets" />
     <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 6.0.targets" />
+    <Import Project="..\RenderEngine\BuildRuleQt.targets" />
+    <Import Project="..\RenderEngine\BuildRuleResources.targets" />
   </ImportGroup>
 </Project>

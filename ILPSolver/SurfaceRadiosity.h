@@ -7,6 +7,8 @@ class Logger;
 class PMOptixRenderer;
 class Scene;
 class Camera;
+class QImage;
+class QCoreApplication;
 
 class SurfaceRadiosity
 {
@@ -18,9 +20,10 @@ private:
 	static const unsigned int sampleImageWidth;
 	static const unsigned int sampleImageHeight;
 	static const unsigned int defaultPhotonWidth;
+	static const float gammaCorrection;
 
 	void saveImage();
-
+	void saveImageAsync(QImage* image);
 	QString surfaceId;
 	int objectId;
 	PMOptixRenderer *renderer;
@@ -28,6 +31,5 @@ private:
 
 	// for sampling images
 	Camera *sampleCamera; 
-	float *sampleOutputBuffer;
 };
 

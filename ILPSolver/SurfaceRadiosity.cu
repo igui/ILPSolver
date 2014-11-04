@@ -27,11 +27,14 @@ __device__ inline static optix::float3 min(optix::float3 a, optix::float3 b)
 			);
 }
 
-__global__ void transformFloatToRGB(optix::float3 *floatColorBuffer, optix::uchar3 *byteColorBuffer)
+__global__ void transformFloatToRGB(optix::float3 *floatColorBuffer, optix::uchar3 *byteColorBuffer, float invGammaCorrection, int width, int height)
 {
-	unsigned int index = blockIdx.x*blockDim.x + threadIdx.x;
+	unsigned int srcIndex = blockIdx.x*blockDim.x + threadIdx.x;
 
-	auto colorFloat = floatColorBuffer[index];
+	auto colorFloat = floatColorBuffer[srcIndex];
+	colorFloat.x = powf(colorFloat.x, invGammaCorrection);
+	colorFloat.y = powf(colorFloat.y, invGammaCorrection);
+	colorFloat.z = powf(colorFloat.z, invGammaCorrection);
 	auto colorFloatCropped = max(
 		optix::make_float3(0.0f),
 		min(optix::make_float3(1.0f) , colorFloat)
@@ -41,11 +44,19 @@ __global__ void transformFloatToRGB(optix::float3 *floatColorBuffer, optix::ucha
 	colorByte.x = floor(colorFloatCropped.x == 1.0f ? 255 : colorFloatCropped.x * 256.0f);
 	colorByte.y = floor(colorFloatCropped.y == 1.0f ? 255 : colorFloatCropped.y * 256.0f);
 	colorByte.z = floor(colorFloatCropped.z == 1.0f ? 255 : colorFloatCropped.z * 256.0f);
-	byteColorBuffer[index] = colorByte;
+	
+	auto x = srcIndex / width;
+	auto y = srcIndex % width;
+	x = height - 1  - x;
+	auto dstIndex = x * width + y;
+
+	byteColorBuffer[dstIndex] = colorByte;
 }
 
 void SurfaceRadiosity::saveImage()
 {
+	// convert float3 image data to 24 bit RGB
+	logger->log("Converting raw image data to RGB\n");
 	nvtxRangePushA("convertImageToRGB");
     int deviceNumber = 0;
 	cudaSetDevice(renderer->deviceOrdinal());
@@ -54,19 +65,23 @@ void SurfaceRadiosity::saveImage()
 	auto floatOutputBuffer = getThrustDevicePtr<optix::float3>(rendererOutputBuffer, deviceNumber);
 	auto floatOutputBufferPtr = thrust::raw_pointer_cast(&floatOutputBuffer[0]);
 
-	thrust::device_vector<optix::uchar3> byteOutputBuffer(sampleImageWidth * sampleImageHeight);
+	int imageSize = sampleImageWidth * sampleImageHeight;
+	thrust::device_vector<optix::uchar3> byteOutputBuffer(imageSize);
 	auto byteOutputBufferPtr = thrust::raw_pointer_cast(&byteOutputBuffer[0]);
 
 	const unsigned int blockSize = 512;
-    unsigned int numBlocks = (sampleImageWidth * sampleImageHeight)/blockSize + ((sampleImageWidth * sampleImageHeight) % blockSize == 0 ? 0 : 1);
+    unsigned int numBlocks = imageSize/blockSize + (imageSize % blockSize == 0 ? 0 : 1);
 
-	transformFloatToRGB<<<numBlocks, blockSize>>> (floatOutputBufferPtr, byteOutputBufferPtr);
+	transformFloatToRGB<<<numBlocks, blockSize>>> (floatOutputBufferPtr, byteOutputBufferPtr, 1.0f / gammaCorrection, sampleImageWidth, sampleImageHeight);
 
 	cudaDeviceSynchronize();
 	nvtxRangePop();
-		
-	optix::uchar3 *imageBytes = new optix::uchar3[sampleImageWidth * sampleImageHeight];
+	
+	// read image data and write it in an image object
+	optix::uchar3 *imageBytes = new optix::uchar3[imageSize];
 	thrust::copy(byteOutputBuffer.begin(), byteOutputBuffer.end(), imageBytes);
-	auto image = QImage((uchar *) imageBytes, sampleImageWidth, sampleImageHeight, QImage::Format_RGB888);
-	image.mirrored(false, true).save("C:\\Users\\Igui\\Desktop\\image.png");
+	auto image = new QImage((uchar *) imageBytes, sampleImageWidth, sampleImageHeight, QImage::Format_RGB888);
+	
+	// save image to a temporary file
+	saveImageAsync(image);
 }

@@ -1,22 +1,40 @@
-/* 
- * Copyright (c) 2014 Ignacio Avas
- * For the full copyright and license information, please view the LICENSE.txt
- * file that was distributed with this source code.
-*/
-
+#include "Main.hxx"
 #include <iostream>
 #include <cstdio>
 #include <ctime>
 #include <algorithm>
 #include <QCoreApplication>
 #include <QCommandLineParser>
-#include "ComputeDeviceRepository.h"
 #include "renderer/PMOptixRenderer.h"
 #include "logging/DummyLogger.h"
 #include "scene/Scene.h"
 #include "ILP.h"
 
-void listDevices()
+
+Main::Main(QObject *parent, const QString &filePath, const ComputeDevice &device):
+	QObject(parent),
+	filePath(filePath),
+	device(device)
+{
+}
+
+
+void Main::run()
+{
+	PMOptixRenderer renderer;
+	DummyLogger logger;
+	logger.log("Init device\n");
+	renderer.initialize(device, &logger);
+	logger.log("Load definition XML & Scene\n");
+	ILP ilp = ILP::fromFile(&logger, filePath, &renderer);
+	logger.log("Optimizing\n");
+	ilp.optimize();
+	logger.log("Done! Cleaning up\n");
+	QThreadPool::globalInstance()->waitForDone();
+	emit finished();
+}
+
+static void listDevices()
 {
 	ComputeDeviceRepository repository;
 	const std::vector<ComputeDevice> & repo = repository.getComputeDevices();
@@ -30,8 +48,6 @@ void listDevices()
 			<< "Clock " << (int)qRound(device.getClockFrequencyKHz() / 1000.0f) << "Mhz)" << std::endl;
 	}
 }
-
-
 
 
 int main(int argc, char **argv)
@@ -96,18 +112,20 @@ int main(int argc, char **argv)
 			<<  "Try -l to list available computing devices." << std::endl;
 		exit(1);
 	}
+
 	ComputeDevice device = repo.at(deviceNumber);
 
-	// init device
-	PMOptixRenderer renderer;
-	DummyLogger logger;
-	logger.log("Init device\n");
-	renderer.initialize(device, &logger);
-	logger.log("Load definition XML & Scene\n");
-	ILP ilp = ILP::fromFile(&logger, inputPath, &renderer);
-	logger.log("Optimizing\n");
-	ilp.optimize();
-	logger.log("Done! Cleaning up\n");
-	return 0;
+	// Task parented to the application so that it
+    // will be deleted by the application.
+	Main *main = new Main(&app, inputPath, device);
+
+    // This will cause the application to exit when
+    // the task signals finished.    
+    QObject::connect(main, SIGNAL(finished()), &app, SLOT(quit()));
+
+    // This will run the task from the application event loop.
+    QTimer::singleShot(0, main, SLOT(run()));
+
+    return app.exec();
 }
 
