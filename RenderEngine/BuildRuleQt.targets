@@ -4,6 +4,7 @@
   <ItemGroup>
     <UIFiles Include="$(MSBuildProjectDirectory)\**\*.ui" />
     <MocFiles Include="$(MSBuildProjectDirectory)\**\*.hxx"/>
+    <ClCompile Include="$(MSBuildProjectDirectory)\**\moc_*.cpp" />
  </ItemGroup>
   
   <Target Name="CompileQtUI" BeforeTargets="ClCompile" Inputs="@(UIFiles)" Outputs="@(UIFiles->'%(RootDir)%(Directory)ui_%(Filename).h')">
