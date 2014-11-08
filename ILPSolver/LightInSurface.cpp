@@ -1,8 +1,10 @@
 #include "LightInSurface.h"
-
+#include <cmath>
+#include <limits>
 
 LightInSurface::LightInSurface(PMOptixRenderer *renderer, Scene *scene, const QString& lightId, const QString& surfaceId):
 	m_surfaceId(surfaceId),
+	m_lightId(lightId),
 	renderer(renderer)
 {
 	int objectId = scene->getObjectId(surfaceId);
@@ -28,20 +30,41 @@ LightInSurface::LightInSurface(PMOptixRenderer *renderer, Scene *scene, const QS
 	optix::float3 pointC = (optix::float3) objectPoints[3] - (optix::float3) objectPoints[0];
 
 	c = optix::make_float2( dot(u, pointC), dot(v, pointC));
+
+	maxDistance = 
+		std::max(
+				std::max(
+					std::max(
+						length(base - pointA),
+						length(base - pointB)
+					),
+					length(base - pointC)
+				),
+				std::max(
+					std::max(
+						length(pointA - pointB),
+						length(pointA - pointC)
+					),
+					length(pointB - pointC)
+				)
+			);
 }
 
-void LightInSurface::pushMoveToNeighbourhood(float radius)
+bool LightInSurface::pushMoveToNeighbourhood(float radius, unsigned int retries)
 {
 	auto currentTransformation = optix::Matrix4x4::identity();
 
-	for(auto transformationIt = savedMovements.begin(); transformationIt != savedMovements.end(); ++transformationIt)
-	{
+	for(auto transformationIt = savedMovements.begin(); transformationIt != savedMovements.end(); ++transformationIt){
 		currentTransformation = (*transformationIt) * currentTransformation;
 	}
 
 	auto center4 = currentTransformation * optix::make_float4(base, 1.0f);
 	auto center = optix::make_float3(center4 / center4.w);
-	auto neighbour = generatePointNeighbourhood(center, radius);
+	auto neighbour = generatePointNeighbourhood(center, radius, retries);
+
+	if(retries <= 0){
+		return false; // no neighbour
+	}
 	
 	// saves last movement
 	auto displacement = neighbour - center;
@@ -50,32 +73,32 @@ void LightInSurface::pushMoveToNeighbourhood(float radius)
 
 	// applies currentTransformation to the renderer
 	currentTransformation = displacementTransformation * currentTransformation;
-	renderer->setNodeTransformation(m_surfaceId, currentTransformation);
+	renderer->setNodeTransformation(m_lightId, currentTransformation);	
+	return true;
 }
 
 void LightInSurface::popLastMovement()
 {
 	savedMovements.pop();
-
-	auto currentTransformation = optix::Matrix4x4::identity();
-	for(auto transformationIt = savedMovements.begin(); transformationIt != savedMovements.end(); ++transformationIt)
-	{
-		currentTransformation = (*transformationIt) * currentTransformation;
-	}
-	renderer->setNodeTransformation(m_surfaceId, currentTransformation);
 }
 
-optix::float3 LightInSurface::generatePointNeighbourhood(optix::float3 centerWorldCoordinates, float radius) const
+optix::float3 LightInSurface::generatePointNeighbourhood(optix::float3 centerWorldCoordinates, float radius, unsigned int& retries) const
 {
-	optix::float2 center = optix::make_float2(dot(u, centerWorldCoordinates - base), dot(v, centerWorldCoordinates - base));
+	auto relativeCenter = centerWorldCoordinates - base;
+	auto center = optix::make_float2(dot(u, relativeCenter), dot(v, relativeCenter));
+	auto relativeRadius = radius * maxDistance;
+
 	optix::float2 res;
-
-	do {
+	while(retries > 0) {
 		float angle = 2.0f * M_PI * qrand() / RAND_MAX; // random angle
-		res = center + radius * optix::make_float2(cosf(angle), sinf(angle)); // res in uv coordinates
-	} while(!pointInSurface(res));
-
-	return res.x * u + res.y * v + base; // res in world coordinates
+		res = center + relativeRadius * optix::make_float2(cosf(angle), sinf(angle)); // res in uv coordinates
+		if(pointInSurface(res)){
+			return res.x * u + res.y * v + base; // res in world coordinates
+		}
+		--retries;
+	}
+	// <NaN, NaN, NaN> for saying that is no neighbour
+	return optix::make_float3(std::numeric_limits<float>::quiet_NaN());
 }
 
 static bool sign(optix::float2 p1, optix::float2 p2, optix::float2 p3)

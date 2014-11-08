@@ -84,14 +84,21 @@ void ILP::readConditions(Logger *logger, QDomDocument& xml)
 
 void ILP::optimize()
 {
-	float radius = 0.1f;
+	float radius = 0.2f;
 	const unsigned int optimizationsRetries = 20;
+
+	optimizationFunction->evaluate();
 
 	for(unsigned int retries = 0; retries < optimizationsRetries; ++retries)
 	{
 		for(auto conditionsIt = conditions.cbegin(); conditionsIt != conditions.cend(); ++conditionsIt)
 		{
-			(*conditionsIt)->pushMoveToNeighbourhood(radius);
+			bool hasNeighbour = (*conditionsIt)->pushMoveToNeighbourhood(radius, optimizationsRetries);
+			if(!hasNeighbour)
+			{
+				// the condition has no neighbour. Maybe a limit point or a high radius was reached
+				break;
+			}
 		}
 		if(optimizationFunction->evaluate() == true)
 		{

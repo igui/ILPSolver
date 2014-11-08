@@ -13,12 +13,12 @@ public:
 	LightInSurface(PMOptixRenderer *renderer, Scene *scene, const QString& lightId, const QString& surfaceId);
 
 	QString lightId();
-	void pushMoveToNeighbourhood(float radius);
+	bool pushMoveToNeighbourhood(float radius, unsigned int retries);
 	void popLastMovement();
 	virtual ~LightInSurface();
 private:
 	bool pointInSurface(optix::float2 point) const;
-	optix::float3 generatePointNeighbourhood(optix::float3 center, float radius) const;
+	optix::float3 generatePointNeighbourhood(optix::float3 center, float radius, unsigned int& retries) const;
 private:
 	QString m_lightId;
 	QString m_surfaceId;
@@ -32,5 +32,7 @@ private:
 	optix::float3 u, v; 
 
 	optix::float2 a,b,c; // other points in uv coordinates (base is 0,0 in uv coordinates).
+
+	float maxDistance; // quad area
 };
 
