@@ -27,6 +27,8 @@ private:
 	QString surfaceId;
 	int objectId;
 	PMOptixRenderer *renderer;
+	float maxRadiosity;
+	float surfaceArea;
 	Logger *logger;
 
 	// for sampling images

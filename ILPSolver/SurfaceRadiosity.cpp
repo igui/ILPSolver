@@ -22,12 +22,17 @@ SurfaceRadiosity::SurfaceRadiosity(Logger *logger, PMOptixRenderer *renderer, Sc
 {
 	if(objectId < 0)
 		throw std::invalid_argument(("There isn't any object named " + surfaceId + " in the scene").toStdString());
+	surfaceArea = scene->getObjectArea(objectId);
+	maxRadiosity = 0;
 }
 
 bool SurfaceRadiosity::evaluate()
 {
 	logger->log("Evaluating solution\n");
 	renderer->render(defaultPhotonWidth, sampleImageHeight, sampleImageWidth, *sampleCamera, true);
+	auto evaluateRadiance = renderer->getRadiance().at(objectId) / surfaceArea;
+	maxRadiosity = std::max(maxRadiosity, evaluateRadiance);
+	logger->log("radiance: %0.1f\n", evaluateRadiance);
 	saveImage();
 	//renderer->genPhotonMap(defaultPhotonWidth);
 	return false;
@@ -50,7 +55,7 @@ private:
         QTemporaryFile tempFile("ilpsolver-XXXXXX.png");
 		tempFile.setAutoRemove(false);
 		tempFile.open();
-		logger->log(QString(), "Saving image at '%s'\n", tempFile.fileName().toStdString().c_str());
+		//logger->log(QString(), "Saving image at '%s'\n", tempFile.fileName().toStdString().c_str());
 		image->save(tempFile.fileName());
 		delete image;
     }
