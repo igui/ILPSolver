@@ -103,33 +103,17 @@
     <ClCompile Include="gui\ComputeDeviceInformationWidgetTabPage.cpp" />
     <ClCompile Include="gui\docks\ConsoleDock.cpp" />
     <ClCompile Include="gui\docks\CameraDock.cpp" />
-    <ClCompile Include="gui\docks\moc_CameraDock.cpp" />
-    <ClCompile Include="gui\docks\moc_ConsoleDock.cpp" />
-    <ClCompile Include="gui\docks\moc_OutputDock.cpp" />
-    <ClCompile Include="gui\docks\moc_PPMDock.cpp" />
-    <ClCompile Include="gui\docks\moc_RenderInformationDock.cpp" />
-    <ClCompile Include="gui\docks\moc_SceneDock.cpp" />
     <ClCompile Include="gui\docks\OutputDock.cpp" />
     <ClCompile Include="gui\docks\PPMDock.cpp" />
     <ClCompile Include="gui\docks\RenderInformationDock.cpp" />
     <ClCompile Include="gui\docks\SceneDock.cpp" />
     <ClCompile Include="gui\main.cpp" />
     <ClCompile Include="gui\MainWindowBase.cpp" />
-    <ClCompile Include="gui\moc_AboutWindow.cpp" />
-    <ClCompile Include="gui\moc_ComputeDeviceInformationWidget.cpp" />
-    <ClCompile Include="gui\moc_ComputeDeviceInformationWidgetTabPage.cpp" />
-    <ClCompile Include="gui\moc_MainWindowBase.cpp" />
-    <ClCompile Include="gui\moc_RenderWidget.cpp" />
     <ClCompile Include="gui\RenderWidget.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="moc_Application.cpp" />
-    <ClCompile Include="models\moc_OutputSettingsModel.cpp" />
-    <ClCompile Include="models\moc_PPMSettingsModel.cpp" />
-    <ClCompile Include="models\moc_RenderStatisticsModel.cpp" />
     <ClCompile Include="models\OutputSettingsModel.cpp" />
     <ClCompile Include="models\PPMSettingsModel.cpp" />
     <ClCompile Include="models\RenderStatisticsModel.cpp" />
-    <ClCompile Include="scene\moc_SceneManager.cpp" />
     <ClCompile Include="scene\SceneManager.cpp" />
   </ItemGroup>
   <ItemGroup>

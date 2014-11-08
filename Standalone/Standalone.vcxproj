@@ -19,7 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="moc_StandaloneRenderManager.cpp" />
     <ClCompile Include="standalone.cpp" />
     <ClCompile Include="StandaloneApplication.cpp" />
     <ClCompile Include="StandaloneRenderManager.cpp" />

@@ -51,7 +51,6 @@
     <ClCompile Include="logging\Logger.cpp" />
     <ClCompile Include="logging\DummyLogger.cpp" />
     <ClCompile Include="logging\SignalLogger.cpp" />
-    <ClCompile Include="logging\moc_SignalLogger.cpp" />
     <ClCompile Include="renderer\PPMOptixRenderer.cpp" />
     <ClCompile Include="renderer\PMOptixRenderer.cpp" />
     <ClCompile Include="renderer\OptixRenderer_CPUKdTree.cpp" />
