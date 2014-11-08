@@ -583,6 +583,11 @@ void PMOptixRenderer::setNodeTransformation(const QString &nodeName, const optix
 
 void PMOptixRenderer::transformNodeImpl(const QString &nodeName, const optix::Matrix4x4 &transformation, bool preMultiply)
 {
+	if(nodeName == NULL || nodeName.isEmpty())
+	{
+		throw std::invalid_argument("nodeName can't be NULL or empty");
+	}
+
 	auto group = (*m_groups)[nodeName];
 	if(group == NULL)
 	{
