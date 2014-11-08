@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <ItemGroup>
+  <ItemGroup Condition="'$(Configuration)'=='Debug'">
     <DllFiles Include="$(QTDIR)\bin\Qt5Cored.dll"/>
     <DllFiles Include="$(QTDIR)\bin\Qt5Guid.dll"/>
     <DllFiles Include="$(QTDIR)\bin\Qt5Networkd.dll"/>
@@ -8,10 +8,21 @@
     <DllFiles Include="$(QTDIR)\bin\Qt5Widgetsd.dll"/>
     <DllFiles Include="$(QTDIR)\bin\Qt5Xmld.dll"/>
     <DllFiles Include="$(QTDIR)\bin\Qt5XmlPatternsd.dll"/>
-    <DllFiles Include="$(QTDIR)\bin\icudt51.dll"/>
-    <DllFiles Include="$(QTDIR)\bin\icuin51.dll"/>
-    <DllFiles Include="$(QTDIR)\bin\icuuc51.dll"/>
-    <DllFiles Include="$(GLEW_PATH)\bin\Release\x64\*.dll"/>
+ </ItemGroup>
+ <ItemGroup Condition="'$(Configuration)'=='Release'">
+    <DllFiles Include="$(QTDIR)\bin\Qt5Core.dll"/>
+    <DllFiles Include="$(QTDIR)\bin\Qt5Gui.dll"/>
+    <DllFiles Include="$(QTDIR)\bin\Qt5Network.dll"/>
+    <DllFiles Include="$(QTDIR)\bin\Qt5OpenGL.dll"/>
+    <DllFiles Include="$(QTDIR)\bin\Qt5Widgets.dll"/>
+    <DllFiles Include="$(QTDIR)\bin\Qt5Xml.dll"/>
+    <DllFiles Include="$(QTDIR)\bin\Qt5XmlPatterns.dll"/>
+ </ItemGroup>
+ <ItemGroup>
+   <DllFiles Include="$(QTDIR)\bin\icudt51.dll"/>
+   <DllFiles Include="$(QTDIR)\bin\icuin51.dll"/>
+   <DllFiles Include="$(QTDIR)\bin\icuuc51.dll"/>
+   <DllFiles Include="$(GLEW_PATH)\bin\Release\x64\*.dll"/>
     <DllFiles Include="$(ASSIMP_PATH)\bin\x64\*.dll"/>
     <DllFiles Include="$(OPTIX_PATH)\bin64\*.dll"/>
     <DllFiles Include="$(NVTOOLSEXT_PATH)\bin\x64\*.dll"/>
