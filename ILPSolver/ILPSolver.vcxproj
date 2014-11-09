@@ -38,6 +38,7 @@
       <AdditionalDependencies>cudart.lib;Qt5OpenGLd.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Xmld.lib;Qt5XmlPatternsd.lib;Qt5Widgetsd.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;optix.1.lib;cuda.lib;optixu.1.lib;glu32.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
       <SubSystem>NotSet</SubSystem>
+      <Profile>true</Profile>
     </Link>
     <ClCompile>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
