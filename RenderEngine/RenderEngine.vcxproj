@@ -84,19 +84,17 @@
     <ClInclude Include="math\AAB.h" />
     <ClInclude Include="math\Sphere.h" />
     <ClInclude Include="math\Vector3.h" />
-    <ClInclude Include="renderer\AABB.h" />
     <ClInclude Include="renderer\helpers\camera.h" />
     <ClInclude Include="renderer\helpers\samplers.h" />
     <ClInclude Include="renderer\helpers\optix.h" />
     <ClInclude Include="renderer\helpers\store_photon.h" />
-    <ClInclude Include="renderer\helpers\vector_types.h" />
     <ClInclude Include="renderer\PMOptixRenderer.h" />
     <ClInclude Include="renderer\PPMOptixRenderer.h" />
     <ClInclude Include="renderer\TransmissionPRD.h" />
     <ClInclude Include="util\imageformats\libtga\tga.h" />
     <ClInclude Include="util\imageformats\libtga\tgaconfig.h" />
     <ClInclude Include="util\Image.h" />
-    <ClInclude Include="material\mirror.h" />
+    <ClInclude Include="material\Mirror.h" />
     <ClInclude Include="material\Texture.h" />
     <ClInclude Include="renderer\helpers\light.h" />
     <ClInclude Include="clientserver\RenderServerRenderRequestDetails.h" />
@@ -133,13 +131,7 @@
     <ClInclude Include="select.h" />
     <ClInclude Include="renderer\ShadowPRD.h" />
     <ClInclude Include="renderer\ppm\PhotonGrid.h" />
-    <ClInclude Include="sutil\ImageDisplay.h" />
-    <ClInclude Include="sutil\ImageLoader.h" />
-    <ClInclude Include="sutil\ModelLoader.h" />
     <ClInclude Include="renderer\helpers\nsight.h" />
-    <ClInclude Include="sutil\ObjLoader.h" />
-    <ClInclude Include="sutil\RayGenCameraData.h" />
-    <ClInclude Include="sutil\SunSky.h" />
     <ClInclude Include="util\Mouse.h" />
     <ClInclude Include="util\sutil.h" />
   </ItemGroup>
@@ -179,13 +171,6 @@
     <ClCompile Include="util\Mouse.cpp" />
     <ClCompile Include="util\sutil.c" />
     <ClCompile Include="math\Vector3.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="BuildRuleCopyDLLs.targets" />
-    <None Include="BuildRuleQt.targets">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="BuildRuleResources.targets" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="geometry_instance\AAB.cu" />

@@ -70,12 +70,6 @@
     <ClInclude Include="gui\docks\OutputDock.hxx" />
     <ClInclude Include="gui\docks\PPMDock.hxx" />
     <ClInclude Include="gui\docks\SceneDock.hxx" />
-    <ClInclude Include="gui\docks\ui\ui_CameraDock.h" />
-    <ClInclude Include="gui\docks\ui\ui_ConsoleDock.h" />
-    <ClInclude Include="gui\docks\ui\ui_OutputDock.h" />
-    <ClInclude Include="gui\docks\ui\ui_PPMDock.h" />
-    <ClInclude Include="gui\docks\ui\ui_RenderInformationDock.h" />
-    <ClInclude Include="gui\docks\ui\ui_SceneDock.h" />
     <ClInclude Include="gui\ui\resources.h" />
     <ClInclude Include="gui_export_api.h" />
     <ClInclude Include="gui\AboutWindow.hxx" />
@@ -84,11 +78,6 @@
     <ClInclude Include="gui\ComputeDeviceInformationWidgetTabPage.hxx" />
     <ClInclude Include="gui\MainWindowBase.hxx" />
     <ClInclude Include="gui\RenderWidget.hxx" />
-    <ClInclude Include="gui\ui\ui_AboutWindow.h" />
-    <ClInclude Include="gui\ui\ui_ComputeDeviceInformationWidget.h" />
-    <ClInclude Include="gui\ui\ui_ComputeDeviceInformationWidgetTabPage.h" />
-    <ClInclude Include="gui\ui\ui_MainWindowBase.h" />
-    <ClInclude Include="gui\ui\ui_RenderTypePPMInfo.h" />
     <ClInclude Include="models\OutputSettingsModel.hxx" />
     <ClInclude Include="models\PPMSettingsModel.hxx" />
     <ClInclude Include="models\RenderStatisticsModel.hxx" />
