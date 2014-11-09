@@ -11,12 +11,23 @@
   <ItemGroup>
     <ClInclude Include="StandaloneRenderManager.hxx" />
     <ClInclude Include="StandaloneApplication.h" />
-    <ClInclude Include="resource.h" />
+    <ClInclude Include="resource.h">
+      <Filter>Resources</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="icon.ico" />
+    <Filter Include="Resources">
+      <UniqueIdentifier>{f37387db-d3f8-4e2f-9144-37f2484b2b50}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="Resource.rc" />
+    <Image Include="icon.ico">
+      <Filter>Resources</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resource.rc">
+      <Filter>Resources</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

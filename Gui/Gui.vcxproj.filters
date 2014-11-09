@@ -142,9 +142,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="LICENSE.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <Filter Include="scene">
       <UniqueIdentifier>{a759dca5-0db8-43d5-82a4-12441af86732}</UniqueIdentifier>
     </Filter>
@@ -163,6 +160,9 @@
     <Filter Include="gui\docks\ui">
       <UniqueIdentifier>{4da1aad4-06d5-45e1-a662-38f1313deb88}</UniqueIdentifier>
     </Filter>
+    <Filter Include="docs">
+      <UniqueIdentifier>{fe63bdc4-1de2-49e7-a9ef-d5c2d8719a4b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Image Include="gui\ui\icon.png">
@@ -173,5 +173,10 @@
     <Xml Include="gui\ui\resources.qrc">
       <Filter>gui\ui</Filter>
     </Xml>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="LICENSE.txt">
+      <Filter>docs</Filter>
+    </Text>
   </ItemGroup>
 </Project>
