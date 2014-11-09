@@ -48,9 +48,11 @@ LightInSurface::LightInSurface(PMOptixRenderer *renderer, Scene *scene, const QS
 					length(pointB - pointC)
 				)
 			);
+
+	initialPosition = base;
 }
 
-bool LightInSurface::pushMoveToNeighbourhood(float radius, unsigned int retries)
+optix::float3 LightInSurface::getCurrentPosition(optix::Matrix4x4 *transformation)
 {
 	auto currentTransformation = optix::Matrix4x4::identity();
 
@@ -59,7 +61,16 @@ bool LightInSurface::pushMoveToNeighbourhood(float radius, unsigned int retries)
 	}
 
 	auto center4 = currentTransformation * optix::make_float4(base, 1.0f);
-	auto center = optix::make_float3(center4 / center4.w);
+	if(transformation != NULL)
+		*transformation = currentTransformation;
+
+	return optix::make_float3(center4 / center4.w);
+}
+
+bool LightInSurface::pushMoveToNeighbourhood(float radius, unsigned int retries)
+{
+	auto currentTransformation = optix::Matrix4x4::identity();
+	auto center = getCurrentPosition(&currentTransformation);
 	auto neighbour = generatePointNeighbourhood(center, radius, retries);
 
 	if(retries <= 0){
@@ -121,7 +132,14 @@ bool LightInSurface::pointInSurface(optix::float2 point) const
 	return (b1 == b2) && (b2 == b3) || (b4 == b5) && (b5 == b6);
 }
 
-
+QString LightInSurface::info()
+{
+	auto position = getCurrentPosition();
+	auto x = QString::number(position.x, 'f', 2);
+	auto y = QString::number(position.y, 'f', 2);
+	auto z = QString::number(position.z, 'f', 2);
+	return x + ", " + y + ", " + z;
+}
 
 LightInSurface::~LightInSurface()
 {

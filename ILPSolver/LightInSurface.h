@@ -12,13 +12,15 @@ class LightInSurface
 public:
 	LightInSurface(PMOptixRenderer *renderer, Scene *scene, const QString& lightId, const QString& surfaceId);
 
-	QString lightId();
 	bool pushMoveToNeighbourhood(float radius, unsigned int retries);
 	void popLastMovement();
+	QString info();
 	virtual ~LightInSurface();
 private:
 	bool pointInSurface(optix::float2 point) const;
 	optix::float3 generatePointNeighbourhood(optix::float3 center, float radius, unsigned int& retries) const;
+	// get the current light position. Also outputs transformation data if parameter is not NULL
+	optix::float3 getCurrentPosition(optix::Matrix4x4 *transformation = NULL);
 private:
 	QString m_lightId;
 	QString m_surfaceId;
@@ -33,6 +35,9 @@ private:
 
 	optix::float2 a,b,c; // other points in uv coordinates (base is 0,0 in uv coordinates).
 
-	float maxDistance; // quad area
+	float maxDistance; // max distance between two point of the quad
+	
+	optix::float3 initialPosition;
+
 };
 

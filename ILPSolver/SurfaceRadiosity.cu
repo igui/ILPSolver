@@ -53,10 +53,9 @@ __global__ void transformFloatToRGB(optix::float3 *floatColorBuffer, optix::ucha
 	byteColorBuffer[dstIndex] = colorByte;
 }
 
-void SurfaceRadiosity::saveImage()
+void SurfaceRadiosity::saveImage(const QString& fileName)
 {
 	// convert float3 image data to 24 bit RGB
-	logger->log("Converting raw image data to RGB\n");
 	nvtxRangePushA("convertImageToRGB");
     int deviceNumber = 0;
 	cudaSetDevice(renderer->deviceOrdinal());
@@ -83,5 +82,5 @@ void SurfaceRadiosity::saveImage()
 	auto image = new QImage((uchar *) imageBytes, sampleImageWidth, sampleImageHeight, QImage::Format_RGB888);
 	
 	// save image to a temporary file
-	saveImageAsync(image);
+	saveImageAsync(fileName, image);
 }

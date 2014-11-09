@@ -18,10 +18,14 @@
 #include "LightInSurface.h"
 #include "SurfaceRadiosity.h"
 #include "renderer/PMOptixRenderer.h"
+#include <ctime>
+
+const QString ILP::logFileName("log.csv");
 
 ILP::ILP():
 	scene(NULL),
-	optimizationFunction(NULL)
+	optimizationFunction(NULL),
+	currentIteration(0)
 {
 }
 
@@ -84,10 +88,15 @@ void ILP::readConditions(Logger *logger, QDomDocument& xml)
 
 void ILP::optimize()
 {
+	qsrand(time(NULL));
 	float radius = 0.2f;
 	const unsigned int optimizationsRetries = 20;
 
+	logIterationHeader();
 	optimizationFunction->evaluate();
+	optimizationFunction->saveImage(getImageFileName());
+	logIterationResults();
+	++currentIteration;
 
 	for(unsigned int retries = 0; retries < optimizationsRetries; ++retries)
 	{
@@ -100,7 +109,13 @@ void ILP::optimize()
 				break;
 			}
 		}
-		if(optimizationFunction->evaluate() == true)
+
+		bool isBetterSolution = optimizationFunction->evaluate();
+		optimizationFunction->saveImage(getImageFileName());
+		logIterationResults();
+		++currentIteration;
+
+		if(isBetterSolution)
 		{
 			retries = -1; // a better solution was found
 			continue;
@@ -110,6 +125,40 @@ void ILP::optimize()
 			(*conditionsIt)->popLastMovement();
 		}
 	}
+}
+
+QString ILP::getImageFileName()
+{
+	return QString("evaluation-%1.png").arg(currentIteration, 4, 10, QLatin1Char('0'));
+}
+
+void ILP::logIterationHeader()
+{
+	QFile file(logFileName);
+	file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate);
+	QTextStream out(&file);
+	
+	out << "Iteration" << ';';
+
+	for(auto conditionsIt = conditions.cbegin(); conditionsIt != conditions.cend(); ++conditionsIt)
+		out << "Condition " << ((conditionsIt-conditions.cbegin()) + 1)  << ';';
+	out << "Optimization Function" << '\n';
+	file.close(); 
+}
+
+
+void ILP::logIterationResults()
+{
+	QFile file(logFileName);
+	file.open(QIODevice::Append | QIODevice::Text);
+	QTextStream out(&file);
+	
+	out << currentIteration << ';';
+
+	for(auto conditionsIt = conditions.cbegin(); conditionsIt != conditions.cend(); ++conditionsIt)
+		out << (*conditionsIt)->info() << ';';
+	out << optimizationFunction->lastEvaluationInfo() << '\n';
+	file.close(); 
 }
 
 void ILP::readOptimizationFunction(Logger *logger, QDomDocument& xml)

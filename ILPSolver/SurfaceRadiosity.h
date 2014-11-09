@@ -1,7 +1,7 @@
 #pragma once
 
-#include <QString>
 #include <vector_types.h>
+#include <QString>
 
 class Logger;
 class PMOptixRenderer;
@@ -15,6 +15,8 @@ class SurfaceRadiosity
 public:
 	SurfaceRadiosity(Logger *logger, PMOptixRenderer *renderer, Scene *scene, const QString &surfaceId);
 	bool evaluate();
+	QString lastEvaluationInfo();
+	void saveImage(const QString &fileName);
 	virtual ~SurfaceRadiosity();
 private:
 	static const unsigned int sampleImageWidth;
@@ -22,11 +24,11 @@ private:
 	static const unsigned int defaultPhotonWidth;
 	static const float gammaCorrection;
 
-	void saveImage();
-	void saveImageAsync(QImage* image);
+	void saveImageAsync(const QString& fileName, QImage* image);
 	QString surfaceId;
 	int objectId;
 	PMOptixRenderer *renderer;
+	float lastRadiosity;
 	float maxRadiosity;
 	float surfaceArea;
 	Logger *logger;

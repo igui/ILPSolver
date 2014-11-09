@@ -30,41 +30,42 @@ bool SurfaceRadiosity::evaluate()
 {
 	logger->log("Evaluating solution\n");
 	renderer->render(defaultPhotonWidth, sampleImageHeight, sampleImageWidth, *sampleCamera, true);
-	auto evaluateRadiance = renderer->getRadiance().at(objectId) / surfaceArea;
-	maxRadiosity = std::max(maxRadiosity, evaluateRadiance);
-	logger->log("radiance: %0.1f\n", evaluateRadiance);
-	saveImage();
-	//renderer->genPhotonMap(defaultPhotonWidth);
+	lastRadiosity = renderer->getRadiance().at(objectId) / surfaceArea;
+	maxRadiosity = std::max(maxRadiosity, lastRadiosity);
+	logger->log("radiance: %0.1f\n", lastRadiosity);
 	return false;
+}
+
+QString SurfaceRadiosity::lastEvaluationInfo()
+{
+	return QString::number(lastRadiosity, 'f', 1);
 }
 
 class SurfaceRadiosityImageSaveASyncTask : public QRunnable
 {
 public:
-	SurfaceRadiosityImageSaveASyncTask(Logger *logger, QImage *image):
+	SurfaceRadiosityImageSaveASyncTask(const QString& fileName, Logger *logger, QImage *image):
 		image(image),
-		logger(logger)
+		logger(logger),
+		fileName(fileName)
 	{
 	}
 private:
 	QImage *image;
 	Logger *logger;
+	QString fileName;
 
     void run()
     {
-        QTemporaryFile tempFile("ilpsolver-XXXXXX.png");
-		tempFile.setAutoRemove(false);
-		tempFile.open();
-		//logger->log(QString(), "Saving image at '%s'\n", tempFile.fileName().toStdString().c_str());
-		image->save(tempFile.fileName());
+		image->save(fileName);
 		delete image;
     }
 };
 
 
-void SurfaceRadiosity::saveImageAsync(QImage *image)
+void SurfaceRadiosity::saveImageAsync(const QString& fileName, QImage *image)
 {
-	auto task = new SurfaceRadiosityImageSaveASyncTask(logger, image);
+	auto task = new SurfaceRadiosityImageSaveASyncTask(fileName, logger, image);
 	QThreadPool::globalInstance()->start(task);
 }
 
