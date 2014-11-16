@@ -102,6 +102,7 @@
     <ClCompile Include="material\DiffuseEmitter.cpp">
       <Filter>material</Filter>
     </ClCompile>
+    <ClCompile Include="util\RelPath.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="select.h" />
@@ -261,6 +262,9 @@
     </ClInclude>
     <ClInclude Include="renderer\helpers\nsight.h">
       <Filter>renderer\helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="util\RelPath.h">
+      <Filter>util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

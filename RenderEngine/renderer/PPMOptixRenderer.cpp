@@ -27,6 +27,7 @@
 #include "util/sutil.h"
 #include "scene/Scene.h"
 #include "renderer/helpers/nsight.h"
+#include "util/RelPath.h"
 
 #if ACCELERATION_STRUCTURE == ACCELERATION_STRUCTURE_UNIFORM_GRID
 const unsigned int PPMOptixRenderer::PHOTON_GRID_MAX_SIZE = 100*100*100;
@@ -136,9 +137,9 @@ void PPMOptixRenderer::initialize(const ComputeDevice & device, Logger *logger)
     // Ray OptixEntryPoint Generation Program
 
     {
-        Program generatorProgram = m_context->createProgramFromPTXFile( "RayGeneratorPPM.cu.ptx", "generateRay" );
-        Program exceptionProgram = m_context->createProgramFromPTXFile( "RayGeneratorPPM.cu.ptx", "exception" );
-        Program missProgram = m_context->createProgramFromPTXFile( "RayGeneratorPPM.cu.ptx", "miss" );
+        Program generatorProgram = m_context->createProgramFromPTXFile( relativePathToExe("RayGeneratorPPM.cu.ptx"), "generateRay" );
+        Program exceptionProgram = m_context->createProgramFromPTXFile( relativePathToExe("RayGeneratorPPM.cu.ptx"), "exception" );
+        Program missProgram = m_context->createProgramFromPTXFile( relativePathToExe("RayGeneratorPPM.cu.ptx"), "miss" );
         
         m_context->setRayGenerationProgram( OptixEntryPoint::PPM_RAYTRACE_PASS, generatorProgram );
         m_context->setExceptionProgram( OptixEntryPoint::PPM_RAYTRACE_PASS, exceptionProgram );
@@ -148,9 +149,9 @@ void PPMOptixRenderer::initialize(const ComputeDevice & device, Logger *logger)
 
     // Path Tracing ray generation
     {
-        Program generatorProgram = m_context->createProgramFromPTXFile( "RayGeneratorPT.cu.ptx", "generateRay" );
-        Program exceptionProgram =  m_context->createProgramFromPTXFile( "RayGeneratorPT.cu.ptx", "exception" );
-        Program missProgram = m_context->createProgramFromPTXFile( "RayGeneratorPT.cu.ptx", "miss" );
+        Program generatorProgram = m_context->createProgramFromPTXFile( relativePathToExe("RayGeneratorPT.cu.ptx"), "generateRay" );
+        Program exceptionProgram =  m_context->createProgramFromPTXFile( relativePathToExe("RayGeneratorPT.cu.ptx"), "exception" );
+        Program missProgram = m_context->createProgramFromPTXFile( relativePathToExe("RayGeneratorPT.cu.ptx"), "miss" );
         m_context->setRayGenerationProgram( OptixEntryPoint::PT_RAYTRACE_PASS, generatorProgram );
         m_context->setExceptionProgram(OptixEntryPoint::PT_RAYTRACE_PASS, exceptionProgram);
     }
@@ -160,9 +161,9 @@ void PPMOptixRenderer::initialize(const ComputeDevice & device, Logger *logger)
     //
 
     {
-        Program generatorProgram = m_context->createProgramFromPTXFile( "PhotonGenerator.cu.ptx", "generator" );
-        Program exceptionProgram = m_context->createProgramFromPTXFile( "PhotonGenerator.cu.ptx", "exception" );
-        Program missProgram = m_context->createProgramFromPTXFile( "PhotonGenerator.cu.ptx", "miss");
+        Program generatorProgram = m_context->createProgramFromPTXFile( relativePathToExe("PhotonGenerator.cu.ptx"), "generator" );
+        Program exceptionProgram = m_context->createProgramFromPTXFile( relativePathToExe("PhotonGenerator.cu.ptx"), "exception" );
+        Program missProgram = m_context->createProgramFromPTXFile( relativePathToExe("PhotonGenerator.cu.ptx"), "miss");
         m_context->setRayGenerationProgram(OptixEntryPoint::PPM_PHOTON_PASS, generatorProgram);
         m_context->setMissProgram(OptixEntryPoint::PPM_PHOTON_PASS, missProgram);
         m_context->setExceptionProgram(OptixEntryPoint::PPM_PHOTON_PASS, exceptionProgram);
@@ -181,7 +182,7 @@ void PPMOptixRenderer::initialize(const ComputeDevice & device, Logger *logger)
     optix::Buffer photonsHashTableCount = m_context->createBuffer(RT_BUFFER_OUTPUT, RT_FORMAT_UNSIGNED_INT, NUM_PHOTONS);
     m_context["photonsHashTableCount"]->set(photonsHashTableCount);
     {
-        Program program = m_context->createProgramFromPTXFile( "UniformGridPhotonInitialize.cu.ptx", "kernel" );
+        Program program = m_context->createProgramFromPTXFile( relativePathToExe("UniformGridPhotonInitialize.cu.ptx"), "kernel" );
         m_context->setRayGenerationProgram(OptixEntryPoint::PPM_CLEAR_PHOTONS_UNIFORM_GRID_PASS, program );
     }
     m_context["photonsGridCellSize"]->setFloat(0.0f);
@@ -226,11 +227,11 @@ void PPMOptixRenderer::initialize(const ComputeDevice & device, Logger *logger)
 
         optix::Geometry photonSpheres = m_context->createGeometry();
         photonSpheres->setPrimitiveCount(NUM_VOLUMETRIC_PHOTONS);
-        photonSpheres->setIntersectionProgram(m_context->createProgramFromPTXFile("VolumetricPhotonSphere.cu.ptx", "intersect"));
-        photonSpheres->setBoundingBoxProgram(m_context->createProgramFromPTXFile("VolumetricPhotonSphere.cu.ptx", "boundingBox"));
+        photonSpheres->setIntersectionProgram(m_context->createProgramFromPTXFile(relativePathToExe("VolumetricPhotonSphere.cu.ptx"), "intersect"));
+        photonSpheres->setBoundingBoxProgram(m_context->createProgramFromPTXFile(relativePathToExe("VolumetricPhotonSphere.cu.ptx"), "boundingBox"));
 
         optix::Material material = m_context->createMaterial();
-        material->setAnyHitProgram(RayType::VOLUMETRIC_RADIANCE, m_context->createProgramFromPTXFile("VolumetricPhotonSphereRadiance.cu.ptx", "anyHitRadiance"));
+        material->setAnyHitProgram(RayType::VOLUMETRIC_RADIANCE, m_context->createProgramFromPTXFile(relativePathToExe("VolumetricPhotonSphereRadiance.cu.ptx"), "anyHitRadiance"));
         optix::GeometryInstance volumetricPhotonSpheres = m_context->createGeometryInstance( photonSpheres, &material, &material+1 );
         volumetricPhotonSpheres["photonsBuffer"]->setBuffer(m_volumetricPhotonsBuffer);
 
@@ -247,7 +248,7 @@ void PPMOptixRenderer::initialize(const ComputeDevice & device, Logger *logger)
     //
 
     {
-        Program program = m_context->createProgramFromPTXFile( "VolumetricPhotonInitialize.cu.ptx", "kernel" );
+        Program program = m_context->createProgramFromPTXFile( relativePathToExe("VolumetricPhotonInitialize.cu.ptx"), "kernel" );
         m_context->setRayGenerationProgram(OptixEntryPoint::PPM_CLEAR_VOLUMETRIC_PHOTONS_PASS, program );
     }
 #endif
@@ -263,7 +264,7 @@ void PPMOptixRenderer::initialize(const ComputeDevice & device, Logger *logger)
     // Indirect Radiance Estimation Program
     //
     {
-        Program program = m_context->createProgramFromPTXFile( "IndirectRadianceEstimation.cu.ptx", "kernel" );
+        Program program = m_context->createProgramFromPTXFile( relativePathToExe("IndirectRadianceEstimation.cu.ptx"), "kernel" );
         m_context->setRayGenerationProgram(OptixEntryPoint::PPM_INDIRECT_RADIANCE_ESTIMATION_PASS, program );
     }
 
@@ -278,7 +279,7 @@ void PPMOptixRenderer::initialize(const ComputeDevice & device, Logger *logger)
     // Direct Radiance Estimation Program
     //
     {
-        Program program = m_context->createProgramFromPTXFile( "DirectRadianceEstimation.cu.ptx", "kernel" );
+        Program program = m_context->createProgramFromPTXFile( relativePathToExe("DirectRadianceEstimation.cu.ptx"), "kernel" );
         m_context->setRayGenerationProgram(OptixEntryPoint::PPM_DIRECT_RADIANCE_ESTIMATION_PASS, program );
     }
 
@@ -294,7 +295,7 @@ void PPMOptixRenderer::initialize(const ComputeDevice & device, Logger *logger)
     // Output Program
     //
     {
-        Program program = m_context->createProgramFromPTXFile( "Output.cu.ptx", "kernel" );
+        Program program = m_context->createProgramFromPTXFile( relativePathToExe("Output.cu.ptx"), "kernel" );
         m_context->setRayGenerationProgram(OptixEntryPoint::PPM_OUTPUT_PASS, program );
     }
 

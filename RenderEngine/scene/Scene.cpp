@@ -21,6 +21,7 @@
 #include "logging/DummyLogger.h"
 #include <cstdio>
 #include <optixu_matrix_namespace.h>
+#include "util/RelPath.h"
 
 Scene::Scene(Logger *logger)
     : m_scene(NULL),
@@ -313,7 +314,7 @@ optix::Group Scene::getSceneRootGroup( optix::Context & context, QMap<QString, o
 {
     if(!m_intersectionProgram)
     {
-        std::string ptxFilename = "TriangleMesh.cu.ptx";
+        std::string ptxFilename = relativePathToExe("TriangleMesh.cu.ptx");
         m_intersectionProgram = context->createProgramFromPTXFile( ptxFilename, "mesh_intersect" );
         m_boundingBoxProgram = context->createProgramFromPTXFile( ptxFilename, "mesh_bounds" );
     }

@@ -78,6 +78,7 @@
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="util\RelPath.h" />
     <ClInclude Include="logging\DummyLogger.h" />
     <ClInclude Include="logging\SignalLogger.hxx" />
     <ClInclude Include="logging\Logger.h" />
@@ -169,6 +170,7 @@
     <ClCompile Include="scene\Scene.cpp" />
     <ClCompile Include="renderer\OptixRenderer.cpp" />
     <ClCompile Include="util\Mouse.cpp" />
+    <ClCompile Include="util\RelPath.cpp" />
     <ClCompile Include="util\sutil.c" />
     <ClCompile Include="math\Vector3.cpp" />
   </ItemGroup>

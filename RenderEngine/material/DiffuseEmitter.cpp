@@ -6,6 +6,7 @@
 
 #include "DiffuseEmitter.h"
 #include "renderer/RayType.h"
+#include "util/RelPath.h"
 
 bool DiffuseEmitter::m_optixMaterialIsCreated = false;
 optix::Material DiffuseEmitter::m_optixMaterial;
@@ -22,12 +23,12 @@ optix::Material DiffuseEmitter::getOptixMaterial(optix::Context & context)
 {
     if(!m_optixMaterialIsCreated)
     {
-        optix::Program radianceProgram = context->createProgramFromPTXFile( "DiffuseEmitter.cu.ptx", "closestHitRadiance");
+        optix::Program radianceProgram = context->createProgramFromPTXFile( relativePathToExe("DiffuseEmitter.cu.ptx"), "closestHitRadiance");
         m_optixMaterial = context->createMaterial();
         m_optixMaterial->setClosestHitProgram(RayType::RADIANCE, radianceProgram);
         m_optixMaterial->setClosestHitProgram(RayType::RADIANCE_IN_PARTICIPATING_MEDIUM, radianceProgram);
-        m_optixMaterial->setClosestHitProgram(RayType::PHOTON, context->createProgramFromPTXFile( "DiffuseEmitter.cu.ptx", "closestHitPhoton") );
-        m_optixMaterial->setAnyHitProgram(RayType::SHADOW, context->createProgramFromPTXFile( "DiffuseEmitter.cu.ptx", "gatherAnyHitOnEmitter"));
+        m_optixMaterial->setClosestHitProgram(RayType::PHOTON, context->createProgramFromPTXFile( relativePathToExe("DiffuseEmitter.cu.ptx"), "closestHitPhoton") );
+        m_optixMaterial->setAnyHitProgram(RayType::SHADOW, context->createProgramFromPTXFile( relativePathToExe("DiffuseEmitter.cu.ptx"), "gatherAnyHitOnEmitter"));
         this->registerMaterialWithShadowProgram(context, m_optixMaterial);
         m_optixMaterialIsCreated = true;
     }

@@ -5,6 +5,7 @@
 */
 
 #include "AABInstance.h"
+#include "util/RelPath.h"
 
 bool AABInstance::m_hasLoadedOptixPrograms = false;
 optix::Program AABInstance::m_programBoundingBox;
@@ -21,8 +22,8 @@ optix::Geometry AABInstance::getOptixGeometry( optix::Context & context)
 {
     if(m_hasLoadedOptixPrograms == false)
     {
-        m_programBoundingBox = context->createProgramFromPTXFile("AAB.cu.ptx", "boundingBox");
-        m_programIntersection = context->createProgramFromPTXFile("AAB.cu.ptx", "intersect");
+        m_programBoundingBox = context->createProgramFromPTXFile(relativePathToExe("AAB.cu.ptx"), "boundingBox");
+        m_programIntersection = context->createProgramFromPTXFile(relativePathToExe("AAB.cu.ptx"), "intersect");
         m_hasLoadedOptixPrograms = true;
     }
     

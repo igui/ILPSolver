@@ -6,6 +6,7 @@
 
 #include "ParticipatingMedium.h"
 #include "renderer/RayType.h"
+#include "util/RelPath.h"
 
 bool ParticipatingMedium::m_optixMaterialIsCreated = false;
 optix::Material ParticipatingMedium::m_optixMaterial;
@@ -19,9 +20,9 @@ optix::Material ParticipatingMedium::getOptixMaterial(optix::Context & context)
 {
     if(!m_optixMaterialIsCreated)
     {
-        optix::Program radianceProgram = context->createProgramFromPTXFile( "ParticipatingMedium.cu.ptx", "closestHitRadiance");
-        optix::Program photonProgram = context->createProgramFromPTXFile( "ParticipatingMedium.cu.ptx", "closestHitPhoton");
-        //optix::Program transmissionProgram = context->createProgramFromPTXFile( "ParticipatingMedium.cu.ptx", "radianceTransmission");
+        optix::Program radianceProgram = context->createProgramFromPTXFile( relativePathToExe("ParticipatingMedium.cu.ptx"), "closestHitRadiance");
+        optix::Program photonProgram = context->createProgramFromPTXFile( relativePathToExe("ParticipatingMedium.cu.ptx"), "closestHitPhoton");
+        //optix::Program transmissionProgram = context->createProgramFromPTXFile( relativePathToExe("ParticipatingMedium.cu.ptx"), "radianceTransmission");
 
         m_optixMaterial = context->createMaterial();
         m_optixMaterial->setClosestHitProgram(RayType::RADIANCE, radianceProgram);

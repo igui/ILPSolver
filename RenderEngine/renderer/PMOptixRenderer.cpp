@@ -28,6 +28,7 @@
 #include "util/sutil.h"
 #include "scene/Scene.h"
 #include "renderer/helpers/nsight.h"
+#include "util/RelPath.h"
 
 const unsigned int PMOptixRenderer::PHOTON_GRID_MAX_SIZE = 100*100*100;
 const unsigned int PMOptixRenderer::MAX_PHOTON_COUNT = MAX_PHOTONS_DEPOSITS_PER_EMITTED;
@@ -67,6 +68,7 @@ PMOptixRenderer::~PMOptixRenderer()
     cudaDeviceReset();
 }
 
+
 void PMOptixRenderer::initialize(const ComputeDevice & device, Logger *logger)
 {
     if(m_initialized)
@@ -105,9 +107,9 @@ void PMOptixRenderer::initialize(const ComputeDevice & device, Logger *logger)
     // Ray OptixEntryPoint Generation Program
 
     {
-        Program generatorProgram = m_context->createProgramFromPTXFile( "PMRayGenerator.cu.ptx", "generateRay" );
-        Program exceptionProgram = m_context->createProgramFromPTXFile( "PMRayGenerator.cu.ptx", "exception" );
-        Program missProgram = m_context->createProgramFromPTXFile( "PMRayGenerator.cu.ptx", "miss" );
+		Program generatorProgram = m_context->createProgramFromPTXFile( relativePathToExe("PMRayGenerator.cu.ptx"), "generateRay" );
+        Program exceptionProgram = m_context->createProgramFromPTXFile( relativePathToExe("PMRayGenerator.cu.ptx"), "exception" );
+        Program missProgram = m_context->createProgramFromPTXFile( relativePathToExe("PMRayGenerator.cu.ptx"), "miss" );
         
         m_context->setRayGenerationProgram( OptixEntryPoint::PPM_RAYTRACE_PASS, generatorProgram );
         m_context->setExceptionProgram( OptixEntryPoint::PPM_RAYTRACE_PASS, exceptionProgram );
@@ -120,9 +122,9 @@ void PMOptixRenderer::initialize(const ComputeDevice & device, Logger *logger)
     //
 
     {
-        Program generatorProgram = m_context->createProgramFromPTXFile( "PMPhotonGenerator.cu.ptx", "generator" );
-        Program exceptionProgram = m_context->createProgramFromPTXFile( "PMPhotonGenerator.cu.ptx", "exception" );
-        Program missProgram = m_context->createProgramFromPTXFile( "PMPhotonGenerator.cu.ptx", "miss");
+        Program generatorProgram = m_context->createProgramFromPTXFile( relativePathToExe("PMPhotonGenerator.cu.ptx"), "generator" );
+        Program exceptionProgram = m_context->createProgramFromPTXFile( relativePathToExe("PMPhotonGenerator.cu.ptx"), "exception" );
+        Program missProgram = m_context->createProgramFromPTXFile( relativePathToExe("PMPhotonGenerator.cu.ptx"), "miss");
         m_context->setRayGenerationProgram(OptixEntryPoint::PPM_PHOTON_PASS, generatorProgram);
         m_context->setMissProgram(OptixEntryPoint::PPM_PHOTON_PASS, missProgram);
         m_context->setExceptionProgram(OptixEntryPoint::PPM_PHOTON_PASS, exceptionProgram);
@@ -168,7 +170,7 @@ void PMOptixRenderer::initialize(const ComputeDevice & device, Logger *logger)
     // Indirect Radiance Estimation Program
     //
     {
-        Program program = m_context->createProgramFromPTXFile( "PMIndirectRadianceEstimation.cu.ptx", "kernel" );
+        Program program = m_context->createProgramFromPTXFile( relativePathToExe("PMIndirectRadianceEstimation.cu.ptx"), "kernel" );
         m_context->setRayGenerationProgram(OptixEntryPoint::PPM_INDIRECT_RADIANCE_ESTIMATION_PASS, program );
     }
 
@@ -183,7 +185,7 @@ void PMOptixRenderer::initialize(const ComputeDevice & device, Logger *logger)
     // Direct Radiance Estimation Program
     //
     {
-        Program program = m_context->createProgramFromPTXFile( "PMDirectRadianceEstimation.cu.ptx", "kernel" );
+        Program program = m_context->createProgramFromPTXFile( relativePathToExe("PMDirectRadianceEstimation.cu.ptx"), "kernel" );
         m_context->setRayGenerationProgram(OptixEntryPoint::PPM_DIRECT_RADIANCE_ESTIMATION_PASS, program );
     }
 
@@ -199,7 +201,7 @@ void PMOptixRenderer::initialize(const ComputeDevice & device, Logger *logger)
     // Output Program
     //
     {
-        Program program = m_context->createProgramFromPTXFile( "PMOutput.cu.ptx", "kernel" );
+        Program program = m_context->createProgramFromPTXFile( relativePathToExe("PMOutput.cu.ptx"), "kernel" );
         m_context->setRayGenerationProgram(OptixEntryPoint::PPM_OUTPUT_PASS, program );
     }
 

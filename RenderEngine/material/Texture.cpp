@@ -8,6 +8,7 @@
 #include "renderer/RayType.h"
 #include "util/Image.h"
 #include <QString>
+#include "util/RelPath.h"
 
 bool Texture::m_optixMaterialIsCreated = false;
 optix::Material Texture::m_optixMaterial;
@@ -63,8 +64,8 @@ optix::Material Texture::getOptixMaterial(optix::Context & context)
     if(!m_optixMaterialIsCreated)
     {
         m_optixMaterial = context->createMaterial();
-        optix::Program radianceProgram = context->createProgramFromPTXFile( "Texture.cu.ptx", "closestHitRadiance");
-        optix::Program photonProgram = context->createProgramFromPTXFile( "Texture.cu.ptx", "closestHitPhoton");
+        optix::Program radianceProgram = context->createProgramFromPTXFile( relativePathToExe("Texture.cu.ptx"), "closestHitRadiance");
+        optix::Program photonProgram = context->createProgramFromPTXFile( relativePathToExe("Texture.cu.ptx"), "closestHitPhoton");
 
         m_optixMaterial->setClosestHitProgram(RayType::RADIANCE, radianceProgram);
         m_optixMaterial->setClosestHitProgram(RayType::RADIANCE_IN_PARTICIPATING_MEDIUM, radianceProgram);

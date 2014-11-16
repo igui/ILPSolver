@@ -6,6 +6,7 @@
 
 #include "Glass.h"
 #include "renderer/RayType.h"
+#include "util/RelPath.h"
 
 bool Glass::m_optixMaterialIsCreated = false;
 optix::Material Glass::m_optixMaterial;
@@ -21,10 +22,10 @@ optix::Material Glass::getOptixMaterial(optix::Context & context)
     if(!m_optixMaterialIsCreated)
     {
         m_optixMaterial = context->createMaterial();
-        optix::Program radianceClosestProgram = context->createProgramFromPTXFile( "Glass.cu.ptx", "closestHitRadiance");
-        optix::Program radianceAnyHitProgram = context->createProgramFromPTXFile( "Glass.cu.ptx", "anyHitRadiance");
-        optix::Program photonClosestProgram = context->createProgramFromPTXFile( "Glass.cu.ptx", "closestHitPhoton");
-        optix::Program photonAnyHitProgram = context->createProgramFromPTXFile( "Glass.cu.ptx", "anyHitPhoton");
+        optix::Program radianceClosestProgram = context->createProgramFromPTXFile( relativePathToExe("Glass.cu.ptx"), "closestHitRadiance");
+        optix::Program radianceAnyHitProgram = context->createProgramFromPTXFile( relativePathToExe("Glass.cu.ptx"), "anyHitRadiance");
+        optix::Program photonClosestProgram = context->createProgramFromPTXFile( relativePathToExe("Glass.cu.ptx"), "closestHitPhoton");
+        optix::Program photonAnyHitProgram = context->createProgramFromPTXFile( relativePathToExe("Glass.cu.ptx"), "anyHitPhoton");
 
         m_optixMaterial->setClosestHitProgram(RayType::RADIANCE, radianceClosestProgram);
         //m_optixMaterial->setAnyHitProgram(RayType::RADIANCE, radianceAnyHitProgram );

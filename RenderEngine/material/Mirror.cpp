@@ -6,6 +6,7 @@
 
 #include "Mirror.h"
 #include "renderer/RayType.h"
+#include "util/RelPath.h"
 
 bool Mirror::m_optixMaterialIsCreated = false;
 optix::Material Mirror::m_optixMaterial;
@@ -19,8 +20,8 @@ optix::Material Mirror::getOptixMaterial(optix::Context & context)
 {
     if(!m_optixMaterialIsCreated)
     {
-        optix::Program photonProgram = context->createProgramFromPTXFile( "Mirror.cu.ptx", "closestHitPhoton");
-        optix::Program radianceProgram = context->createProgramFromPTXFile( "Mirror.cu.ptx", "closestHitRadiance");
+        optix::Program photonProgram = context->createProgramFromPTXFile( relativePathToExe("Mirror.cu.ptx"), "closestHitPhoton");
+        optix::Program radianceProgram = context->createProgramFromPTXFile( relativePathToExe("Mirror.cu.ptx"), "closestHitRadiance");
         m_optixMaterial = context->createMaterial();
         m_optixMaterial->setClosestHitProgram(RayType::RADIANCE, radianceProgram);
         m_optixMaterial->setClosestHitProgram(RayType::RADIANCE_IN_PARTICIPATING_MEDIUM, radianceProgram);

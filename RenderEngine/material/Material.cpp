@@ -6,6 +6,7 @@
 
 #include "Material.h"
 #include "renderer/RayType.h"
+#include "util/RelPath.h"
 
 bool Material::m_hasLoadedOptixAnyHitProgram = false;
 optix::Program Material::m_optixAnyHitProgram;
@@ -35,7 +36,7 @@ void Material::registerMaterialWithShadowProgram( optix::Context & context, opti
 {
     if(!m_hasLoadedOptixAnyHitProgram)
     {
-        m_optixAnyHitProgram = context->createProgramFromPTXFile( "DirectRadianceEstimation.cu.ptx", "gatherAnyHitOnNonEmitter");
+        m_optixAnyHitProgram = context->createProgramFromPTXFile( relativePathToExe("DirectRadianceEstimation.cu.ptx"), "gatherAnyHitOnNonEmitter");
         m_hasLoadedOptixAnyHitProgram = true;
     }
     material->setAnyHitProgram(RayType::SHADOW, m_optixAnyHitProgram);

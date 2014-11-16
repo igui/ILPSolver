@@ -6,6 +6,7 @@
 
 #include "SphereInstance.h"
 #include "math/Sphere.h"
+#include "util/RelPath.h"
 
 bool SphereInstance::m_hasLoadedOptixPrograms = false;
 optix::Program SphereInstance::m_programBoundingBox;
@@ -22,8 +23,8 @@ optix::Geometry SphereInstance::getOptixGeometry( optix::Context & context)
 {
     if(m_hasLoadedOptixPrograms == false)
     {
-        m_programBoundingBox = context->createProgramFromPTXFile("Sphere.cu.ptx", "boundingBox");
-        m_programIntersection = context->createProgramFromPTXFile("Sphere.cu.ptx", "intersect");
+        m_programBoundingBox = context->createProgramFromPTXFile(relativePathToExe("Sphere.cu.ptx"), "boundingBox");
+        m_programIntersection = context->createProgramFromPTXFile(relativePathToExe("Sphere.cu.ptx"), "intersect");
         m_hasLoadedOptixPrograms = true;
     }
 
