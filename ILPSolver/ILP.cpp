@@ -10,7 +10,6 @@
 #include <QXmlResultItems>
 #include <QFile>
 #include <QFileInfo>
-#include <QDir>
 #include <QXmlNodeModelIndex>
 #include <QAbstractXmlNodeModel>
 #include <qdebug.h>
@@ -32,7 +31,7 @@ ILP::ILP():
 {
 }
 
-void ILP::readScene(Logger *logger, QFile &file, const QString& fileName)
+void ILP::readScene(QFile &file, const QString& fileName)
 {
 	QXmlQuery query(QXmlQuery::XQuery10);
     query.setFocus(&file);
@@ -58,7 +57,7 @@ void ILP::readScene(Logger *logger, QFile &file, const QString& fileName)
 	inited = true;
 }
 
-void ILP::readConditions(Logger *logger, QDomDocument& xml)
+void ILP::readConditions(QDomDocument& xml)
 {
 	auto nodes = xml.documentElement().childNodes();
 	for(int i = 0; i < nodes.length(); ++i)
@@ -174,13 +173,37 @@ bool ILP::pushMoveToNeighbourhoodAll(int optimizationsRetries, float radius)
 
 QString ILP::getImageFileName()
 {
-	return QString("evaluation-%1.png").arg(currentIteration, 4, 10, QLatin1Char('0'));
+	return  outputDir.filePath(
+		QString("evaluation-%1.png").arg(currentIteration, 4, 10, QLatin1Char('0'))
+	);
 }
+
+void ILP::cleanOutputDir()
+{
+	if(!outputDir.exists()){
+		outputDir.mkpath(".");
+	} else {
+		// cleans unneeded files
+		auto cleanFiles = outputDir.entryInfoList(
+			QStringList() << "evaluation-*.png" << "logger.csv",
+			QDir::Files
+		);
+		for(auto cleanFilesIt = cleanFiles.begin(); cleanFilesIt != cleanFiles.end(); ++cleanFilesIt){
+			QFile(cleanFilesIt->absoluteFilePath()).remove();
+		}
+	}
+}
+
 
 void ILP::logIterationHeader()
 {
-	QFile file(logFileName);
-	file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate);
+	cleanOutputDir();
+
+	QFile file(outputDir.filePath(logFileName));
+	bool success = file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate);
+	if(!success){
+		throw std::logic_error(("Couldn't open log file: " + file.errorString()).toStdString().c_str());
+	}
 	QTextStream out(&file);
 	
 	out << "Iteration" << ';';
@@ -194,8 +217,11 @@ void ILP::logIterationHeader()
 
 void ILP::logIterationResults(SurfaceRadiosityEvaluation *evaluation)
 {
-	QFile file(logFileName);
-	file.open(QIODevice::Append | QIODevice::Text);
+	QFile file(outputDir.filePath(logFileName));
+	bool success = file.open(QIODevice::Append | QIODevice::Text);
+	if(!success){
+		throw std::logic_error(("Couldn't open log file: " + file.errorString()).toStdString().c_str());
+	}
 	QTextStream out(&file);
 	
 	out << currentIteration << ';';
@@ -206,7 +232,7 @@ void ILP::logIterationResults(SurfaceRadiosityEvaluation *evaluation)
 	file.close(); 
 }
 
-void ILP::readOptimizationFunction(Logger *logger, QDomDocument& xml)
+void ILP::readOptimizationFunction(QDomDocument& xml)
 {
 	auto nodes = xml.documentElement().childNodes();
 	for(int i = 0; i < nodes.length(); ++i)
@@ -240,6 +266,26 @@ void ILP::readOptimizationFunction(Logger *logger, QDomDocument& xml)
 		throw std::logic_error("an objective must be set");
 }
 
+void ILP::readOutputPath(const QString &fileName, QDomDocument& xml)
+{
+	auto nodes = xml.documentElement().childNodes();
+	for(int i = 0; i < nodes.length(); ++i){
+		auto outputPathNode = nodes.at(i).toElement();
+		if(outputPathNode.tagName() != "output")
+			continue;
+
+		QString path = outputPathNode.attribute("path");
+		if(path.isEmpty()){
+			throw std::logic_error("A path attribute must be set for the output element");
+		}
+		
+		outputDir = QDir(QFileInfo(fileName).dir().absoluteFilePath(path));
+		return;
+	}
+
+	throw std::logic_error("No output path set");
+}
+
 ILP ILP::fromFile(Logger *logger, const QString& filePath, PMOptixRenderer *renderer)
 {
 	ILP res;
@@ -265,10 +311,11 @@ ILP ILP::fromFile(Logger *logger, const QString& filePath, PMOptixRenderer *rend
 
 	res.logger = logger;
 	res.renderer = renderer;
-	res.readScene(logger, file, filePath);
-	res.readConditions(logger, xml);
-	res.readOptimizationFunction(logger, xml);
+	res.readScene(file, filePath);
+	res.readConditions(xml);
+	res.readOptimizationFunction(xml);
 	res.renderer->initScene(*res.scene);
+	res.readOutputPath(filePath, xml);
 
 	return res;
 }

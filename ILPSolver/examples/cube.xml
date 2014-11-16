@@ -4,7 +4,7 @@
   <scene path="cube.dae"/>
 
   <!-- print output images and log on "./output" folder -->
-  <printOutput folder="output"/>
+  <output path="output"/>
   
   <!-- Optimization variables -->
   <conditions>

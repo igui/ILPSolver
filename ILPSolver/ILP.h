@@ -8,6 +8,7 @@
 #include "scene/Scene.h"
 #include "renderer/PMOptixRenderer.h"
 #include <QVector>
+#include <QDir>
 
 class Logger;
 class QFile;
@@ -26,15 +27,17 @@ public:
 	static ILP fromFile(Logger *logger, const QString& filePath, PMOptixRenderer *renderer);
 	void optimize();
 private:
-	void readScene(Logger *logger, QFile &file, const QString& fileName);
-	void readConditions(Logger *logger, QDomDocument& doc);
-	void readOptimizationFunction(Logger *logger, QDomDocument& doc);
+	void readScene(QFile &file, const QString& fileName);
+	void readConditions(QDomDocument& doc);
+	void readOptimizationFunction(QDomDocument& doc);
 	QString getImageFileName();
 	void logIterationHeader();
 	void logIterationResults(SurfaceRadiosityEvaluation *evaluation);
 	SurfaceRadiosityEvaluation *findFirstImprovement(SurfaceRadiosityEvaluation *currentEval, float radius);
 	bool pushMoveToNeighbourhoodAll(int retries, float radius);
 	void popMoveAll();
+	void readOutputPath(const QString &fileName, QDomDocument& doc);
+	void cleanOutputDir();
 
 	bool inited;
 	Scene *scene;
@@ -43,4 +46,5 @@ private:
 	PMOptixRenderer *renderer;
 	int currentIteration;
 	Logger *logger;
+	QDir outputDir;
 };
