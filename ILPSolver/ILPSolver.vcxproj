@@ -63,6 +63,7 @@
     <ClCompile Include="LightInSurface.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="SurfaceRadiosity.cpp" />
+    <ClCompile Include="SurfaceRadiosityEvaluation.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RenderEngine\RenderEngine.vcxproj">
@@ -75,11 +76,19 @@
     <ClInclude Include="LightInSurface.h" />
     <ClInclude Include="Main.hxx" />
     <ClInclude Include="SurfaceRadiosity.h" />
+    <ClInclude Include="SurfaceRadiosityEvaluation.h" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="SurfaceRadiosity.cu">
       <NvccCompilation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">compile</NvccCompilation>
     </CudaCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="examples\cube.blend" />
+    <None Include="examples\cube.dae" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="examples\cube.xml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

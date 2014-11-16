@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<input>
+  <!-- Scene path (relative to this file) -->
+  <scene path="cube.dae"/>
+
+  <!-- print output images and log on "./output" folder -->
+  <printOutput folder="output"/>
+  
+  <!-- Optimization variables -->
+  <conditions>
+    <lightInSurface id="EmitiveLight" surface="Ceiling"></lightInSurface>
+  </conditions>
+
+  <!-- Which aspects of the scene must be optimized  -->
+  <objectives>
+    <!-- Maximize radiance on floor surface with 95% and radius of 5 W -->
+    <maximizeRadiance surface="Floor" confidenceIntervalRadius="5" confidence="0.95"></maximizeRadiance>
+  </objectives>  
+</input>

@@ -6,6 +6,7 @@
     <ClCompile Include="LightInSurface.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="SurfaceRadiosity.cpp" />
+    <ClCompile Include="SurfaceRadiosityEvaluation.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ILP.h" />
@@ -13,8 +14,25 @@
     <ClInclude Include="LightInSurface.h" />
     <ClInclude Include="Main.hxx" />
     <ClInclude Include="SurfaceRadiosity.h" />
+    <ClInclude Include="SurfaceRadiosityEvaluation.h" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="SurfaceRadiosity.cu" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="examples\cube.blend">
+      <Filter>examples</Filter>
+    </None>
+    <None Include="examples\cube.dae">
+      <Filter>examples</Filter>
+    </None>
+    <None Include="examples\cube.xml">
+      <Filter>examples</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="examples">
+      <UniqueIdentifier>{5ee97804-250e-4ed5-a9aa-a2804802de53}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>
