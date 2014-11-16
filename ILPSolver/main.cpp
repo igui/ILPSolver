@@ -25,8 +25,17 @@ void Main::run()
 	DummyLogger logger;
 	logger.log("Init device\n");
 	renderer.initialize(device, &logger);
-	logger.log("Load definition XML & Scene\n");
-	ILP ilp = ILP::fromFile(&logger, filePath, &renderer);
+	
+	ILP ilp;
+	try {
+		logger.log("Load definition XML & Scene\n");
+		ilp = ILP::fromFile(&logger, filePath, &renderer);
+	} catch(std::exception ex){
+		logger.log(QString(), "Error reading file: %s\n", ex.what());
+		emit finished();
+		return;
+	}
+
 	logger.log("Optimizing\n");
 	ilp.optimize();
 	logger.log("Done! Cleaning up\n");
