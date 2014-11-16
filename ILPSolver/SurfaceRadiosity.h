@@ -2,6 +2,7 @@
 
 #include <vector_types.h>
 #include <QString>
+#include "SurfaceRadiosityEvaluation.h"
 
 class Logger;
 class PMOptixRenderer;
@@ -14,8 +15,7 @@ class SurfaceRadiosity
 {
 public:
 	SurfaceRadiosity(Logger *logger, PMOptixRenderer *renderer, Scene *scene, const QString &surfaceId);
-	bool evaluate();
-	QString lastEvaluationInfo();
+	SurfaceRadiosityEvaluation *evaluate();
 	void saveImage(const QString &fileName);
 	virtual ~SurfaceRadiosity();
 private:
@@ -28,8 +28,6 @@ private:
 	QString surfaceId;
 	int objectId;
 	PMOptixRenderer *renderer;
-	float lastRadiosity;
-	float maxRadiosity;
 	float surfaceArea;
 	Logger *logger;
 

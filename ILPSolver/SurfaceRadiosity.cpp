@@ -23,22 +23,14 @@ SurfaceRadiosity::SurfaceRadiosity(Logger *logger, PMOptixRenderer *renderer, Sc
 	if(objectId < 0)
 		throw std::invalid_argument(("There isn't any object named " + surfaceId + " in the scene").toStdString());
 	surfaceArea = scene->getObjectArea(objectId);
-	maxRadiosity = 0;
 }
 
-bool SurfaceRadiosity::evaluate()
+SurfaceRadiosityEvaluation *SurfaceRadiosity::evaluate()
 {
 	logger->log("Evaluating solution\n");
 	renderer->render(defaultPhotonWidth, sampleImageHeight, sampleImageWidth, *sampleCamera, true);
-	lastRadiosity = renderer->getRadiance().at(objectId) / surfaceArea;
-	maxRadiosity = std::max(maxRadiosity, lastRadiosity);
-	logger->log("radiance: %0.1f\n", lastRadiosity);
-	return false;
-}
-
-QString SurfaceRadiosity::lastEvaluationInfo()
-{
-	return QString::number(lastRadiosity, 'f', 1);
+	float radiosity = renderer->getRadiance().at(objectId) / surfaceArea;
+	return new SurfaceRadiosityEvaluation(radiosity);
 }
 
 class SurfaceRadiosityImageSaveASyncTask : public QRunnable

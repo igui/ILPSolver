@@ -25,7 +25,10 @@ const QString ILP::logFileName("log.csv");
 ILP::ILP():
 	scene(NULL),
 	optimizationFunction(NULL),
-	currentIteration(0)
+	currentIteration(0),
+	logger(NULL),
+	renderer(NULL),
+	inited(false)
 {
 }
 
@@ -52,6 +55,7 @@ void ILP::readScene(Logger *logger, QFile &file, const QString& fileName)
 		absoluteScenePath = QFileInfo(fileName).dir().absoluteFilePath(scenePath);
 	}
 	scene = Scene::createFromFile(logger, absoluteScenePath.toStdString().c_str());
+	inited = true;
 }
 
 void ILP::readConditions(Logger *logger, QDomDocument& xml)
@@ -88,44 +92,85 @@ void ILP::readConditions(Logger *logger, QDomDocument& xml)
 
 void ILP::optimize()
 {
+	if(!inited){
+		throw std::logic_error("ILP is not inited");
+	}
+
 	qsrand(time(NULL));
-	float radius = 0.2f;
-	const unsigned int optimizationsRetries = 20;
 
 	logIterationHeader();
-	optimizationFunction->evaluate();
+	auto bestVal = optimizationFunction->evaluate();
+	logger->log(QString(), "Initial solution: %s\n", ((QString)*bestVal).toStdString().c_str());
 	optimizationFunction->saveImage(getImageFileName());
-	logIterationResults();
-	++currentIteration;
+	logIterationResults(bestVal);
 
-	for(unsigned int retries = 0; retries < optimizationsRetries; ++retries)
-	{
-		for(auto conditionsIt = conditions.cbegin(); conditionsIt != conditions.cend(); ++conditionsIt)
-		{
-			bool hasNeighbour = (*conditionsIt)->pushMoveToNeighbourhood(radius, optimizationsRetries);
-			if(!hasNeighbour)
-			{
-				// the condition has no neighbour. Maybe a limit point or a high radius was reached
-				break;
+	float radius = 0.05f;
+	while(radius < 1.0f){
+		auto improvement = findFirstImprovement(bestVal, radius);
+		if(improvement != NULL && improvement->better(bestVal)){
+			delete bestVal;
+			bestVal = improvement;
+			radius = 0.05f;
+		} else {
+			if(improvement != NULL){
+				popMoveAll();
 			}
-		}
-
-		bool isBetterSolution = optimizationFunction->evaluate();
-		optimizationFunction->saveImage(getImageFileName());
-		logIterationResults();
-		++currentIteration;
-
-		if(isBetterSolution)
-		{
-			retries = -1; // a better solution was found
-			continue;
-		}
-		for(auto conditionsIt = conditions.cbegin(); conditionsIt != conditions.cend(); ++conditionsIt)
-		{
-			(*conditionsIt)->popLastMovement();
+			radius += 0.05;
 		}
 	}
+	++currentIteration;	
 }
+
+SurfaceRadiosityEvaluation *ILP::findFirstImprovement(SurfaceRadiosityEvaluation *currentEval, float radius)
+{
+	static const int optimizationsRetries = 20;
+	for(int retries = 1; retries < optimizationsRetries; ++retries){
+		bool success = pushMoveToNeighbourhoodAll(optimizationsRetries, radius);
+		if(!success)
+			break; // no neighbours
+
+		auto candidate = optimizationFunction->evaluate();
+		optimizationFunction->saveImage(getImageFileName());
+		logIterationResults(candidate);
+		++currentIteration;
+
+		if(candidate->better(currentEval)){
+			logger->log(QString(), "Better solution: %s\n", ((QString)*candidate).toStdString().c_str());
+			return candidate; // a better solution was found
+		} else {
+			delete candidate;
+		}
+		popMoveAll();
+	}
+	return NULL; // no better candidate
+}
+
+void ILP::popMoveAll()
+{
+	for(auto conditionsIt = conditions.cbegin(); conditionsIt != conditions.cend(); ++conditionsIt){
+		(*conditionsIt)->popLastMovement();
+	}
+}
+
+bool ILP::pushMoveToNeighbourhoodAll(int optimizationsRetries, float radius)
+{
+	for(int i = 0; i < conditions.size(); ++i){
+		bool hasNeighbour = conditions[i]->pushMoveToNeighbourhood(radius, optimizationsRetries);
+		if(!hasNeighbour){
+			// the condition has no neighbour. Maybe a limit point or a high radius was reached
+			logger->log("No neighbours found\n");
+			
+			// all or nothing: undoes movements already done
+			for(int j = 0; j < i; ++j){
+				conditions[j]->popLastMovement();
+			}
+			return false; // no neighbours
+		}
+	}
+	return true;
+}
+
+
 
 QString ILP::getImageFileName()
 {
@@ -147,7 +192,7 @@ void ILP::logIterationHeader()
 }
 
 
-void ILP::logIterationResults()
+void ILP::logIterationResults(SurfaceRadiosityEvaluation *evaluation)
 {
 	QFile file(logFileName);
 	file.open(QIODevice::Append | QIODevice::Text);
@@ -157,7 +202,7 @@ void ILP::logIterationResults()
 
 	for(auto conditionsIt = conditions.cbegin(); conditionsIt != conditions.cend(); ++conditionsIt)
 		out << (*conditionsIt)->info() << ';';
-	out << optimizationFunction->lastEvaluationInfo() << '\n';
+	out << (*evaluation) << '\n';
 	file.close(); 
 }
 
@@ -218,6 +263,7 @@ ILP ILP::fromFile(Logger *logger, const QString& filePath, PMOptixRenderer *rend
  
 	file.reset();
 
+	res.logger = logger;
 	res.renderer = renderer;
 	res.readScene(logger, file, filePath);
 	res.readConditions(logger, xml);
