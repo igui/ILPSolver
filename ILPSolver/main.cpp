@@ -30,15 +30,20 @@ void Main::run()
 	try {
 		logger.log("Load definition XML & Scene\n");
 		ilp = ILP::fromFile(&logger, filePath, &renderer);
-	} catch(std::exception ex){
+	} catch(std::exception& ex){
 		logger.log(QString(), "Error reading file: %s\n", ex.what());
 		emit finished();
 		return;
 	}
 
-	logger.log("Optimizing\n");
-	ilp.optimize();
-	logger.log("Done! Cleaning up\n");
+	try {
+		logger.log("Optimizing\n");
+		ilp.optimize();
+	}catch(std::exception& ex){
+		logger.log(QString(), "Error optimizing: %s\n", ex.what());
+	}
+	
+	logger.log("Cleaning up\n");
 	QThreadPool::globalInstance()->waitForDone();
 	emit finished();
 }
