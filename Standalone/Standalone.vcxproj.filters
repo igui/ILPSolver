@@ -25,9 +25,4 @@
       <Filter>Resources</Filter>
     </Image>
   </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="Resource.rc">
-      <Filter>Resources</Filter>
-    </ResourceCompile>
-  </ItemGroup>
 </Project>
