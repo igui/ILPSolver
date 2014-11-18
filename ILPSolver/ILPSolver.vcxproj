@@ -45,6 +45,7 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;_USE_MATH_DEFINES;NOMINMAX;GLUT_FOUND;GLUT_NO_LIB_PRAGMA;sutil_EXPORTS;RELEASE_PUBLIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Optimization>Disabled</Optimization>
+      <DisableSpecificWarnings>4244;4305;4251</DisableSpecificWarnings>
     </ClCompile>
     <CudaCompile>
       <TargetMachinePlatform>64</TargetMachinePlatform>
