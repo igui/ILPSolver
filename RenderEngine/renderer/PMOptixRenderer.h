@@ -51,6 +51,7 @@ public:
 	RENDER_ENGINE_EXPORT_API void setNodeTransformation(const QString &nodeName, const optix::Matrix4x4 &transformation);
 	RENDER_ENGINE_EXPORT_API int deviceOrdinal() const;
 	RENDER_ENGINE_EXPORT_API optix::Buffer outputBuffer();
+	RENDER_ENGINE_EXPORT_API unsigned int getNumPhotons() const;
 
     const static unsigned int PHOTON_GRID_MAX_SIZE;
 private:
@@ -64,7 +65,6 @@ private:
     void createUniformGridPhotonMap(float ppmRadius);
     void initializeStochasticHashPhotonMap(float ppmRadius);
     void createPhotonKdTreeOnCPU();
-	unsigned int getNumPhotons() const;
 	void resizeBuffers(unsigned int width, unsigned int height, unsigned int generateOutput);
 	void countHitCountPerObject();
 	void transformNodeImpl(const QString &nodeName, const optix::Matrix4x4 &transformation, bool preMultiply);

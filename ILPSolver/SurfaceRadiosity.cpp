@@ -13,12 +13,13 @@ const unsigned int SurfaceRadiosity::sampleImageWidth = 1024;
 const unsigned int SurfaceRadiosity::defaultPhotonWidth = 512;
 const float SurfaceRadiosity::gammaCorrection = 2.8f;
 
-SurfaceRadiosity::SurfaceRadiosity(Logger *logger, PMOptixRenderer *renderer, Scene *scene, const QString &surfaceId):
+SurfaceRadiosity::SurfaceRadiosity(Logger *logger, PMOptixRenderer *renderer, Scene *scene, const QString &surfaceId, float confidenceIntervalRadius):
 	surfaceId(surfaceId),
 	objectId(scene->getObjectId(surfaceId)),
 	sampleCamera(new Camera(scene->getDefaultCamera())),
 	renderer(renderer),
-	logger(logger)
+	logger(logger),
+	confidenceIntervalRadius(confidenceIntervalRadius)
 {
 	if(objectId < 0)
 		throw std::invalid_argument(("There isn't any object named " + surfaceId + " in the scene").toStdString());
@@ -29,8 +30,23 @@ SurfaceRadiosityEvaluation *SurfaceRadiosity::evaluate()
 {
 	logger->log("Evaluating solution\n");
 	renderer->render(defaultPhotonWidth, sampleImageHeight, sampleImageWidth, *sampleCamera, true);
-	float radiosity = renderer->getRadiance().at(objectId) / surfaceArea;
-	return new SurfaceRadiosityEvaluation(radiosity);
+	
+	unsigned int n  = renderer->getHitCount().at(objectId);
+	float p = (float) n / renderer->getNumPhotons();
+	float W = renderer->getRadiance().at(objectId) / surfaceArea;
+	
+	/*
+		// for calculating minimun photonWidth
+		static const float 4z2 = 7.6832f;
+		float minimumNumPhotons = 4z2 * (1-p) * p * (r/confidenceIntervalRadius)*(r/confidenceIntervalRadius);
+		int minimumWidth = ceilf(sqrtf(minimumNumPhotons));
+		qDebug() << ("min width: " + QString::number(minimumWidth));
+	*/
+
+	const static float z = 1.96f;
+	float radius = z * W * sqrtf(p*(1-p)/n);
+	qDebug() << ("interval Radius: " + QString::number(radius));
+	return new SurfaceRadiosityEvaluation(W, radius);
 }
 
 class SurfaceRadiosityImageSaveASyncTask : public QRunnable

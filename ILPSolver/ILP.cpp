@@ -102,6 +102,7 @@ void ILP::optimize()
 	logger->log(QString(), "Initial solution: %s\n", ((QString)*bestVal).toStdString().c_str());
 	optimizationFunction->saveImage(getImageFileName());
 	logIterationResults(bestVal);
+	++currentIteration;
 
 	float radius = 0.05f;
 	while(radius < 1.0f){
@@ -252,11 +253,16 @@ void ILP::readOptimizationFunction(QDomDocument& xml)
 
 
 			QString surface = maximizeRadianceNode.attribute("surface");
+			bool conversionOk;
+			float confidenceIntervalRadius = maximizeRadianceNode.attribute("confidenceIntervalRadius").toDouble(&conversionOk);
+			if(!conversionOk){
+				throw std::logic_error("Invalid confidenceIntervalRadius format");
+			}
 
 			if(surface.isEmpty())
 				throw std::logic_error("surface can't be empty");
 
-			optimizationFunction = new SurfaceRadiosity(logger, renderer, scene, surface);
+			optimizationFunction = new SurfaceRadiosity(logger, renderer, scene, surface, confidenceIntervalRadius);
 
 			qDebug() << "objective: SurfaceRadiosity on " + surface;
 		}

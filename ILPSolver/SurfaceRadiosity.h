@@ -14,7 +14,7 @@ class QCoreApplication;
 class SurfaceRadiosity
 {
 public:
-	SurfaceRadiosity(Logger *logger, PMOptixRenderer *renderer, Scene *scene, const QString &surfaceId);
+	SurfaceRadiosity(Logger *logger, PMOptixRenderer *renderer, Scene *scene, const QString &surfaceId, float confidenceIntervalRadius);
 	SurfaceRadiosityEvaluation *evaluate();
 	void saveImage(const QString &fileName);
 	virtual ~SurfaceRadiosity();
@@ -25,10 +25,12 @@ private:
 	static const float gammaCorrection;
 
 	void saveImageAsync(const QString& fileName, QImage* image);
+
 	QString surfaceId;
 	int objectId;
 	PMOptixRenderer *renderer;
 	float surfaceArea;
+	float confidenceIntervalRadius;
 	Logger *logger;
 
 	// for sampling images
