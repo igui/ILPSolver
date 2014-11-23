@@ -3,21 +3,48 @@
   <ItemGroup>
     <ClCompile Include="ILP.cpp" />
     <ClCompile Include="Interval.cpp" />
-    <ClCompile Include="LightInSurface.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="SurfaceRadiosity.cpp" />
-    <ClCompile Include="SurfaceRadiosityEvaluation.cpp" />
+    <ClCompile Include="optimizations\SurfaceRadiosity.cpp">
+      <Filter>optimizations</Filter>
+    </ClCompile>
+    <ClCompile Include="optimizations\SurfaceRadiosityEvaluation.cpp">
+      <Filter>optimizations</Filter>
+    </ClCompile>
+    <ClCompile Include="conditions\LightInSurface.cpp">
+      <Filter>conditions</Filter>
+    </ClCompile>
+    <ClCompile Include="conditions\Condition.cpp">
+      <Filter>conditions</Filter>
+    </ClCompile>
+    <ClCompile Include="optimizations\OptimizationFunction.cpp">
+      <Filter>optimizations</Filter>
+    </ClCompile>
+    <ClCompile Include="optimizations\Evaluation.cpp">
+      <Filter>optimizations</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ILP.h" />
     <ClInclude Include="Interval.h" />
-    <ClInclude Include="LightInSurface.h" />
     <ClInclude Include="Main.hxx" />
-    <ClInclude Include="SurfaceRadiosity.h" />
-    <ClInclude Include="SurfaceRadiosityEvaluation.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <CudaCompile Include="SurfaceRadiosity.cu" />
+    <ClInclude Include="optimizations\SurfaceRadiosity.h">
+      <Filter>optimizations</Filter>
+    </ClInclude>
+    <ClInclude Include="optimizations\SurfaceRadiosityEvaluation.h">
+      <Filter>optimizations</Filter>
+    </ClInclude>
+    <ClInclude Include="conditions\LightInSurface.h">
+      <Filter>conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="conditions\Condition.h">
+      <Filter>conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="optimizations\Evaluation.h">
+      <Filter>optimizations</Filter>
+    </ClInclude>
+    <ClInclude Include="optimizations\OptimizationFunction.h">
+      <Filter>optimizations</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="examples\cube.blend">
@@ -34,5 +61,16 @@
     <Filter Include="examples">
       <UniqueIdentifier>{5ee97804-250e-4ed5-a9aa-a2804802de53}</UniqueIdentifier>
     </Filter>
+    <Filter Include="conditions">
+      <UniqueIdentifier>{f8753e75-2d19-4478-aab6-71e6d25185a5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="optimizations">
+      <UniqueIdentifier>{319846bd-d1a7-400b-b0e5-c441611cf3a1}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="optimizations\SurfaceRadiosity.cu">
+      <Filter>optimizations</Filter>
+    </CudaCompile>
   </ItemGroup>
 </Project>

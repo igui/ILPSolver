@@ -53,18 +53,21 @@
       <KeepDir>$(IntDir)</KeepDir>
       <CompileOut>$(OutDir)%(Filename)%(Extension).ptx</CompileOut>
       <GPUDebugInfo>false</GPUDebugInfo>
-      <CodeGeneration>compute_20,sm_20</CodeGeneration>
+      <CodeGeneration>compute_30,sm_30</CodeGeneration>
       <HostDebugInfo>false</HostDebugInfo>
       <FastMath>true</FastMath>
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="conditions\Condition.cpp" />
+    <ClCompile Include="optimizations\Evaluation.cpp" />
     <ClCompile Include="ILP.cpp" />
     <ClCompile Include="Interval.cpp" />
-    <ClCompile Include="LightInSurface.cpp" />
+    <ClCompile Include="conditions\LightInSurface.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="SurfaceRadiosity.cpp" />
-    <ClCompile Include="SurfaceRadiosityEvaluation.cpp" />
+    <ClCompile Include="optimizations\OptimizationFunction.cpp" />
+    <ClCompile Include="optimizations\SurfaceRadiosity.cpp" />
+    <ClCompile Include="optimizations\SurfaceRadiosityEvaluation.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RenderEngine\RenderEngine.vcxproj">
@@ -72,15 +75,18 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="conditions\Condition.h" />
+    <ClInclude Include="optimizations\Evaluation.h" />
     <ClInclude Include="ILP.h" />
     <ClInclude Include="Interval.h" />
-    <ClInclude Include="LightInSurface.h" />
+    <ClInclude Include="conditions\LightInSurface.h" />
     <ClInclude Include="Main.hxx" />
-    <ClInclude Include="SurfaceRadiosity.h" />
-    <ClInclude Include="SurfaceRadiosityEvaluation.h" />
+    <ClInclude Include="optimizations\OptimizationFunction.h" />
+    <ClInclude Include="optimizations\SurfaceRadiosity.h" />
+    <ClInclude Include="optimizations\SurfaceRadiosityEvaluation.h" />
   </ItemGroup>
   <ItemGroup>
-    <CudaCompile Include="SurfaceRadiosity.cu">
+    <CudaCompile Include="optimizations\SurfaceRadiosity.cu">
       <NvccCompilation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">compile</NvccCompilation>
     </CudaCompile>
   </ItemGroup>
