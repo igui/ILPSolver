@@ -41,7 +41,8 @@ PMOptixRenderer::PMOptixRenderer() :
     m_height(10),
 	m_photonWidth(10),
 	m_groups(new QMap<QString, Group>()),
-	m_lights(new QMap<QString, QList<int>>())
+	m_lights(new QMap<QString, QList<int>>()),
+	m_totalPhotons(0)
 {
     try
     {
@@ -653,4 +654,9 @@ int PMOptixRenderer::deviceOrdinal() const
 Buffer PMOptixRenderer::outputBuffer()
 {
 	return m_outputBuffer;
+}
+
+unsigned int PMOptixRenderer::totalPhotons()
+{
+	return m_totalPhotons;
 }

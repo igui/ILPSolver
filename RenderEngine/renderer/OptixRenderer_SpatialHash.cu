@@ -6,6 +6,7 @@
 
 #include "config.h"
 #include <cuda.h>
+#include <curand_kernel.h>
 #include <optix_world.h>
 #include <thrust/reduce.h>
 #include <thrust/pair.h>
@@ -484,6 +485,13 @@ void PMOptixRenderer::countHitCountPerObject()
 
 	sumPhotonsHitCount<<<numBlocks, blockSize>>> (photonsPtr, numPhotons, hitCountPtr, rawRadiancePtr);
 	cudaDeviceSynchronize();
+
+	m_totalPhotons = 0;
+	unsigned int *hitCountHost = (unsigned int *) m_hitCountBuffer->map();
+	for(unsigned int i = 0; i < m_sceneObjects; ++i){
+		m_totalPhotons += hitCountHost[i];
+	}
+	m_hitCountBuffer->unmap();
 
 	nvtxRangePop();
 }
