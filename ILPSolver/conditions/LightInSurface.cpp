@@ -1,6 +1,7 @@
 #include "LightInSurface.h"
 #include <cmath>
 #include <limits>
+#include <QLocale>
 
 LightInSurface::LightInSurface(PMOptixRenderer *renderer, Scene *scene, const QString& lightId, const QString& surfaceId):
 	m_surfaceId(surfaceId),
@@ -132,12 +133,13 @@ bool LightInSurface::pointInSurface(optix::float2 point) const
 	return (b1 == b2) && (b2 == b3) || (b4 == b5) && (b5 == b6);
 }
 
-QString LightInSurface::info()
+LightInSurface::operator QString ()
 {
+	QLocale locale; 
 	auto position = getCurrentPosition();
-	auto x = QString::number(position.x, 'f', 2);
-	auto y = QString::number(position.y, 'f', 2);
-	auto z = QString::number(position.z, 'f', 2);
+	auto x = locale.toString(position.x, 'f', 2);
+	auto y = locale.toString(position.y, 'f', 2);
+	auto z = locale.toString(position.z, 'f', 2);
 	return x + ", " + y + ", " + z;
 }
 

@@ -1,20 +1,21 @@
 #pragma once
 
+#include "Condition.h"
 #include "math/Vector3.h"
 #include "scene/Scene.h"
 #include "renderer/PMOptixRenderer.h"
 #include <optixu_matrix_namespace.h>
-#include <QString>
 #include <QStack>
 
-class LightInSurface
+
+class LightInSurface: public Condition
 {
 public:
 	LightInSurface(PMOptixRenderer *renderer, Scene *scene, const QString& lightId, const QString& surfaceId);
 
-	bool pushMoveToNeighbourhood(float radius, unsigned int retries);
-	void popLastMovement();
-	QString info();
+	virtual bool pushMoveToNeighbourhood(float radius, unsigned int retries);
+	virtual void popLastMovement();
+	virtual operator QString();
 	virtual ~LightInSurface();
 private:
 	bool pointInSurface(optix::float2 point) const;
