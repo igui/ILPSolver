@@ -5,21 +5,12 @@
 */
 
 #include "ILP.h"
-#include <QDomDocument>
-#include <QXmlQuery>
-#include <QXmlResultItems>
-#include <QFile>
-#include <QFileInfo>
-#include <QXmlNodeModelIndex>
-#include <QAbstractXmlNodeModel>
-#include <qdebug.h>
 #include "logging/Logger.h"
 #include "conditions/Condition.h"
-#include "conditions/LightInSurface.h"
-#include "optimizations/SurfaceRadiosity.h"
-#include "renderer/PMOptixRenderer.h"
 #include "optimizations/Evaluation.h"
 #include "optimizations/OptimizationFunction.h"
+#include "Configuration.h"
+#include <QTextStream>
 #include <ctime>
 
 const QString ILP::logFileName("log.csv");
@@ -34,64 +25,6 @@ ILP::ILP():
 {
 }
 
-void ILP::readScene(QFile &file, const QString& fileName)
-{
-	QXmlQuery query(QXmlQuery::XQuery10);
-    query.setFocus(&file);
-    query.setQuery("for $scene in /input/scene "
-				   "	return string($scene/@path)");
- 
-    QStringList results;
-	file.reset();
-    query.evaluateTo(&results);
-    int count = results.count();
-	if(count == 0)
-		throw std::invalid_argument("Input must have a scene definition");
-    if(count > 1)
-		throw std::invalid_argument("Multiple scenes are not allowed in the input");
-	
-	QString scenePath = results.first();
-	QString absoluteScenePath = scenePath;
-	if(!QFileInfo(scenePath).isAbsolute())
-	{
-		absoluteScenePath = QFileInfo(fileName).dir().absoluteFilePath(scenePath);
-	}
-	scene = Scene::createFromFile(logger, absoluteScenePath.toStdString().c_str());
-	inited = true;
-}
-
-void ILP::readConditions(QDomDocument& xml)
-{
-	auto nodes = xml.documentElement().childNodes();
-	for(int i = 0; i < nodes.length(); ++i)
-	{
-		auto conditionParentNode = nodes.at(i).toElement();
-		if(conditionParentNode.tagName() != "conditions")
-			continue;
-		auto conditionNodes = conditionParentNode.childNodes();
-		for(int j = 0; j < conditionNodes.length(); ++j)
-		{
-			auto lightInSurfaceNode = conditionNodes.at(j).toElement();
-			if(lightInSurfaceNode.tagName() != "lightInSurface")
-				continue;
-
-			QString id = lightInSurfaceNode.attribute("id");
-			QString surface = lightInSurfaceNode.attribute("surface");
-
-			if(id.isEmpty())
-				throw std::logic_error("id can't be empty");
-			if(surface.isEmpty())
-				throw std::logic_error("surface can't be empty");
-
-			qDebug() << "condition: LightInSurface id: " + id + ", surface: " + surface;
-			conditions.append(new LightInSurface(renderer, scene, id, surface));
-		}
-	}
-
-	if(conditions.empty())
-		throw std::logic_error("at least one condition must be set");
-}
-
 void ILP::optimize()
 {
 	if(!inited){
@@ -100,40 +33,43 @@ void ILP::optimize()
 
 	qsrand(time(NULL));
 
+	// first solution
 	logIterationHeader();
-	QVector<Evaluation *> bestVals;
-	bestVals.append(optimizationFunction->evaluate());
-	logger->log(QString(), "Initial solution: %s\n", ((QString)(*bestVals.at(0))).toStdString().c_str());
-	optimizationFunction->saveImage(getImageFileName());
-	logIterationResults(bestVals.at(0));
+	QVector<Configuration> bestSolutions;
+	auto initialEval = optimizationFunction->evaluateFast();
+	auto initialConfig = Configuration(initialEval, QVector<ConditionPosition *>());
+	bestSolutions.append(initialConfig);
+	logger->log(QString(), "Initial solution: %s\n", ((QString)(*initialEval)).toStdString().c_str());
+	//optimizationFunction->saveImage(getImageFileName());
+	logIterationResults(initialEval);
 	++currentIteration;
 
 	float radius = 0.05f;
 	while(radius < 1.0f){
-		findFirstImprovement(bestVals, radius);
-		if(bestVals.length() == 1){
+		findFirstImprovement(bestSolutions, radius);
+		if(bestSolutions.length() == 1){
 			radius = 0.05f;
 		} else {
 			radius += 0.05;
 		}
 	}
 
-	logger->log(QString(), "Best values(%d)\n", bestVals.length());
-	for(auto it = bestVals.begin(); it != bestVals.end(); ++it){
-		logger->log(QString(), "\t%s\n", ((QString)(**it)).toStdString().c_str());
+	logger->log(QString(), "Best values(%d)\n", bestSolutions.length());
+	for(auto it = bestSolutions.begin(); it != bestSolutions.end(); ++it){
+		QString evalInfo = *it->evaluation();
+		logger->log(QString(), "\t%s\n", evalInfo.toStdString().c_str());
 	}
 
 	++currentIteration;	
 }
 
-static bool appendAndRemoveWorse(QVector<Evaluation *> &currentEvals, Evaluation *candidate)
+static bool appendAndRemoveWorse(QVector<Configuration> &currentEvals, Evaluation *candidate, QVector<ConditionPosition *> &positions)
 {
 	bool candidateIsGoodEnough = false;
 	auto it = currentEvals.begin();
 	while(it != currentEvals.end()){
-		auto comp = candidate->compare(*it);
+		auto comp = candidate->compare(it->evaluation());
 		if(comp == EvaluationResult::BETTER){
-			delete *it;
 			it = currentEvals.erase(it);
 		} else {
 			++it;
@@ -142,32 +78,37 @@ static bool appendAndRemoveWorse(QVector<Evaluation *> &currentEvals, Evaluation
 	}
 	
 	if(candidateIsGoodEnough){
-		currentEvals.append(candidate);
+		currentEvals.append(Configuration(candidate, positions));
 	}
 	return candidateIsGoodEnough;
 }
 
-void ILP::findFirstImprovement(QVector<Evaluation *> &currentEvals, float radius)
+void ILP::findFirstImprovement(QVector<Configuration> &configurations, float radius)
 {
 	static const int optimizationsRetries = 20;
 	for(int retries = 1; retries < optimizationsRetries; ++retries){
-		bool success = pushMoveToNeighbourhoodAll(optimizationsRetries, radius);
-		if(!success)
+		auto neighbourPosition = pushMoveToNeighbourhoodAll(optimizationsRetries, radius);
+		if(neighbourPosition.empty()){
 			break; // no neighbours
+		}
 
-		auto candidate = optimizationFunction->evaluate();
-		optimizationFunction->saveImage(getImageFileName());
+		auto candidate = optimizationFunction->evaluateFast();
+		//optimizationFunction->saveImage(getImageFileName());
 		logIterationResults(candidate);
 		++currentIteration;
 
-		bool isGoodEnough = appendAndRemoveWorse(currentEvals, candidate);
+		bool isGoodEnough = appendAndRemoveWorse(configurations, candidate, neighbourPosition);
 
-		if(isGoodEnough && currentEvals.length() == 1){
+		if(isGoodEnough && configurations.length() == 1){
 			logger->log(QString(), "Better solution: %s\n", ((QString)*candidate).toStdString().c_str());
 			break; 
 		} else {	
 			if(!isGoodEnough) {
+				// removes candidate and positions from memory
 				delete candidate;
+				for(auto it = neighbourPosition.begin(); it != neighbourPosition.end(); ++it){
+					delete *it;
+				}
 			} else {
 				logger->log(QString(), "Probable solution: %s\n", ((QString)*candidate).toStdString().c_str());
 			}
@@ -183,11 +124,13 @@ void ILP::popMoveAll()
 	}
 }
 
-bool ILP::pushMoveToNeighbourhoodAll(int optimizationsRetries, float radius)
+QVector<ConditionPosition *> ILP::pushMoveToNeighbourhoodAll(int optimizationsRetries, float radius)
 {
+	QVector<ConditionPosition *> res;
+
 	for(int i = 0; i < conditions.size(); ++i){
-		bool hasNeighbour = conditions[i]->pushMoveToNeighbourhood(radius, optimizationsRetries);
-		if(!hasNeighbour){
+		auto neighbour = conditions[i]->pushMoveToNeighbourhood(radius, optimizationsRetries);
+		if(neighbour == NULL){
 			// the condition has no neighbour. Maybe a limit point or a high radius was reached
 			logger->log("No neighbours found\n");
 			
@@ -195,10 +138,17 @@ bool ILP::pushMoveToNeighbourhoodAll(int optimizationsRetries, float radius)
 			for(int j = 0; j < i; ++j){
 				conditions[j]->popLastMovement();
 			}
-			return false; // no neighbours
+
+			for(auto it = res.begin(); it != res.end(); ++it){
+				delete *it;
+			}
+			res.clear();
+			return res; // empty array: no neighbours
+		} else {
+			res.append(neighbour);
 		}
 	}
-	return true;
+	return res;
 }
 
 
@@ -265,95 +215,4 @@ void ILP::logIterationResults(Evaluation *evaluation)
 	file.close(); 
 }
 
-void ILP::readOptimizationFunction(QDomDocument& xml)
-{
-	auto nodes = xml.documentElement().childNodes();
-	for(int i = 0; i < nodes.length(); ++i)
-	{
-		auto conditionParentNode = nodes.at(i).toElement();
-		if(conditionParentNode.tagName() != "objectives")
-			continue;
-		auto conditionNodes = conditionParentNode.childNodes();
-		for(int j = 0; j < conditionNodes.length(); ++j)
-		{
-			auto maximizeRadianceNode = conditionNodes.at(j).toElement();
-			if(maximizeRadianceNode.tagName() != "maximizeRadiance")
-				continue;
 
-			if(optimizationFunction != NULL)
-				throw std::logic_error("only an objective must be set");
-
-
-			QString surface = maximizeRadianceNode.attribute("surface");
-			bool conversionOk;
-			float confidenceIntervalRadius = maximizeRadianceNode.attribute("confidenceIntervalRadius").toDouble(&conversionOk);
-			if(!conversionOk){
-				throw std::logic_error("Invalid confidenceIntervalRadius format");
-			}
-
-			if(surface.isEmpty())
-				throw std::logic_error("surface can't be empty");
-
-			optimizationFunction = new SurfaceRadiosity(logger, renderer, scene, surface, confidenceIntervalRadius);
-
-			qDebug() << "objective: SurfaceRadiosity on " + surface;
-		}
-	}
-
-	if(optimizationFunction == NULL)
-		throw std::logic_error("an objective must be set");
-}
-
-void ILP::readOutputPath(const QString &fileName, QDomDocument& xml)
-{
-	auto nodes = xml.documentElement().childNodes();
-	for(int i = 0; i < nodes.length(); ++i){
-		auto outputPathNode = nodes.at(i).toElement();
-		if(outputPathNode.tagName() != "output")
-			continue;
-
-		QString path = outputPathNode.attribute("path");
-		if(path.isEmpty()){
-			throw std::logic_error("A path attribute must be set for the output element");
-		}
-		
-		outputDir = QDir(QFileInfo(fileName).dir().absoluteFilePath(path));
-		return;
-	}
-
-	throw std::logic_error("No output path set");
-}
-
-ILP ILP::fromFile(Logger *logger, const QString& filePath, PMOptixRenderer *renderer)
-{
-	ILP res;
-
-    QFile file(filePath);
-	if(!QFileInfo(file).exists())
-		throw std::invalid_argument(("File " + filePath + " doesn't exist").toStdString());
-    file.open(QFile::ReadOnly);
-
-	QDomDocument xml;
-	{
-		QString errorMsg;
-		int errorLine;
-		int errorColumn;
-		if(!xml.setContent(&file, &errorMsg, &errorLine, &errorColumn))
-		{
-			QString msg = "Error while reading file: " + errorMsg;
-			throw std::invalid_argument(msg.toStdString());
-		}
-	}
- 
-	file.reset();
-
-	res.logger = logger;
-	res.renderer = renderer;
-	res.readScene(file, filePath);
-	res.readConditions(xml);
-	res.readOptimizationFunction(xml);
-	res.renderer->initScene(*res.scene);
-	res.readOutputPath(filePath, xml);
-
-	return res;
-}

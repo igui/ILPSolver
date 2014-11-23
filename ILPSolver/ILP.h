@@ -7,6 +7,7 @@
 
 #include "scene/Scene.h"
 #include "renderer/PMOptixRenderer.h"
+#include "Configuration.h"
 #include <QVector>
 #include <QDir>
 
@@ -17,6 +18,7 @@ class Condition;
 class OptimizationFunction;
 class Evaluation;
 class QDomDocument;
+class Configuration;
 
 class ILP
 {
@@ -33,8 +35,8 @@ private:
 	QString getImageFileName();
 	void logIterationHeader();
 	void logIterationResults(Evaluation *evaluation);
-	void findFirstImprovement(QVector<Evaluation *> &currentEvals, float radius);
-	bool pushMoveToNeighbourhoodAll(int retries, float radius);
+	void findFirstImprovement(QVector<Configuration> &currentEvals, float radius);
+	QVector<ConditionPosition *> pushMoveToNeighbourhoodAll(int retries, float radius);
 	void popMoveAll();
 	void readOutputPath(const QString &fileName, QDomDocument& doc);
 	void cleanOutputDir();
