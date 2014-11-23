@@ -27,11 +27,22 @@ SurfaceRadiosity::SurfaceRadiosity(Logger *logger, PMOptixRenderer *renderer, Sc
 	surfaceArea = scene->getObjectArea(objectId);
 }
 
-Evaluation *SurfaceRadiosity::evaluate()
+Evaluation *SurfaceRadiosity::evaluateRadiosity()
 {
-	logger->log("Evaluating solution\n");
+	logger->log("Evaluating solution (With radiosity)\n");
 	renderer->render(defaultPhotonWidth, sampleImageHeight, sampleImageWidth, *sampleCamera, true);
-	
+	return genEvaluation();
+}
+
+Evaluation *SurfaceRadiosity::evaluateFast()
+{
+	logger->log("Evaluating solution (Fast)\n");
+	renderer->genPhotonMap(defaultPhotonWidth);
+	return genEvaluation();
+}
+
+Evaluation *SurfaceRadiosity::genEvaluation()
+{
 	unsigned int n  = renderer->getHitCount().at(objectId);
 	float p = (float) n / renderer->totalPhotons();
 	float W = renderer->getRadiance().at(objectId) / surfaceArea;

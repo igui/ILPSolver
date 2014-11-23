@@ -16,7 +16,8 @@ class SurfaceRadiosity: public OptimizationFunction
 {
 public:
 	SurfaceRadiosity(Logger *logger, PMOptixRenderer *renderer, Scene *scene, const QString &surfaceId, float confidenceIntervalRadius);
-	virtual Evaluation *evaluate();
+	virtual Evaluation *evaluateFast();
+	virtual Evaluation *evaluateRadiosity();
 	virtual void saveImage(const QString &fileName);
 	virtual ~SurfaceRadiosity();
 private:
@@ -26,6 +27,7 @@ private:
 	static const float gammaCorrection;
 
 	void saveImageAsync(const QString& fileName, QImage* image);
+	Evaluation *genEvaluation();
 
 	QString surfaceId;
 	int objectId;
