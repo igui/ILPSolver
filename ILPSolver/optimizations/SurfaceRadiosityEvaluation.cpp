@@ -1,12 +1,19 @@
 #include "SurfaceRadiosityEvaluation.h"
+#include <QLocale>
 
 SurfaceRadiosityEvaluation::SurfaceRadiosityEvaluation(float val, float radius):
  val(val),
  radius(radius)
 {
 }
-EvaluationResult::CompareResult SurfaceRadiosityEvaluation::compare(const SurfaceRadiosityEvaluation* other) const
+
+EvaluationResult::CompareResult SurfaceRadiosityEvaluation::compare(const Evaluation* eval) const
 {
+	auto other = dynamic_cast<const SurfaceRadiosityEvaluation *>(eval);
+	if(other == NULL){
+		throw std::invalid_argument("other");
+	}
+
 	if((val - radius) > (other->val + other->radius))
 		return EvaluationResult::BETTER;
 	else if((val + radius) < (other->val - other->radius))
@@ -17,12 +24,8 @@ EvaluationResult::CompareResult SurfaceRadiosityEvaluation::compare(const Surfac
 		return EvaluationResult::SIMILAR;
 }
 
-bool SurfaceRadiosityEvaluation::better(const SurfaceRadiosityEvaluation* other) const
-{
-	return (val - radius) > (other->val + other->radius);
-}
-
 SurfaceRadiosityEvaluation::operator QString() const
 {
-	return QString::number(val-radius, 'f', 2) + ";" + QString::number(val, 'f', 2) + ";" + QString::number(val+radius, 'f', 2);
+	QLocale locale;
+	return locale.toString(val-radius, 'f', 2) + ";" + locale.toString(val, 'f', 2) + ";" + locale.toString(val+radius, 'f', 2);
 }
