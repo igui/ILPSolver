@@ -1,4 +1,5 @@
 #include "SurfaceRadiosity.h"
+#include "SurfaceRadiosityEvaluation.h"
 #include <QImage>
 #include <QtCore>
 #include <QRunnable>
@@ -26,13 +27,13 @@ SurfaceRadiosity::SurfaceRadiosity(Logger *logger, PMOptixRenderer *renderer, Sc
 	surfaceArea = scene->getObjectArea(objectId);
 }
 
-SurfaceRadiosityEvaluation *SurfaceRadiosity::evaluate()
+Evaluation *SurfaceRadiosity::evaluate()
 {
 	logger->log("Evaluating solution\n");
 	renderer->render(defaultPhotonWidth, sampleImageHeight, sampleImageWidth, *sampleCamera, true);
 	
 	unsigned int n  = renderer->getHitCount().at(objectId);
-	float p = (float) n / renderer->getNumPhotons();
+	float p = (float) n / renderer->totalPhotons();
 	float W = renderer->getRadiance().at(objectId) / surfaceArea;
 	
 	/*
@@ -45,7 +46,6 @@ SurfaceRadiosityEvaluation *SurfaceRadiosity::evaluate()
 
 	const static float z = 1.96f;
 	float radius = z * W * sqrtf(p*(1-p)/n);
-	qDebug() << ("interval Radius: " + QString::number(radius));
 	return new SurfaceRadiosityEvaluation(W, radius);
 }
 

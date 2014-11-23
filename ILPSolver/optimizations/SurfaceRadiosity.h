@@ -2,7 +2,7 @@
 
 #include <vector_types.h>
 #include <QString>
-#include "SurfaceRadiosityEvaluation.h"
+#include "OptimizationFunction.h"
 
 class Logger;
 class PMOptixRenderer;
@@ -10,13 +10,14 @@ class Scene;
 class Camera;
 class QImage;
 class QCoreApplication;
+class Evaluation;
 
-class SurfaceRadiosity
+class SurfaceRadiosity: public OptimizationFunction
 {
 public:
 	SurfaceRadiosity(Logger *logger, PMOptixRenderer *renderer, Scene *scene, const QString &surfaceId, float confidenceIntervalRadius);
-	SurfaceRadiosityEvaluation *evaluate();
-	void saveImage(const QString &fileName);
+	virtual Evaluation *evaluate();
+	virtual void saveImage(const QString &fileName);
 	virtual ~SurfaceRadiosity();
 private:
 	static const unsigned int sampleImageWidth;
