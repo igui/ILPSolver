@@ -13,7 +13,7 @@ class LightInSurface: public Condition
 public:
 	LightInSurface(PMOptixRenderer *renderer, Scene *scene, const QString& lightId, const QString& surfaceId);
 
-	virtual bool pushMoveToNeighbourhood(float radius, unsigned int retries);
+	virtual ConditionPosition *pushMoveToNeighbourhood(float radius, unsigned int retries);
 	virtual void popLastMovement();
 	virtual operator QString();
 	virtual ~LightInSurface();

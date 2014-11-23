@@ -1,4 +1,5 @@
 #include "LightInSurface.h"
+#include "LightInSurfacePosition.h"
 #include <cmath>
 #include <limits>
 #include <QLocale>
@@ -68,14 +69,14 @@ optix::float3 LightInSurface::getCurrentPosition(optix::Matrix4x4 *transformatio
 	return optix::make_float3(center4 / center4.w);
 }
 
-bool LightInSurface::pushMoveToNeighbourhood(float radius, unsigned int retries)
+ConditionPosition *LightInSurface::pushMoveToNeighbourhood(float radius, unsigned int retries)
 {
 	auto currentTransformation = optix::Matrix4x4::identity();
 	auto center = getCurrentPosition(&currentTransformation);
 	auto neighbour = generatePointNeighbourhood(center, radius, retries);
 
 	if(retries <= 0){
-		return false; // no neighbour
+		return NULL; // no neighbour
 	}
 	
 	// saves last movement
@@ -86,7 +87,7 @@ bool LightInSurface::pushMoveToNeighbourhood(float radius, unsigned int retries)
 	// applies currentTransformation to the renderer
 	currentTransformation = displacementTransformation * currentTransformation;
 	renderer->setNodeTransformation(m_lightId, currentTransformation);	
-	return true;
+	return new LightInSurfacePosition(m_lightId, currentTransformation);
 }
 
 void LightInSurface::popLastMovement()
