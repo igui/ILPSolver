@@ -14,9 +14,12 @@
 #include <QAbstractXmlNodeModel>
 #include <qdebug.h>
 #include "logging/Logger.h"
-#include "LightInSurface.h"
-#include "SurfaceRadiosity.h"
+#include "conditions/Condition.h"
+#include "conditions/LightInSurface.h"
+#include "optimizations/SurfaceRadiosity.h"
 #include "renderer/PMOptixRenderer.h"
+#include "optimizations/Evaluation.h"
+#include "optimizations/OptimizationFunction.h"
 #include <ctime>
 
 const QString ILP::logFileName("log.csv");
@@ -98,30 +101,53 @@ void ILP::optimize()
 	qsrand(time(NULL));
 
 	logIterationHeader();
-	auto bestVal = optimizationFunction->evaluate();
-	logger->log(QString(), "Initial solution: %s\n", ((QString)*bestVal).toStdString().c_str());
+	QVector<Evaluation *> bestVals;
+	bestVals.append(optimizationFunction->evaluate());
+	logger->log(QString(), "Initial solution: %s\n", ((QString)(*bestVals.at(0))).toStdString().c_str());
 	optimizationFunction->saveImage(getImageFileName());
-	logIterationResults(bestVal);
+	logIterationResults(bestVals.at(0));
 	++currentIteration;
 
 	float radius = 0.05f;
 	while(radius < 1.0f){
-		auto improvement = findFirstImprovement(bestVal, radius);
-		if(improvement != NULL && improvement->better(bestVal)){
-			delete bestVal;
-			bestVal = improvement;
+		findFirstImprovement(bestVals, radius);
+		if(bestVals.length() == 1){
 			radius = 0.05f;
 		} else {
-			if(improvement != NULL){
-				popMoveAll();
-			}
 			radius += 0.05;
 		}
 	}
+
+	logger->log(QString(), "Best values(%d)\n", bestVals.length());
+	for(auto it = bestVals.begin(); it != bestVals.end(); ++it){
+		logger->log(QString(), "\t%s\n", ((QString)(**it)).toStdString().c_str());
+	}
+
 	++currentIteration;	
 }
 
-SurfaceRadiosityEvaluation *ILP::findFirstImprovement(SurfaceRadiosityEvaluation *currentEval, float radius)
+static bool appendAndRemoveWorse(QVector<Evaluation *> &currentEvals, Evaluation *candidate)
+{
+	bool candidateIsGoodEnough = false;
+	auto it = currentEvals.begin();
+	while(it != currentEvals.end()){
+		auto comp = candidate->compare(*it);
+		if(comp == EvaluationResult::BETTER){
+			delete *it;
+			it = currentEvals.erase(it);
+		} else {
+			++it;
+		}
+		candidateIsGoodEnough = candidateIsGoodEnough || (comp != EvaluationResult::WORSE);
+	}
+	
+	if(candidateIsGoodEnough){
+		currentEvals.append(candidate);
+	}
+	return candidateIsGoodEnough;
+}
+
+void ILP::findFirstImprovement(QVector<Evaluation *> &currentEvals, float radius)
 {
 	static const int optimizationsRetries = 20;
 	for(int retries = 1; retries < optimizationsRetries; ++retries){
@@ -134,15 +160,20 @@ SurfaceRadiosityEvaluation *ILP::findFirstImprovement(SurfaceRadiosityEvaluation
 		logIterationResults(candidate);
 		++currentIteration;
 
-		if(candidate->better(currentEval)){
+		bool isGoodEnough = appendAndRemoveWorse(currentEvals, candidate);
+
+		if(isGoodEnough && currentEvals.length() == 1){
 			logger->log(QString(), "Better solution: %s\n", ((QString)*candidate).toStdString().c_str());
-			return candidate; // a better solution was found
-		} else {
-			delete candidate;
+			break; 
+		} else {	
+			if(!isGoodEnough) {
+				delete candidate;
+			} else {
+				logger->log(QString(), "Probable solution: %s\n", ((QString)*candidate).toStdString().c_str());
+			}
+			popMoveAll();
 		}
-		popMoveAll();
 	}
-	return NULL; // no better candidate
 }
 
 void ILP::popMoveAll()
@@ -216,7 +247,7 @@ void ILP::logIterationHeader()
 }
 
 
-void ILP::logIterationResults(SurfaceRadiosityEvaluation *evaluation)
+void ILP::logIterationResults(Evaluation *evaluation)
 {
 	QFile file(outputDir.filePath(logFileName));
 	bool success = file.open(QIODevice::Append | QIODevice::Text);
@@ -227,8 +258,9 @@ void ILP::logIterationResults(SurfaceRadiosityEvaluation *evaluation)
 	
 	out << currentIteration << ';';
 
-	for(auto conditionsIt = conditions.cbegin(); conditionsIt != conditions.cend(); ++conditionsIt)
-		out << (*conditionsIt)->info() << ';';
+	for(auto conditionsIt = conditions.cbegin(); conditionsIt != conditions.cend(); ++conditionsIt){
+		out << (**conditionsIt) << ';';
+	}
 	out << (*evaluation) << '\n';
 	file.close(); 
 }

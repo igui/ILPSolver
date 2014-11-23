@@ -13,9 +13,9 @@
 class Logger;
 class QFile;
 class QString;
-class LightInSurface;
-class SurfaceRadiosity;
-class SurfaceRadiosityEvaluation;
+class Condition;
+class OptimizationFunction;
+class Evaluation;
 class QDomDocument;
 
 class ILP
@@ -32,8 +32,8 @@ private:
 	void readOptimizationFunction(QDomDocument& doc);
 	QString getImageFileName();
 	void logIterationHeader();
-	void logIterationResults(SurfaceRadiosityEvaluation *evaluation);
-	SurfaceRadiosityEvaluation *findFirstImprovement(SurfaceRadiosityEvaluation *currentEval, float radius);
+	void logIterationResults(Evaluation *evaluation);
+	void findFirstImprovement(QVector<Evaluation *> &currentEvals, float radius);
 	bool pushMoveToNeighbourhoodAll(int retries, float radius);
 	void popMoveAll();
 	void readOutputPath(const QString &fileName, QDomDocument& doc);
@@ -41,8 +41,8 @@ private:
 
 	bool inited;
 	Scene *scene;
-	QVector<LightInSurface *> conditions;
-	SurfaceRadiosity *optimizationFunction;
+	QVector<Condition *> conditions;
+	OptimizationFunction *optimizationFunction;
 	PMOptixRenderer *renderer;
 	int currentIteration;
 	Logger *logger;
