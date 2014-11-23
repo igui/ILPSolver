@@ -22,6 +22,14 @@
     <ClCompile Include="optimizations\Evaluation.cpp">
       <Filter>optimizations</Filter>
     </ClCompile>
+    <ClCompile Include="conditions\ConditionPosition.cpp">
+      <Filter>conditions</Filter>
+    </ClCompile>
+    <ClCompile Include="conditions\LightInSurfacePosition.cpp">
+      <Filter>conditions</Filter>
+    </ClCompile>
+    <ClCompile Include="Configuration.cpp" />
+    <ClCompile Include="ILPRead.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ILP.h" />
@@ -45,6 +53,13 @@
     <ClInclude Include="optimizations\OptimizationFunction.h">
       <Filter>optimizations</Filter>
     </ClInclude>
+    <ClInclude Include="conditions\ConditionPosition.h">
+      <Filter>conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="conditions\LightInSurfacePosition.h">
+      <Filter>conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="Configuration.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="examples\cube.blend">

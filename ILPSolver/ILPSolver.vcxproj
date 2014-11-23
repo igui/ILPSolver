@@ -59,7 +59,11 @@
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="conditions\ConditionPosition.cpp" />
     <ClCompile Include="conditions\Condition.cpp" />
+    <ClCompile Include="conditions\LightInSurfacePosition.cpp" />
+    <ClCompile Include="Configuration.cpp" />
+    <ClCompile Include="ILPRead.cpp" />
     <ClCompile Include="optimizations\Evaluation.cpp" />
     <ClCompile Include="ILP.cpp" />
     <ClCompile Include="Interval.cpp" />
@@ -75,7 +79,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="conditions\ConditionPosition.h" />
     <ClInclude Include="conditions\Condition.h" />
+    <ClInclude Include="conditions\LightInSurfacePosition.h" />
+    <ClInclude Include="Configuration.h" />
     <ClInclude Include="optimizations\Evaluation.h" />
     <ClInclude Include="ILP.h" />
     <ClInclude Include="Interval.h" />
