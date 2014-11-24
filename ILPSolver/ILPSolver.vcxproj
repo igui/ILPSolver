@@ -63,9 +63,11 @@
     <ClCompile Include="conditions\Condition.cpp" />
     <ClCompile Include="conditions\LightInSurfacePosition.cpp" />
     <ClCompile Include="Configuration.cpp" />
+    <ClCompile Include="FileLogger.cpp" />
+    <ClCompile Include="ILPLog.cpp" />
     <ClCompile Include="ILPRead.cpp" />
     <ClCompile Include="optimizations\Evaluation.cpp" />
-    <ClCompile Include="ILP.cpp" />
+    <ClCompile Include="ILPOptimize.cpp" />
     <ClCompile Include="Interval.cpp" />
     <ClCompile Include="conditions\LightInSurface.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -83,6 +85,7 @@
     <ClInclude Include="conditions\Condition.h" />
     <ClInclude Include="conditions\LightInSurfacePosition.h" />
     <ClInclude Include="Configuration.h" />
+    <ClInclude Include="FileLogger.h" />
     <ClInclude Include="optimizations\Evaluation.h" />
     <ClInclude Include="ILP.h" />
     <ClInclude Include="Interval.h" />

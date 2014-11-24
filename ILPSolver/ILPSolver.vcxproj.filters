@@ -1,7 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="ILP.cpp" />
     <ClCompile Include="Interval.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="optimizations\SurfaceRadiosity.cpp">
@@ -30,6 +29,9 @@
     </ClCompile>
     <ClCompile Include="Configuration.cpp" />
     <ClCompile Include="ILPRead.cpp" />
+    <ClCompile Include="FileLogger.cpp" />
+    <ClCompile Include="ILPLog.cpp" />
+    <ClCompile Include="ILPOptimize.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ILP.h" />
@@ -60,6 +62,7 @@
       <Filter>conditions</Filter>
     </ClInclude>
     <ClInclude Include="Configuration.h" />
+    <ClInclude Include="FileLogger.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="examples\cube.blend">
