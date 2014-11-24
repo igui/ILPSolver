@@ -26,3 +26,4 @@ ui_*.h
 ILPSolver/examples/output
 /Debug
 /x64
+ILPSolver/examples/log.txt
