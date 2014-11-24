@@ -198,7 +198,7 @@ void Scene::loadSceneMaterials()
             Material* matl;
             if(material->Get(AI_MATKEY_TEXTURE(aiTextureType_NORMALS, 0), normalsName) == AI_SUCCESS)
             {
-                m_logger->log(QString(""), "Found normal map %s!\n", normalsName.C_Str());
+                m_logger->log("Found normal map %s!\n", normalsName.C_Str());
                 QString normalsAbsoluteFilePath = QString("%1/%2").arg(m_sceneFile->absoluteDir().absolutePath(), normalsName.C_Str());
                 matl = new Texture(textureAbsoluteFilePath, normalsAbsoluteFilePath);
             }
@@ -292,7 +292,7 @@ void Scene::loadMeshLightSource(const aiNode *node, aiMesh* mesh, DiffuseEmitter
     {
         aiString name;
         m_scene->mMaterials[mesh->mMaterialIndex]->Get(AI_MATKEY_NAME, name);
-        m_logger->log(QString(""), "Material %s: Does only support quadrangle light source NumFaces: %d.\n", name.C_Str(), mesh->mNumFaces);
+        m_logger->log("Material %s: Does only support quadrangle light source NumFaces: %d.\n", name.C_Str(), mesh->mNumFaces);
     }
 
     aiFace face = mesh->mFaces[0];
@@ -630,7 +630,7 @@ void Scene::walkNode(const aiScene *scene, const aiNode *node, int depth)
 	
 	float area = getNodeArea(scene, node);
 
-	m_logger->log(QString(""), "%s: area %f\n", node->mName.C_Str(), area);
+	m_logger->log("%s: area %f\n", node->mName.C_Str(), area);
 
 	unsigned int nodeId = m_nodeToId.value((aiNode *) node, UINT_MAX);
 	if(nodeId != UINT_MAX)
