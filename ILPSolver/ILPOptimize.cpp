@@ -7,13 +7,13 @@
 #include "ILP.h"
 #include "logging/Logger.h"
 #include "conditions/Condition.h"
-#include "optimizations/Evaluation.h"
+#include "conditions/ConditionPosition.h"
 #include "optimizations/OptimizationFunction.h"
+#include "optimizations/Evaluation.h"
 #include "Configuration.h"
-#include <QTextStream>
 #include <ctime>
 
-const QString ILP::logFileName("log.csv");
+const QString ILP::logFileName("solutions.csv");
 
 ILP::ILP():
 	scene(NULL),
@@ -34,33 +34,52 @@ void ILP::optimize()
 	qsrand(time(NULL));
 
 	// first solution
-	logIterationHeader();
-	QVector<Configuration> bestSolutions;
-	auto initialEval = optimizationFunction->evaluateFast();
-	auto initialConfig = Configuration(initialEval, QVector<ConditionPosition *>());
-	bestSolutions.append(initialConfig);
-	logger->log(QString(), "Initial solution: %s\n", ((QString)(*initialEval)).toStdString().c_str());
-	//optimizationFunction->saveImage(getImageFileName());
-	logIterationResults(initialEval);
-	++currentIteration;
+	QVector<Configuration> bestConfigurations;
+	bestConfigurations.append(processInitialConfiguration());
 
+	// apply ILP
 	float radius = 0.05f;
 	while(radius < 1.0f){
-		findFirstImprovement(bestSolutions, radius);
-		if(bestSolutions.length() == 1){
+		findFirstImprovement(bestConfigurations, radius);
+		if(bestConfigurations.length() == 1){
 			radius = 0.05f;
 		} else {
 			radius += 0.05;
 		}
 	}
 
-	logger->log(QString(), "Best values(%d)\n", bestSolutions.length());
-	for(auto it = bestSolutions.begin(); it != bestSolutions.end(); ++it){
-		QString evalInfo = *it->evaluation();
-		logger->log(QString(), "\t%s\n", evalInfo.toStdString().c_str());
-	}
+	logBestConfigurations(bestConfigurations);
+}
 
-	++currentIteration;	
+void ILP::logBestConfigurations(QVector<Configuration> &bestConfigurations)
+{
+	logger->log("Best values(%d)\n", bestConfigurations.length());
+	for(auto it = bestConfigurations.begin(); it != bestConfigurations.end(); ++it){
+		auto positions = it->positions();
+		for(auto positionsIt = positions.begin(); positionsIt != positions.end(); ++positionsIt){
+			(*positionsIt)->apply(renderer);
+		}
+		auto evalSolutionNow = optimizationFunction->evaluateRadiosity();
+		optimizationFunction->saveImage(getImageFileNameSolution(it - bestConfigurations.begin()));
+		QString evalInfo = *it->evaluation();
+		QString evalInfoNow = *evalSolutionNow;
+		logger->log(
+			"\tEval: %s (now evals as %s)\n",
+			evalInfo.toStdString().c_str(),
+			evalInfoNow.toStdString().c_str()
+		);
+	}
+}
+
+Configuration ILP::processInitialConfiguration()
+{
+	logIterationHeader();
+	auto initialEval = optimizationFunction->evaluateFast();
+	auto initialConfig = Configuration(initialEval, QVector<ConditionPosition *>());
+	logger->log("Initial solution: %s\n", ((QString)(*initialEval)).toStdString().c_str());
+	logIterationResults(initialEval);
+	++currentIteration;
+	return initialConfig;
 }
 
 static bool appendAndRemoveWorse(QVector<Configuration> &currentEvals, Evaluation *candidate, QVector<ConditionPosition *> &positions)
@@ -100,7 +119,7 @@ void ILP::findFirstImprovement(QVector<Configuration> &configurations, float rad
 		bool isGoodEnough = appendAndRemoveWorse(configurations, candidate, neighbourPosition);
 
 		if(isGoodEnough && configurations.length() == 1){
-			logger->log(QString(), "Better solution: %s\n", ((QString)*candidate).toStdString().c_str());
+			logger->log("Better solution: %s\n", ((QString)*candidate).toStdString().c_str());
 			break; 
 		} else {	
 			if(!isGoodEnough) {
@@ -110,7 +129,7 @@ void ILP::findFirstImprovement(QVector<Configuration> &configurations, float rad
 					delete *it;
 				}
 			} else {
-				logger->log(QString(), "Probable solution: %s\n", ((QString)*candidate).toStdString().c_str());
+				logger->log("Probable solution: %s\n", ((QString)*candidate).toStdString().c_str());
 			}
 			popMoveAll();
 		}
@@ -151,8 +170,6 @@ QVector<ConditionPosition *> ILP::pushMoveToNeighbourhoodAll(int optimizationsRe
 	return res;
 }
 
-
-
 QString ILP::getImageFileName()
 {
 	return  outputDir.filePath(
@@ -160,59 +177,9 @@ QString ILP::getImageFileName()
 	);
 }
 
-void ILP::cleanOutputDir()
+QString ILP::getImageFileNameSolution(int solutionNum)
 {
-	if(!outputDir.exists()){
-		outputDir.mkpath(".");
-	} else {
-		// cleans unneeded files
-		auto cleanFiles = outputDir.entryInfoList(
-			QStringList() << "evaluation-*.png" << "logger.csv",
-			QDir::Files
-		);
-		for(auto cleanFilesIt = cleanFiles.begin(); cleanFilesIt != cleanFiles.end(); ++cleanFilesIt){
-			QFile(cleanFilesIt->absoluteFilePath()).remove();
-		}
-	}
+	return  outputDir.filePath(
+		QString("evaluation-solution-%1.png").arg(solutionNum, 4, 10, QLatin1Char('0'))
+	);
 }
-
-
-void ILP::logIterationHeader()
-{
-	cleanOutputDir();
-
-	QFile file(outputDir.filePath(logFileName));
-	bool success = file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate);
-	if(!success){
-		throw std::logic_error(("Couldn't open log file: " + file.errorString()).toStdString().c_str());
-	}
-	QTextStream out(&file);
-	
-	out << "Iteration" << ';';
-
-	for(auto conditionsIt = conditions.cbegin(); conditionsIt != conditions.cend(); ++conditionsIt)
-		out << "Condition " << ((conditionsIt-conditions.cbegin()) + 1)  << ';';
-	out << "Optimization Function" << '\n';
-	file.close(); 
-}
-
-
-void ILP::logIterationResults(Evaluation *evaluation)
-{
-	QFile file(outputDir.filePath(logFileName));
-	bool success = file.open(QIODevice::Append | QIODevice::Text);
-	if(!success){
-		throw std::logic_error(("Couldn't open log file: " + file.errorString()).toStdString().c_str());
-	}
-	QTextStream out(&file);
-	
-	out << currentIteration << ';';
-
-	for(auto conditionsIt = conditions.cbegin(); conditionsIt != conditions.cend(); ++conditionsIt){
-		out << (**conditionsIt) << ';';
-	}
-	out << (*evaluation) << '\n';
-	file.close(); 
-}
-
-
