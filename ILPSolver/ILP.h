@@ -29,17 +29,28 @@ public:
 	static ILP fromFile(Logger *logger, const QString& filePath, PMOptixRenderer *renderer);
 	void optimize();
 private:
+	// scene reading
 	void readScene(QFile &file, const QString& fileName);
 	void readConditions(QDomDocument& doc);
 	void readOptimizationFunction(QDomDocument& doc);
+	void readOutputPath(const QString &fileName, QDomDocument& doc);
+
+	// misc
 	QString getImageFileName();
+	QString getImageFileNameSolution(int solutionNum);
+	
+	// logging
+	void cleanOutputDir();
 	void logIterationHeader();
 	void logIterationResults(Evaluation *evaluation);
+
+	// optimization
+	Configuration processInitialConfiguration();
 	void findFirstImprovement(QVector<Configuration> &currentEvals, float radius);
 	QVector<ConditionPosition *> pushMoveToNeighbourhoodAll(int retries, float radius);
 	void popMoveAll();
-	void readOutputPath(const QString &fileName, QDomDocument& doc);
-	void cleanOutputDir();
+	void logBestConfigurations(QVector<Configuration> &bestConfigurations);
+	
 
 	bool inited;
 	Scene *scene;
