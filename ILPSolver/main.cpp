@@ -1,13 +1,14 @@
 #include "Main.hxx"
 #include <iostream>
-#include <cstdio>
 #include <ctime>
 #include <algorithm>
+#include <QDir>
 #include <QCoreApplication>
 #include <QCommandLineParser>
 #include "renderer/PMOptixRenderer.h"
 #include "logging/DummyLogger.h"
 #include "scene/Scene.h"
+#include "FileLogger.h"
 #include "ILP.h"
 
 
@@ -22,8 +23,14 @@ Main::Main(QObject *parent, const QString &filePath, const ComputeDevice &device
 void Main::run()
 {
 	PMOptixRenderer renderer;
-	DummyLogger logger;
-	logger.log("Init device\n");
+	FileLogger logger;
+	try {
+		QString logPath = QFileInfo(filePath).dir().absoluteFilePath("log.txt");
+		logger = FileLogger(logPath);
+	} catch(std::exception &ex) {
+		std::cerr << "Could not initialize logger: " << ex.what() << std::endl;
+		return;
+	}
 	renderer.initialize(device, &logger);
 	
 	ILP ilp;
@@ -31,7 +38,7 @@ void Main::run()
 		logger.log("Load definition XML & Scene\n");
 		ilp = ILP::fromFile(&logger, filePath, &renderer);
 	} catch(std::exception& ex){
-		logger.log(QString(), "Error reading file: %s\n", ex.what());
+		logger.log("Error reading file: %s\n", ex.what());
 		emit finished();
 		return;
 	}
@@ -40,7 +47,7 @@ void Main::run()
 		logger.log("Optimizing\n");
 		ilp.optimize();
 	}catch(std::exception& ex){
-		logger.log(QString(), "Error optimizing: %s\n", ex.what());
+		logger.log("Error optimizing: %s\n", ex.what());
 	}
 	
 	logger.log("Cleaning up\n");
