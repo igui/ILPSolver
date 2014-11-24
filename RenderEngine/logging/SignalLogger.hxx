@@ -17,7 +17,6 @@ public:
 	RENDER_ENGINE_EXPORT_API SignalLogger(QObject *parent = 0);
 
 	RENDER_ENGINE_EXPORT_API void log(const char *format, ...);
-	RENDER_ENGINE_EXPORT_API void log(const QString &styleOptions, const char *format, ...);
 	RENDER_ENGINE_EXPORT_API void vlog(const QString &styleOptions, const char *format, va_list args);
 
 	RENDER_ENGINE_EXPORT_API void setSignalReceiver(QObject *signalReceiver);

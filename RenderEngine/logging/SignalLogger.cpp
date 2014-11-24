@@ -20,13 +20,6 @@ void SignalLogger::log(const char *format, ...)
 	va_end (args);
 }
 
-void SignalLogger::log(const QString &styleOptions, const char *format, ...)
-{
-	va_list args;
-	va_start (args, format);
-	vlog(styleOptions, format, args);
-	va_end (args);
-}
 
 void SignalLogger::vlog(const QString &styleOptions, const char *format, va_list args)
 {
