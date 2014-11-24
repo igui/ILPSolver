@@ -15,7 +15,8 @@ public:
 
 	virtual ConditionPosition *pushMoveToNeighbourhood(float radius, unsigned int retries);
 	virtual void popLastMovement();
-	virtual operator QString();
+	virtual QStringList info();
+	virtual QStringList header();
 	virtual ~LightInSurface();
 private:
 	bool pointInSurface(optix::float2 point) const;

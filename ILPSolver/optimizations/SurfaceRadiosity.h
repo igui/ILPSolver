@@ -19,6 +19,7 @@ public:
 	virtual Evaluation *evaluateFast();
 	virtual Evaluation *evaluateRadiosity();
 	virtual void saveImage(const QString &fileName);
+	virtual QStringList header();
 	virtual ~SurfaceRadiosity();
 private:
 	static const unsigned int sampleImageWidth;

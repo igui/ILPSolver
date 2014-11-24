@@ -46,7 +46,7 @@ Evaluation *SurfaceRadiosity::genEvaluation()
 	unsigned int n  = renderer->getHitCount().at(objectId);
 	float p = (float) n / renderer->totalPhotons();
 	float W = renderer->getRadiance().at(objectId) / surfaceArea;
-	
+
 	/*
 		// for calculating minimun photonWidth
 		static const float 4z2 = 7.6832f;
@@ -81,11 +81,15 @@ private:
     }
 };
 
-
 void SurfaceRadiosity::saveImageAsync(const QString& fileName, QImage *image)
 {
 	auto task = new SurfaceRadiosityImageSaveASyncTask(fileName, logger, image);
 	QThreadPool::globalInstance()->start(task);
+}
+
+QStringList SurfaceRadiosity::header()
+{
+	return QStringList() << "Radiosity min" << "Radiosity center" << "Radiosity max";
 }
 
 SurfaceRadiosity::~SurfaceRadiosity(void)

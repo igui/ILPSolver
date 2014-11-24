@@ -134,14 +134,19 @@ bool LightInSurface::pointInSurface(optix::float2 point) const
 	return (b1 == b2) && (b2 == b3) || (b4 == b5) && (b5 == b6);
 }
 
-LightInSurface::operator QString ()
+QStringList LightInSurface::info()
 {
 	QLocale locale; 
 	auto position = getCurrentPosition();
 	auto x = locale.toString(position.x, 'f', 2);
 	auto y = locale.toString(position.y, 'f', 2);
 	auto z = locale.toString(position.z, 'f', 2);
-	return x + ", " + y + ", " + z;
+	return QStringList() << x << y << z;
+}
+
+QStringList LightInSurface::header()
+{
+	return QStringList() << (m_lightId + "(x)") << (m_lightId + "(y)") << (m_lightId + "(z)");
 }
 
 LightInSurface::~LightInSurface()
