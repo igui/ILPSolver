@@ -11,12 +11,12 @@ Configuration::Configuration(Evaluation *evaluation, const QVector<ConditionPosi
 {
 }
 
-Evaluation *Configuration::evaluation()
+Evaluation *Configuration::evaluation() const
 {
 	return m_evaluation;
 }
 
-QVector<ConditionPosition *> Configuration::positions()
+QVector<ConditionPosition *> Configuration::positions() const
 {
 	return m_positions;
 }

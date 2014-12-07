@@ -11,8 +11,8 @@ class Configuration
 public:
 	Configuration();
 	Configuration(Evaluation *evaluation, const QVector<ConditionPosition *> &positions);
-	Evaluation *evaluation();
-	QVector<ConditionPosition *> positions();
+	Evaluation *evaluation() const;
+	QVector<ConditionPosition *> positions() const;
 	~Configuration();
 private:
 	Evaluation *m_evaluation;
