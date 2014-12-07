@@ -33,7 +33,4 @@ void FileLogger::log(const char *format, ...)
 
 FileLogger::~FileLogger(void)
 {
-	if(logStream){
-		fclose(logStream);
-	}
 }
