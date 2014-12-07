@@ -12,17 +12,11 @@
     <ClCompile Include="conditions\LightInSurface.cpp">
       <Filter>conditions</Filter>
     </ClCompile>
-    <ClCompile Include="conditions\Condition.cpp">
-      <Filter>conditions</Filter>
-    </ClCompile>
     <ClCompile Include="optimizations\OptimizationFunction.cpp">
       <Filter>optimizations</Filter>
     </ClCompile>
     <ClCompile Include="optimizations\Evaluation.cpp">
       <Filter>optimizations</Filter>
-    </ClCompile>
-    <ClCompile Include="conditions\ConditionPosition.cpp">
-      <Filter>conditions</Filter>
     </ClCompile>
     <ClCompile Include="conditions\LightInSurfacePosition.cpp">
       <Filter>conditions</Filter>
@@ -74,6 +68,12 @@
     <None Include="examples\cube.xml">
       <Filter>examples</Filter>
     </None>
+    <None Include="examples\conference.blend">
+      <Filter>examples</Filter>
+    </None>
+    <None Include="examples\conference.dae">
+      <Filter>examples</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="examples">
@@ -90,5 +90,10 @@
     <CudaCompile Include="optimizations\SurfaceRadiosity.cu">
       <Filter>optimizations</Filter>
     </CudaCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="examples\conference.xml">
+      <Filter>examples</Filter>
+    </Xml>
   </ItemGroup>
 </Project>
