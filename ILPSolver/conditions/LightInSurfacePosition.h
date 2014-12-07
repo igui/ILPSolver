@@ -2,17 +2,20 @@
 
 #include "ConditionPosition.h"
 #include <optixu_matrix_namespace.h>
-#include <QString>
+#include <QStringList>
 
 class PMOptixRenderer;
 
 class LightInSurfacePosition: public ConditionPosition
 {
 public:
-	LightInSurfacePosition(const QString &lightId, const optix::Matrix4x4 &transformation);
-	virtual void apply(PMOptixRenderer *);
+	LightInSurfacePosition(const QString &lightId, optix::float3 initialPosition, const optix::Matrix4x4 &transformation);
+	QStringList info() const;
+	optix::Matrix4x4 transformation() const; 
+	virtual void apply(PMOptixRenderer *) const;
 private:
 	QString lightId;
-	optix::Matrix4x4 transformation;
+	optix::float3 initialPosition;
+	optix::Matrix4x4 m_transformation;
 };
 

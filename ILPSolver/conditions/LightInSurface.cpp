@@ -2,12 +2,10 @@
 #include "LightInSurfacePosition.h"
 #include <cmath>
 #include <limits>
-#include <QLocale>
 
-LightInSurface::LightInSurface(PMOptixRenderer *renderer, Scene *scene, const QString& lightId, const QString& surfaceId):
+LightInSurface::LightInSurface(Scene *scene, const QString& lightId, const QString& surfaceId):
 	m_surfaceId(surfaceId),
-	m_lightId(lightId),
-	renderer(renderer)
+	m_lightId(lightId)
 {
 	int objectId = scene->getObjectId(surfaceId);
 
@@ -50,29 +48,12 @@ LightInSurface::LightInSurface(PMOptixRenderer *renderer, Scene *scene, const QS
 					length(pointB - pointC)
 				)
 			);
-
-	initialPosition = base;
 }
 
-optix::float3 LightInSurface::getCurrentPosition(optix::Matrix4x4 *transformation)
+ConditionPosition *LightInSurface::findNeighbour(ConditionPosition *from, float radius, unsigned int retries) const
 {
-	auto currentTransformation = optix::Matrix4x4::identity();
-
-	for(auto transformationIt = savedMovements.begin(); transformationIt != savedMovements.end(); ++transformationIt){
-		currentTransformation = (*transformationIt) * currentTransformation;
-	}
-
-	auto center4 = currentTransformation * optix::make_float4(base, 1.0f);
-	if(transformation != NULL)
-		*transformation = currentTransformation;
-
-	return optix::make_float3(center4 / center4.w);
-}
-
-ConditionPosition *LightInSurface::pushMoveToNeighbourhood(float radius, unsigned int retries)
-{
-	auto currentTransformation = optix::Matrix4x4::identity();
-	auto center = getCurrentPosition(&currentTransformation);
+	auto center4 =  ((LightInSurfacePosition *) from)->transformation() * optix::make_float4(base, 1.0f);
+	auto center = optix::make_float3(center4 / center4.w);
 	auto neighbour = generatePointNeighbourhood(center, radius, retries);
 
 	if(retries <= 0){
@@ -82,17 +63,9 @@ ConditionPosition *LightInSurface::pushMoveToNeighbourhood(float radius, unsigne
 	// saves last movement
 	auto displacement = neighbour - center;
 	auto displacementTransformation = optix::Matrix4x4().identity().translate(displacement);
-	savedMovements.push(displacementTransformation);
-
 	// applies currentTransformation to the renderer
-	currentTransformation = displacementTransformation * currentTransformation;
-	renderer->setNodeTransformation(m_lightId, currentTransformation);	
-	return new LightInSurfacePosition(m_lightId, currentTransformation);
-}
-
-void LightInSurface::popLastMovement()
-{
-	savedMovements.pop();
+	auto currentTransformation = displacementTransformation * ((LightInSurfacePosition *) from)->transformation();
+	return new LightInSurfacePosition(m_lightId, base, currentTransformation);
 }
 
 optix::float3 LightInSurface::generatePointNeighbourhood(optix::float3 centerWorldCoordinates, float radius, unsigned int& retries) const
@@ -134,17 +107,12 @@ bool LightInSurface::pointInSurface(optix::float2 point) const
 	return (b1 == b2) && (b2 == b3) || (b4 == b5) && (b5 == b6);
 }
 
-QStringList LightInSurface::info()
+ConditionPosition *LightInSurface::initial() const 
 {
-	QLocale locale; 
-	auto position = getCurrentPosition();
-	auto x = locale.toString(position.x, 'f', 2);
-	auto y = locale.toString(position.y, 'f', 2);
-	auto z = locale.toString(position.z, 'f', 2);
-	return QStringList() << x << y << z;
+	return new LightInSurfacePosition(m_lightId, base, optix::Matrix4x4::identity());
 }
 
-QStringList LightInSurface::header()
+QStringList LightInSurface::header() const
 {
 	return QStringList() << (m_lightId + "(x)") << (m_lightId + "(y)") << (m_lightId + "(z)");
 }
