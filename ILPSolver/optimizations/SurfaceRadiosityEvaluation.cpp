@@ -24,8 +24,15 @@ EvaluationResult::CompareResult SurfaceRadiosityEvaluation::compare(const Evalua
 		return EvaluationResult::SIMILAR;
 }
 
-SurfaceRadiosityEvaluation::operator QString() const
+QString SurfaceRadiosityEvaluation:: info() const
 {
 	QLocale locale;
 	return locale.toString(val-radius, 'f', 2) + ";" + locale.toString(val, 'f', 2) + ";" + locale.toString(val+radius, 'f', 2);
 }
+
+QString SurfaceRadiosityEvaluation:: infoShort() const
+{
+	QLocale locale;
+	return locale.toString(val, 'f', 2);
+}
+
