@@ -59,8 +59,6 @@
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="conditions\ConditionPosition.cpp" />
-    <ClCompile Include="conditions\Condition.cpp" />
     <ClCompile Include="conditions\LightInSurfacePosition.cpp" />
     <ClCompile Include="Configuration.cpp" />
     <ClCompile Include="FileLogger.cpp" />
@@ -101,6 +99,8 @@
     </CudaCompile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="examples\conference.blend" />
+    <None Include="examples\conference.dae" />
     <None Include="examples\cube.blend" />
     <None Include="examples\cube.dae" />
   </ItemGroup>
@@ -108,6 +108,11 @@
     <None Include="examples\cube.xml">
       <SubType>Designer</SubType>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="examples\conference.xml">
+      <SubType>Designer</SubType>
+    </Xml>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
