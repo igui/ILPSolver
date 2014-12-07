@@ -6,14 +6,13 @@
 
 #include "ILP.h"
 #include "logging/Logger.h"
+#include "util/sutil.h"
 #include "conditions/Condition.h"
 #include "conditions/ConditionPosition.h"
 #include "optimizations/OptimizationFunction.h"
 #include "optimizations/Evaluation.h"
 #include "Configuration.h"
 #include <ctime>
-
-const QString ILP::logFileName("solutions.csv");
 
 ILP::ILP():
 	scene(NULL),
@@ -23,6 +22,17 @@ ILP::ILP():
 	renderer(NULL),
 	inited(false)
 {
+}
+
+static int getRetriesForRadius(float radius)
+{
+	int res = ceilf(sqrtf(radius) * 200.0f);
+	return res;
+}
+
+static float getShuffleRadius(float progress)
+{
+	return 0.5f * (0.5f + sinf(2.0f * (float)M_PI * progress - 0.5f * (float)M_PI) / 2.0f);
 }
 
 void ILP::optimize()
@@ -37,90 +47,118 @@ void ILP::optimize()
 	QVector<Configuration> bestConfigurations;
 	bestConfigurations.append(processInitialConfiguration());
 
+	double start = sutilCurrentTime();
+
 	// apply ILP
-	float radius = 0.05f;
-	while(radius < 1.0f){
-		findFirstImprovement(bestConfigurations, radius);
-		if(bestConfigurations.length() == 1){
-			radius = 0.05f;
-		} else {
-			radius += 0.05;
+	while(currentIteration < maxIterations)
+	{
+		float minRadius = 0.0f;
+		float maxRadius = 0.05f;
+		while(maxRadius < 1.0f){
+			float suffleRadius = getShuffleRadius((float) currentIteration / maxIterations);
+			bool improvementFound = findFirstImprovement(bestConfigurations, minRadius, maxRadius,  suffleRadius, getRetriesForRadius(maxRadius));
+			if(improvementFound){
+				minRadius = 0;
+				maxRadius = 0.05f;
+			} else {
+				minRadius = maxRadius;
+				maxRadius += 0.05;
+			}
 		}
+		logger->log("Done navigating whole neighbourhood: %d\n", currentIteration);
 	}
+	double totalTime = sutilCurrentTime() - start;
+	
+	logger->log("%d iterations on %0.2fs. %0.2fs per iteration\n", 
+		(currentIteration+1), totalTime, totalTime/(currentIteration+1));
 
 	logBestConfigurations(bestConfigurations);
-}
-
-void ILP::logBestConfigurations(QVector<Configuration> &bestConfigurations)
-{
-	logger->log("Best values(%d)\n", bestConfigurations.length());
-	for(auto it = bestConfigurations.begin(); it != bestConfigurations.end(); ++it){
-		auto positions = it->positions();
-		for(auto positionsIt = positions.begin(); positionsIt != positions.end(); ++positionsIt){
-			(*positionsIt)->apply(renderer);
-		}
-		auto evalSolutionNow = optimizationFunction->evaluateRadiosity();
-		optimizationFunction->saveImage(getImageFileNameSolution(it - bestConfigurations.begin()));
-		QString evalInfo = *it->evaluation();
-		QString evalInfoNow = *evalSolutionNow;
-		logger->log(
-			"\tEval: %s (now evals as %s)\n",
-			evalInfo.toStdString().c_str(),
-			evalInfoNow.toStdString().c_str()
-		);
-	}
 }
 
 Configuration ILP::processInitialConfiguration()
 {
 	logIterationHeader();
 	auto initialEval = optimizationFunction->evaluateFast();
-	auto initialConfig = Configuration(initialEval, QVector<ConditionPosition *>());
-	logger->log("Initial solution: %s\n", ((QString)(*initialEval)).toStdString().c_str());
-	logIterationResults(initialEval);
+	auto initialPositions = QVector<ConditionPosition *>();
+	for(auto conditionIt = conditions.begin(); conditionIt != conditions.end(); ++conditionIt){
+		initialPositions.append((*conditionIt)->initial());
+	}
+	auto initialConfig = Configuration(initialEval, initialPositions);
+	logger->log("Initial solution: %s\n", initialEval->infoShort().toStdString().c_str() );
+	logIterationResults(initialConfig.positions(), initialEval);
 	++currentIteration;
 	return initialConfig;
 }
 
 static bool appendAndRemoveWorse(QVector<Configuration> &currentEvals, Evaluation *candidate, QVector<ConditionPosition *> &positions)
 {
+	QVector<Configuration> evals = currentEvals;
+	currentEvals.clear();
+
 	bool candidateIsGoodEnough = false;
-	auto it = currentEvals.begin();
-	while(it != currentEvals.end()){
-		auto comp = candidate->compare(it->evaluation());
-		if(comp == EvaluationResult::BETTER){
-			it = currentEvals.erase(it);
-		} else {
-			++it;
+	for(auto i = 0; i < evals.size(); ++i){
+		auto comp = candidate->compare(evals.at(i).evaluation());
+		if(comp != EvaluationResult::BETTER){
+			currentEvals.append(evals.at(i));
+		}			
+
+		if(!candidateIsGoodEnough && comp != EvaluationResult::WORSE){
+			candidateIsGoodEnough = true;
+			currentEvals.append(Configuration(candidate, positions));
 		}
-		candidateIsGoodEnough = candidateIsGoodEnough || (comp != EvaluationResult::WORSE);
-	}
-	
-	if(candidateIsGoodEnough){
-		currentEvals.append(Configuration(candidate, positions));
 	}
 	return candidateIsGoodEnough;
 }
 
-void ILP::findFirstImprovement(QVector<Configuration> &configurations, float radius)
+bool ILP::findFirstImprovement(QVector<Configuration> &configurations, float minRadius, float maxRadius, float shuffleRadius, int retries)
 {
-	static const int optimizationsRetries = 20;
-	for(int retries = 1; retries < optimizationsRetries; ++retries){
-		auto neighbourPosition = pushMoveToNeighbourhoodAll(optimizationsRetries, radius);
+	static const int neighbourhoodRetries = 20;
+
+	while(retries-- > 0){
+		// move the reference point to some element of the configuration file
+		int someConfigIdx = rand() % configurations.length();
+		auto positions = configurations.at(someConfigIdx).positions();
+
+		// shuffle condition positions a bit
+		for(int i = 0; i < positions.size(); ++i){
+			auto currentShuffleRadius = shuffleRadius * qrand() / RAND_MAX;
+			auto neighbour = conditions.at(i)->findNeighbour(positions.at(i), currentShuffleRadius, retries);
+			if(!neighbour){
+				return false; // couldn't suffle
+			}
+			positions[i] = neighbour;
+		}
+		
+		// find neighbours
+		auto neighbourPosition = findAllNeighbours(positions, neighbourhoodRetries, minRadius, maxRadius);
 		if(neighbourPosition.empty()){
-			break; // no neighbours
+			return false; // no neighbours
 		}
 
+		// evaluate function
+		for(auto it = neighbourPosition.begin(); it != neighbourPosition.end(); ++it){
+			(*it)->apply(renderer);
+		}
 		auto candidate = optimizationFunction->evaluateFast();
-		//optimizationFunction->saveImage(getImageFileName());
-		logIterationResults(candidate);
+		logIterationResults(positions, candidate);
 		++currentIteration;
 
+		// crop worse solutions
 		bool isGoodEnough = appendAndRemoveWorse(configurations, candidate, neighbourPosition);
 
+		// evaluate if the solution is an improvement
 		if(isGoodEnough && configurations.length() == 1){
-			logger->log("Better solution: %s\n", ((QString)*candidate).toStdString().c_str());
-			break; 
+			logger->log("Better solution: %s\n", candidate->infoShort().toStdString().c_str());
+
+			/*for(int i = 0; i < 10; ++i)
+			{
+				auto candidateReeval = optimizationFunction->evaluateFast();
+				logger->log("                 %s (%s)\n",
+					candidateReeval->infoShort().toStdString().c_str(),
+					toString(candidateReeval->compare(candidate)).toStdString().c_str());
+			}*/
+
+			return true; 
 		} else {	
 			if(!isGoodEnough) {
 				// removes candidate and positions from memory
@@ -129,35 +167,41 @@ void ILP::findFirstImprovement(QVector<Configuration> &configurations, float rad
 					delete *it;
 				}
 			} else {
-				logger->log("Probable solution: %s\n", ((QString)*candidate).toStdString().c_str());
+				logger->log("Probable solution: %s\n", candidate->infoShort().toStdString().c_str());
+				/*for(int i = 0; i < 10; ++i)
+				{
+					auto candidateReeval = optimizationFunction->evaluateFast();
+					logger->log("                   %s (%s)\n",
+						candidateReeval->infoShort().toStdString().c_str(),
+						toString(candidateReeval->compare(candidate)).toStdString().c_str());
+				}*/
 			}
-			popMoveAll();
 		}
 	}
+	return false;
 }
 
-void ILP::popMoveAll()
-{
-	for(auto conditionsIt = conditions.cbegin(); conditionsIt != conditions.cend(); ++conditionsIt){
-		(*conditionsIt)->popLastMovement();
-	}
-}
-
-QVector<ConditionPosition *> ILP::pushMoveToNeighbourhoodAll(int optimizationsRetries, float radius)
+QVector<ConditionPosition *> ILP::findAllNeighbours(QVector<ConditionPosition *> &currentPositions, int optimizationsRetries, float minRadius, float maxRadius)
 {
 	QVector<ConditionPosition *> res;
 
+	float radius = ((maxRadius - minRadius) * qrand()) / RAND_MAX + minRadius;
+
+	// generate partitions
+	auto corradius = QVector<float>() << 0.0f;
+	for(int i = 0; i < conditions.size()-1; ++i){
+		corradius.append(radius * qrand() / RAND_MAX);
+	}
+	corradius << radius;
+	qSort(corradius);
+
 	for(int i = 0; i < conditions.size(); ++i){
-		auto neighbour = conditions[i]->pushMoveToNeighbourhood(radius, optimizationsRetries);
+		auto neighbourRadius = corradius.at(i+1) - corradius.at(i);
+		auto neighbour = conditions.at(i)->findNeighbour(currentPositions.at(i), neighbourRadius, optimizationsRetries);
 		if(neighbour == NULL){
 			// the condition has no neighbour. Maybe a limit point or a high radius was reached
-			logger->log("No neighbours found\n");
+			logger->log("No neighbours found (radius %0.2f to %0.2f)\n", minRadius, maxRadius);
 			
-			// all or nothing: undoes movements already done
-			for(int j = 0; j < i; ++j){
-				conditions[j]->popLastMovement();
-			}
-
 			for(auto it = res.begin(); it != res.end(); ++it){
 				delete *it;
 			}

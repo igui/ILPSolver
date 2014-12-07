@@ -62,7 +62,8 @@ void ILP::readConditions(QDomDocument& xml)
 				throw std::logic_error("surface can't be empty");
 
 			qDebug() << "condition: LightInSurface id: " + id + ", surface: " + surface;
-			conditions.append(new LightInSurface(renderer, scene, id, surface));
+
+			conditions.append(new LightInSurface(scene, id, surface));
 		}
 	}
 
@@ -96,10 +97,23 @@ void ILP::readOptimizationFunction(QDomDocument& xml)
 	auto nodes = xml.documentElement().childNodes();
 	for(int i = 0; i < nodes.length(); ++i)
 	{
-		auto conditionParentNode = nodes.at(i).toElement();
-		if(conditionParentNode.tagName() != "objectives")
+		auto objectivesNode = nodes.at(i).toElement();
+		if(objectivesNode.tagName() != "objectives")
 			continue;
-		auto conditionNodes = conditionParentNode.childNodes();
+		
+		QString maxIterationsStr = objectivesNode.attribute("maxIterations");
+		if(maxIterationsStr.isEmpty()){
+			throw std::logic_error("maxIterations must be present in objectives element");
+		}
+		bool parseOk;
+		maxIterations = maxIterationsStr.toInt(&parseOk);
+		if(!parseOk){
+			throw std::logic_error("maxIterations must be an integer");
+		}
+
+		auto conditionNodes = objectivesNode.childNodes();
+
+		
 		for(int j = 0; j < conditionNodes.length(); ++j)
 		{
 			auto maximizeRadianceNode = conditionNodes.at(j).toElement();
@@ -108,7 +122,6 @@ void ILP::readOptimizationFunction(QDomDocument& xml)
 
 			if(optimizationFunction != NULL)
 				throw std::logic_error("only an objective must be set");
-
 
 			QString surface = maximizeRadianceNode.attribute("surface");
 			bool conversionOk;

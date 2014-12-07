@@ -4,6 +4,9 @@
 #include "conditions/Condition.h"
 #include "optimizations/OptimizationFunction.h"
 #include "optimizations/Evaluation.h"
+#include "conditions/ConditionPosition.h"
+
+const QString ILP::logFileName("solutions.csv");
 
 void ILP::cleanOutputDir()
 {
@@ -51,7 +54,7 @@ void ILP::logIterationHeader()
 }
 
 
-void ILP::logIterationResults(Evaluation *evaluation)
+void ILP::logIterationResults(QVector<ConditionPosition *> positions, Evaluation *evaluation)
 {
 	QFile file(outputDir.filePath(logFileName));
 	bool success = file.open(QIODevice::Append | QIODevice::Text);
@@ -62,14 +65,33 @@ void ILP::logIterationResults(Evaluation *evaluation)
 	
 	out << currentIteration << ';';
 
-	for(auto conditionsIt = conditions.cbegin(); conditionsIt != conditions.cend(); ++conditionsIt){
-		auto info = (*conditionsIt)->info();
+	for(auto positionsIt = positions.cbegin(); positionsIt != positions.cend(); ++positionsIt){
+		auto info = (*positionsIt)->info();
 		for(auto infoIt = info.begin(); infoIt != info.end(); ++infoIt){
 			out << *infoIt  << ';';
 		}
 	}
-	out << (*evaluation) << '\n';
+	out << evaluation->info() << '\n';
 	file.close(); 
 }
 
 
+void ILP::logBestConfigurations(QVector<Configuration> &bestConfigurations)
+{
+	logger->log("Best values(%d)\n", bestConfigurations.length());
+	for(auto it = bestConfigurations.begin(); it != bestConfigurations.end(); ++it){
+		auto positions = it->positions();
+		for(auto positionsIt = positions.begin(); positionsIt != positions.end(); ++positionsIt){
+			(*positionsIt)->apply(renderer);
+		}
+		auto evalSolutionNow = optimizationFunction->evaluateRadiosity();
+		optimizationFunction->saveImage(getImageFileNameSolution(1 + it - bestConfigurations.begin()));
+		QString evalInfo = it->evaluation()->info();
+		QString evalInfoNow = evalSolutionNow->infoShort();
+		logger->log(
+			"\tEval: %s (now evals as %s)\n",
+			evalInfo.toStdString().c_str(),
+			evalInfoNow.toStdString().c_str()
+		);
+	}
+}

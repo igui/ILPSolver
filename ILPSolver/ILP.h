@@ -42,13 +42,12 @@ private:
 	// logging
 	void cleanOutputDir();
 	void logIterationHeader();
-	void logIterationResults(Evaluation *evaluation);
+	void logIterationResults(QVector<ConditionPosition *>positions, Evaluation *evaluation);
 
 	// optimization
 	Configuration processInitialConfiguration();
-	void findFirstImprovement(QVector<Configuration> &currentEvals, float radius);
-	QVector<ConditionPosition *> pushMoveToNeighbourhoodAll(int retries, float radius);
-	void popMoveAll();
+	bool findFirstImprovement(QVector<Configuration> &currentEvals, float minRadius, float maxRadius, float suffleRadius, int retries);
+	QVector<ConditionPosition *> findAllNeighbours(QVector<ConditionPosition *> &currentPositions, int retries, float minRadius, float maxRadius);
 	void logBestConfigurations(QVector<Configuration> &bestConfigurations);
 	
 
@@ -58,6 +57,7 @@ private:
 	OptimizationFunction *optimizationFunction;
 	PMOptixRenderer *renderer;
 	int currentIteration;
+	int maxIterations;
 	Logger *logger;
 	QDir outputDir;
 };
