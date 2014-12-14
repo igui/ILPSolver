@@ -18,16 +18,18 @@ namespace optix {
 class Light
 {
 public:
-    enum LightType {AREA, POINT, SPOT};
+    enum LightType {AREA, POINT, SPOT, DIRECTIONAL};
 
 #ifndef __CUDACC__
     RENDER_ENGINE_EXPORT_API Light(){};
 	// Paralelogram surface light
-    RENDER_ENGINE_EXPORT_API Light(const char *name, Vector3 power, Vector3 position, Vector3 v1, Vector3 v2);
-	// Point Light
-    RENDER_ENGINE_EXPORT_API Light(const char *name, Vector3 power, Vector3 position);
-	// Spot Light
-    RENDER_ENGINE_EXPORT_API Light(const char *name, Vector3 power, Vector3 position, Vector3 direction, float angle);
+    static RENDER_ENGINE_EXPORT_API Light createParalelogram(const char *name, Vector3 power, Vector3 position, Vector3 v1, Vector3 v2);
+	// Point light
+    static RENDER_ENGINE_EXPORT_API Light createPoint(const char *name, Vector3 power, Vector3 position);
+	// Spot light
+    static RENDER_ENGINE_EXPORT_API Light createSpot(const char *name, Vector3 power, Vector3 position, Vector3 direction, float angle);
+	// Directional light
+	static RENDER_ENGINE_EXPORT_API Light createDirectional(const char *name, Vector3 power, Vector3 direction);
 
 	void initAreaLight(Vector3 v1, Vector3 v2);
 	void transform(const optix::Matrix4x4& transform);

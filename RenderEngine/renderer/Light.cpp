@@ -12,48 +12,68 @@
 
 
 
-Light::Light(const char *name,  Vector3 power, Vector3 position, Vector3 v1, Vector3 v2 ):
-	power(power),
-    position(position),
-	originalPosition(position),
-    v1(v1),
-	originalV1(v1),
-    v2(v2),
-	originalV2(v2),
-    lightType(LightType::AREA),
-	originalDirection(optix::make_float3(0))
+Light Light::createParalelogram(const char *name,  Vector3 power, Vector3 position, Vector3 v1, Vector3 v2 )
 {
-	strncpy_s(this->name, LIGHT_MAX_NAMELENGTH, name, _TRUNCATE);
+	Light res;
+	res.power = power;
+	res.position = position;
+	res.originalPosition = position;
+	res.v1 = v1;
+	res.originalV1 = v1;
+	res.v2 = v2;
+	res.originalV2 = v2;
+	res.lightType = LightType::AREA;
+	res.originalDirection = optix::make_float3(0);
+	strncpy_s(res.name, LIGHT_MAX_NAMELENGTH, name, _TRUNCATE);
 
-	initAreaLight(v1, v2);
+	res.initAreaLight(v1, v2);
+	return res;
 }
 
-Light::Light(const char *name, Vector3 power, Vector3 position):
-	power(power),
-    position(position),
-	originalPosition(position),
-    lightType(LightType::POINT),
-	originalV1(optix::make_float3(0)), 
-	originalV2(optix::make_float3(0)),
-	originalDirection(optix::make_float3(0))
+Light Light::createPoint(const char *name, Vector3 power, Vector3 position)
 {
-	strncpy_s(this->name, LIGHT_MAX_NAMELENGTH, name, _TRUNCATE);
+	Light res;
+	res.power = power;
+	res.position = position;
+	res.originalPosition = position;
+	res.lightType = LightType::POINT;
+	res.originalV1 = optix::make_float3(0);
+	res.originalV2 = optix::make_float3(0);
+	res.originalDirection = optix::make_float3(0);
+	strncpy_s(res.name, LIGHT_MAX_NAMELENGTH, name, _TRUNCATE);
+	return res;
 }
 
-Light::Light(const char *name,  Vector3 power, Vector3 position, Vector3 direction, float angle ):
-	power(power),
-	position(position),
-	originalPosition(position),
-	direction(direction),
-	originalDirection(direction),
-	angle(angle),
-	lightType(LightType::SPOT),
-	originalV1(optix::make_float3(0)), 
-	originalV2(optix::make_float3(0))
+Light Light::createSpot(const char *name,  Vector3 power, Vector3 position, Vector3 direction, float angle )
 {
-	strncpy_s(this->name, LIGHT_MAX_NAMELENGTH, name, _TRUNCATE);
-	this->name[LIGHT_MAX_NAMELENGTH-1] = '\0';
-    direction = optix::normalize(direction);
+	Light res;
+	res.power = power;
+	res.position = position;
+	res.originalPosition = position;
+	res.direction = direction;
+	res.originalDirection = direction;
+	res.angle = angle;
+	res.lightType = LightType::SPOT;
+	res.originalV1 = optix::make_float3(0); 
+	res.originalV2 = optix::make_float3(0);
+	strncpy_s(res.name, LIGHT_MAX_NAMELENGTH, name, _TRUNCATE);
+    res.direction = optix::normalize(direction);
+	return res;
+}
+
+Light Light::createDirectional(const char *name, Vector3 power, Vector3 direction)
+{
+	Light res;
+	res.power = power;
+	res.position = optix::make_float3(0);
+	res.originalPosition = optix::make_float3(0);
+	res.direction =  direction * (1 / direction.length());
+	res.originalDirection = res.direction;
+	res.lightType = LightType::DIRECTIONAL;
+	res.originalV1 = optix::make_float3(0);
+	res.originalV2 = optix::make_float3(0);
+	strncpy_s(res.name, LIGHT_MAX_NAMELENGTH, name, _TRUNCATE);
+	return res;
 }
 
 void Light::initAreaLight(Vector3 v1, Vector3 v2)
@@ -92,7 +112,6 @@ void Light::transformImpl(const optix::Matrix4x4& transform, bool preMultiply)
 {
 	position = applyTransform(transform, preMultiply ? position: originalPosition);
 	optix::Matrix4x4 centeredTransform;
-
 	switch(lightType)
 	{
 	case AREA: 
@@ -101,7 +120,7 @@ void Light::transformImpl(const optix::Matrix4x4& transform, bool preMultiply)
 		v2 = applyTransform(centeredTransform, preMultiply ? v2: originalV2);
 		initAreaLight(v1, v2);
 		break;
-	case SPOT:
+	case SPOT: case DIRECTIONAL:
 		direction = optix::normalize(
 			applyTransform(
 				getCenteredTransform(transform), 
