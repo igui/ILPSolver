@@ -46,8 +46,8 @@ private:
 
 	// optimization
 	Configuration processInitialConfiguration();
-	bool findFirstImprovement(QVector<Configuration> &currentEvals, float minRadius, float maxRadius, float suffleRadius, int retries);
-	QVector<ConditionPosition *> findAllNeighbours(QVector<ConditionPosition *> &currentPositions, int retries, float minRadius, float maxRadius);
+	bool findFirstImprovement(QVector<Configuration> &currentEvals, float maxRadius, float suffleRadius, int retries);
+	QVector<ConditionPosition *> findAllNeighbours(QVector<ConditionPosition *> &currentPositions, int retries, float maxRadius);
 	void logBestConfigurations(QVector<Configuration> &bestConfigurations);
 	
 
