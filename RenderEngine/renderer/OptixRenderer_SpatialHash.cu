@@ -486,12 +486,9 @@ void PMOptixRenderer::countHitCountPerObject()
 	sumPhotonsHitCount<<<numBlocks, blockSize>>> (photonsPtr, numPhotons, hitCountPtr, rawRadiancePtr);
 	cudaDeviceSynchronize();
 
-	m_totalPhotons = 0;
-	unsigned int *hitCountHost = (unsigned int *) m_hitCountBuffer->map();
-	for(unsigned int i = 0; i < m_sceneObjects; ++i){
-		m_totalPhotons += hitCountHost[i];
-	}
-	m_hitCountBuffer->unmap();
+	unsigned int *m_photonsEmittedHost = (unsigned int *) m_photonsEmittedBuffer->map();
+	m_totalPhotons =  m_photonWidth * m_photonWidth +  m_photonsEmittedHost[0];
+	m_photonsEmittedBuffer->unmap();
 
 	nvtxRangePop();
 }

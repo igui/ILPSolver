@@ -35,6 +35,7 @@ rtDeclareVariable(rtObject, sceneRootObject, , );
 rtDeclareVariable(uint, maxPhotonDepositsPerEmitted, , );
 rtDeclareVariable(float3, Kd, , );
 rtDeclareVariable(unsigned int, objectId, , );
+rtBuffer<unsigned int> photonsEmitted;
 
 #if ACCELERATION_STRUCTURE == ACCELERATION_STRUCTURE_STOCHASTIC_HASH
 rtDeclareVariable(uint3, photonsGridSize, , );
@@ -64,6 +65,12 @@ RT_PROGRAM void closestHitRadiance()
     }
 }
 
+__device__ inline void storePhoton(const optix::float3 & power, const optix::float3 & position, const optix::float3 & rayDirection, const optix::uint & objectId)
+{
+	Photon photon(power, position, rayDirection, objectId);
+	STORE_PHOTON(photon);
+}
+
 /*
 // Photon Program
 */
@@ -76,8 +83,7 @@ RT_PROGRAM void closestHitPhoton()
 
     if(photonPrd.depth >= 1 && photonPrd.numStoredPhotons < maxPhotonDepositsPerEmitted)
     {
-        Photon photon (photonPrd.power, hitPoint, ray.direction, objectId);
-        STORE_PHOTON(photon);
+		storePhoton(photonPrd.power, hitPoint, ray.direction, objectId);
     }
 
     photonPrd.power *= Kd;
@@ -110,5 +116,6 @@ RT_PROGRAM void closestHitPhoton()
 
     newPhotonDirection = sampleUnitHemisphereCos(worldShadingNormal, getRandomUniformFloat2(&photonPrd.randomState));
     optix::Ray newRay( hitPoint, newPhotonDirection, RayType::PHOTON, 0.0001 );
+	atomicAdd(&photonsEmitted[0], 1);
     rtTrace(sceneRootObject, newRay, photonPrd);
 }

@@ -86,6 +86,7 @@ private:
     optix::Buffer m_randomStatesBuffer;
 	optix::Buffer m_hitCountBuffer;
 	optix::Buffer m_rawRadianceBuffer;
+	optix::Buffer m_photonsEmittedBuffer;
 	optix::uint3 m_gridSize;
     float m_spatialHashMapCellSize;
     AAB m_sceneAABB;

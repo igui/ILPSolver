@@ -176,6 +176,11 @@ void PPMOptixRenderer::initialize(const ComputeDevice & device, Logger *logger)
     m_context["photons"]->set( m_photons );
     m_context["photonsSize"]->setUint( NUM_PHOTONS );
 
+	m_photonsEmittedBuffer = m_context->createBuffer(RT_BUFFER_INPUT_OUTPUT);
+	m_photonsEmittedBuffer->setFormat(RT_FORMAT_UNSIGNED_INT);
+	m_photonsEmittedBuffer->setSize(1);
+	m_context["photonsEmitted"]->set(m_photonsEmittedBuffer);
+
 
 #if ACCELERATION_STRUCTURE == ACCELERATION_STRUCTURE_STOCHASTIC_HASH
 
@@ -442,6 +447,10 @@ void PPMOptixRenderer::renderNextIteration(unsigned long long iterationNumber, u
         const RenderMethod::E renderMethod = details.getRenderMethod();
 
         double traceStartTime = sutilCurrentTime();
+
+		auto photonsEmittedPtr = (unsigned int *) m_photonsEmittedBuffer->map();
+		*photonsEmittedPtr = 0;
+		m_photonsEmittedBuffer->unmap();
 
         m_context["camera"]->setUserData( sizeof(Camera), &camera );
         m_context["iterationNumber"]->setFloat( static_cast<float>(iterationNumber));
