@@ -268,12 +268,12 @@ void Scene::loadLightSources()
 		
         if(lightPtr->mType == aiLightSource_POINT)
         {
-			Light light (lightPtr->mName.C_Str(), toFloat3(lightPtr->mColorDiffuse), toFloat3(transformation * lightPtr->mPosition));
+			Light light = Light::createPoint(lightPtr->mName.C_Str(), toFloat3(lightPtr->mColorDiffuse), toFloat3(transformation * lightPtr->mPosition));
             m_lights.push_back(light);
         }
         else if(lightPtr->mType == aiLightSource_SPOT)
         {
-			Light light (
+			Light light = Light::createSpot (
 				lightPtr->mName.C_Str(),
 				toFloat3(lightPtr->mColorDiffuse),
 				toFloat3(transformation * lightPtr->mPosition),
@@ -281,6 +281,15 @@ void Scene::loadLightSources()
 				lightPtr->mAngleInnerCone);
             m_lights.push_back(light);
         }
+		else if(lightPtr->mType == aiLightSource_DIRECTIONAL)
+		{
+			Light light = Light::createDirectional(
+				lightPtr->mName.C_Str(),
+				toFloat3(lightPtr->mColorDiffuse),
+				toFloat3(centeredTransformation * lightPtr->mDirection)
+				);
+			m_lights.push_back(light);
+		}
     }
 }
 
@@ -304,7 +313,7 @@ void Scene::loadMeshLightSource(const aiNode *node, aiMesh* mesh, DiffuseEmitter
         optix::float3 v1 = p1-anchor;
         optix::float3 v2 = p2-anchor;
 
-		Light light (node->mName.C_Str(), diffuseEmitter->getPower(), anchor, v1, v2);
+		Light light = Light::createParalelogram(node->mName.C_Str(), diffuseEmitter->getPower(), anchor, v1, v2);
         m_lights.push_back(light);
         diffuseEmitter->setInverseArea(light.inverseArea);
     }
