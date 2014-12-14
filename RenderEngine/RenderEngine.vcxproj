@@ -50,9 +50,7 @@
       <EntryPointSymbol>
       </EntryPointSymbol>
       <NoEntryPoint>false</NoEntryPoint>
-      <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <Profile>true</Profile>
     </Link>
     <PostBuildEvent>
       <Command>
@@ -62,19 +60,17 @@
       <Message>Performing Custom Build Step</Message>
     </CustomBuildStep>
     <CudaCompile>
-      <TargetMachinePlatform>64</TargetMachinePlatform>
-      <CodeGeneration>compute_30,sm_30</CodeGeneration>
+      <CodeGeneration>compute_20,sm_20</CodeGeneration>
       <HostDebugInfo>false</HostDebugInfo>
       <GPUDebugInfo>false</GPUDebugInfo>
       <NvccCompilation>ptx</NvccCompilation>
       <CompileOut>$(OutDir)%(Filename)%(Extension).ptx</CompileOut>
       <FastMath>true</FastMath>
-      <KeepDir>$(IntDir)</KeepDir>
       <GenerateLineInfo>false</GenerateLineInfo>
-      <Optimization>InheritFromHost</Optimization>
       <AdditionalCompilerOptions>
       </AdditionalCompilerOptions>
       <AdditionalOptions>-use_fast_math %(AdditionalOptions)</AdditionalOptions>
+      <TargetMachinePlatform>64</TargetMachinePlatform>
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>

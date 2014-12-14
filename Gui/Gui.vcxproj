@@ -28,7 +28,6 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(MSBuildProjectDirectory);$(IncludePath);$(CUDA_INC_PATH);$(OPTIX_PATH)/include;C:\Program Files\NVIDIA Corporation\NvToolsExt\include;$(OPTIX_PATH)/include/optixu;$(SolutionDir)/RenderEngine/;$(SolutionDir)/include/;$(QTDIR)\include;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtOpenGL;%(AdditionalIncludeDirectories);$(CUDA_PATH)/include</IncludePath>
     <LibraryPath>$(FREEGLUT_PATH)\lib\x64;$(LibraryPath);$(SolutionDir)\lib;$(NVTOOLSEXT_PATH)\lib\x64;$(QTDIR)\lib;$(GLEW_PATH)\lib\Release\x64</LibraryPath>
   </PropertyGroup>
