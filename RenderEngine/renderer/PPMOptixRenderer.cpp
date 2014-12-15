@@ -646,6 +646,26 @@ unsigned int PPMOptixRenderer::getScreenBufferSizeBytes() const
 void PPMOptixRenderer::debugOutputPhotonTracing()
 {
 #if ENABLE_RENDER_DEBUG_OUTPUT
+	{
+		int someIdx = rand();
+
+		
+		optix::Buffer debugPhotonDirectionBuffer = m_context["debugPhotonDirection"]->getBuffer();
+		float3* debugPhotonDirectionBufferHost = (float3*)debugPhotonDirectionBuffer->map();
+		float3 someDirection = debugPhotonDirectionBufferHost[someIdx];
+		debugPhotonDirectionBuffer->unmap();
+		
+		optix::Buffer debugPhotonOriginBuffer = m_context["debugPhotonOrigin"]->getBuffer();
+		float3* debugPhotonOriginBufferHost = (float3*)debugPhotonOriginBuffer->map();
+		float3 someOrigin = debugPhotonOriginBufferHost[someIdx];
+		debugPhotonOriginBuffer->unmap();
+
+		m_logger->log("Random Idx %d. Direction: %3.2f %3.2f %3.2f. Origin: %4.2f %4.2f %4.2f\n",
+			someIdx, someDirection.x, someDirection.y, someDirection.z, someOrigin.x, someOrigin.y, someOrigin.z);
+	}
+#endif
+
+#if ENABLE_RENDER_DEBUG_OUTPUT
     m_logger->log("Grid size: %d %d %d. Cellsize: %.4f\n", m_gridSize.x, m_gridSize.y, m_gridSize.z, m_context["photonsGridCellSize"]->getFloat());
     {
         optix::Buffer buffer = m_context["debugPhotonPathLengthBuffer"]->getBuffer();
@@ -735,5 +755,10 @@ void PPMOptixRenderer::createGpuDebugBuffers()
     m_context["debugIndirectRadianceCellsVisisted"]->setBuffer(debugIndirectRadianceCellsVisisted);
     optix::Buffer debugIndirectRadiancePhotonsVisisted = m_context->createBuffer(RT_BUFFER_OUTPUT, RT_FORMAT_UNSIGNED_INT, 2000, 2000);
     m_context["debugIndirectRadiancePhotonsVisisted"]->setBuffer(debugIndirectRadiancePhotonsVisisted);
+
+	optix::Buffer debugPhotonDirectionBuffer = m_context->createBuffer(RT_BUFFER_OUTPUT, RT_FORMAT_FLOAT3, PHOTON_LAUNCH_WIDTH, PHOTON_LAUNCH_HEIGHT);
+    m_context["debugPhotonDirection"]->setBuffer(debugPhotonDirectionBuffer);
+	optix::Buffer debugPhotonOriginBuffer = m_context->createBuffer(RT_BUFFER_OUTPUT, RT_FORMAT_FLOAT3, PHOTON_LAUNCH_WIDTH, PHOTON_LAUNCH_HEIGHT);
+    m_context["debugPhotonOrigin"]->setBuffer(debugPhotonOriginBuffer);
 #endif
 }

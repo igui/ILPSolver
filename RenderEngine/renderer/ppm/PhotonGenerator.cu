@@ -33,6 +33,8 @@ rtDeclareVariable(Sphere, sceneBoundingSphere, , );
 
 #if ENABLE_RENDER_DEBUG_OUTPUT
 rtBuffer<unsigned int, 2> debugPhotonPathLengthBuffer;
+rtBuffer<float3, 2> debugPhotonDirection;
+rtBuffer<float3, 2> debugPhotonOrigin;
 #endif
 
 static __device__ void generatePhotonOriginAndDirection(const Light& light, RandomState& state, const Sphere & boundingSphere, 
@@ -73,6 +75,12 @@ static __device__ void generatePhotonOriginAndDirection(const Light& light, Rand
         float3 pointOnDisc = sampleDisc(sample1, origin+light.direction, sinf(light.angle/2), light.direction);
         direction = normalize(pointOnDisc-origin);
     }
+	else if(light.lightType == Light::DIRECTIONAL)
+	{
+		direction = normalize(light.direction);
+		auto discCenter = (float3) boundingSphere.center - boundingSphere.radius * direction;
+		origin = sampleDisc(sample1, discCenter, boundingSphere.radius, direction);
+	}
 }
 
 RT_PROGRAM void generator()
@@ -101,6 +109,11 @@ RT_PROGRAM void generator()
     float photonPowerFactor = 1.f;
     generatePhotonOriginAndDirection(light, photonPrd.randomState, sceneBoundingSphere, rayOrigin, rayDirection, photonPowerFactor);
     photonPrd.power *= photonPowerFactor;
+
+#if ENABLE_RENDER_DEBUG_OUTPUT
+	debugPhotonDirection[launchIndex] = rayDirection;
+	debugPhotonOrigin[launchIndex] = rayOrigin;
+#endif
 
     Ray photon = Ray(rayOrigin, rayDirection, RayType::PHOTON, 0.0001, RT_DEFAULT_MAX );
 
