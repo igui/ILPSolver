@@ -27,7 +27,7 @@ ILP::ILP():
 #include "optimizations/SurfaceRadiosityEvaluation.h"
 static void reevalCandidate(Logger *logger, OptimizationFunction *optimizationFunction, Evaluation *candidateObj)
 {
-	static const float tries = 20;
+	static const float tries = 2000;
 	
 	auto candidate = (SurfaceRadiosityEvaluation *)candidateObj;
 	float diff = 0;
@@ -170,6 +170,7 @@ bool ILP::findFirstImprovement(QVector<Configuration> &configurations, float max
 		}
 		auto candidate = optimizationFunction->evaluateFast();
 		logIterationResults(positions, candidate);
+		reevalCandidate(logger, optimizationFunction, candidate);
 		++currentIteration;
 		
 		// crop worse solutions
