@@ -31,6 +31,7 @@ rtDeclareVariable(uint2, launchIndex, rtLaunchIndex, );
 rtDeclareVariable(uint2, launchDim, rtLaunchDim, );
 rtDeclareVariable(Sphere, sceneBoundingSphere, , );
 
+
 #if ENABLE_RENDER_DEBUG_OUTPUT
 rtBuffer<unsigned int, 2> debugPhotonPathLengthBuffer;
 rtBuffer<float3, 2> debugPhotonDirection;

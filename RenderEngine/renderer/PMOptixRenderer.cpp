@@ -143,6 +143,11 @@ void PMOptixRenderer::initialize(const ComputeDevice & device, Logger *logger)
 	m_photonsEmittedBuffer->setSize(1);
 	m_context["photonsEmitted"]->set(m_photonsEmittedBuffer);
 
+	m_powerEmittedBuffer = m_context->createBuffer(RT_BUFFER_INPUT_OUTPUT);
+	m_powerEmittedBuffer->setFormat(RT_FORMAT_FLOAT);
+	m_powerEmittedBuffer->setSize(1);
+	m_context["powerEmitted"]->set(m_powerEmittedBuffer);
+
     m_context["photonsGridCellSize"]->setFloat(0.0f);
     m_context["photonsGridSize"]->setUint(0,0,0);
     m_context["photonsWorldOrigo"]->setFloat(make_float3(0));
@@ -387,6 +392,10 @@ void PMOptixRenderer::render(unsigned int photonLaunchWidth, unsigned int height
 		*photonsEmittedPtr = 0;
 		m_photonsEmittedBuffer->unmap();
 
+		auto powerEmittedPtr = (float *) m_powerEmittedBuffer->map();
+		*powerEmittedPtr = 0;
+		m_powerEmittedBuffer->unmap();
+
         //
         // Photon Tracing
         //
@@ -554,6 +563,14 @@ std::vector<float> PMOptixRenderer::getRadiance()
 	}
     m_rawRadianceBuffer->unmap();
 
+	return res;
+}
+
+float PMOptixRenderer::getEmittedPower()
+{
+	auto powerEmittedPtr = (float *) m_powerEmittedBuffer->map();
+	float res = *powerEmittedPtr;
+	m_powerEmittedBuffer->unmap();
 	return res;
 }
 

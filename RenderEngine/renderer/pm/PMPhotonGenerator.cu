@@ -30,6 +30,20 @@ rtBuffer<Light, 1> lights;
 rtDeclareVariable(uint2, launchIndex, rtLaunchIndex, );
 rtDeclareVariable(uint2, launchDim, rtLaunchDim, );
 rtDeclareVariable(Sphere, sceneBoundingSphere, , );
+rtBuffer<float> powerEmitted;
+
+// From https://devtalk.nvidia.com/default/topic/458062/atomicadd-float-float-atomicmul-float-float-/
+__device__ inline void floatAtomicAdd(float* address, float value)
+{
+	float old = value;
+	float new_old;
+
+	do
+	{
+		new_old = atomicExch(address, 0.0f);
+		new_old += old;
+	}while ((old = atomicExch(address, new_old))!=0.0f);
+};
 
 
 static __device__ void generatePhotonOriginAndDirection(const Light& light, RandomState& state, const Sphere & boundingSphere, 
@@ -98,6 +112,8 @@ RT_PROGRAM void generator()
     float photonPowerFactor = 1.f;
     generatePhotonOriginAndDirection(light, photonPrd.randomState, sceneBoundingSphere, rayOrigin, rayDirection, photonPowerFactor);
     photonPrd.power *= photonPowerFactor;
+
+	floatAtomicAdd(&powerEmitted[0], photonPrd.power.x + photonPrd.power.y + photonPrd.power.y);
 
     Ray photon = Ray(rayOrigin, rayDirection, RayType::PHOTON, 0.0001, RT_DEFAULT_MAX );
 

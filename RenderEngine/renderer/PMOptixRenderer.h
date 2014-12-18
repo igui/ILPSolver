@@ -47,6 +47,7 @@ public:
     RENDER_ENGINE_EXPORT_API unsigned int getHeight() const;
     RENDER_ENGINE_EXPORT_API unsigned int getScreenBufferSizeBytes() const;
 	RENDER_ENGINE_EXPORT_API std::vector<float> getRadiance();
+	RENDER_ENGINE_EXPORT_API float getEmittedPower();
 	RENDER_ENGINE_EXPORT_API void transformNode(const QString &nodeName, const optix::Matrix4x4 &transformation);
 	RENDER_ENGINE_EXPORT_API void setNodeTransformation(const QString &nodeName, const optix::Matrix4x4 &transformation);
 	RENDER_ENGINE_EXPORT_API int deviceOrdinal() const;
@@ -87,6 +88,7 @@ private:
 	optix::Buffer m_hitCountBuffer;
 	optix::Buffer m_rawRadianceBuffer;
 	optix::Buffer m_photonsEmittedBuffer;
+	optix::Buffer m_powerEmittedBuffer;
 	optix::uint3 m_gridSize;
     float m_spatialHashMapCellSize;
     AAB m_sceneAABB;
