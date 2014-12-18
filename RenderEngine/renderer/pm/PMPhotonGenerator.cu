@@ -107,13 +107,14 @@ RT_PROGRAM void generator()
 
     photonPrd.power = light.power*powerScale;
 
+	floatAtomicAdd(&powerEmitted[0], photonPrd.power.x + photonPrd.power.y + photonPrd.power.y);
+
     float3 rayOrigin, rayDirection;
    
     float photonPowerFactor = 1.f;
     generatePhotonOriginAndDirection(light, photonPrd.randomState, sceneBoundingSphere, rayOrigin, rayDirection, photonPowerFactor);
     photonPrd.power *= photonPowerFactor;
 
-	floatAtomicAdd(&powerEmitted[0], photonPrd.power.x + photonPrd.power.y + photonPrd.power.y);
 
     Ray photon = Ray(rayOrigin, rayDirection, RayType::PHOTON, 0.0001, RT_DEFAULT_MAX );
 

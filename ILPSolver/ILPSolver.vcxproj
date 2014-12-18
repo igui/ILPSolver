@@ -98,7 +98,9 @@
     <None Include="examples\conference.blend" />
     <None Include="examples\conference.dae" />
     <None Include="examples\cube.blend" />
-    <None Include="examples\cube.dae" />
+    <None Include="examples\cube.dae">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="examples\cube.xml">

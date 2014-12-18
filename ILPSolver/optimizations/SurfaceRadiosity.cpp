@@ -51,7 +51,7 @@ Evaluation *SurfaceRadiosity::genEvaluation()
 	float r = renderer->getRadiance().at(objectId) / surfaceArea;
 	float R = renderer->getEmittedPower() / surfaceArea;
 	// radius is the confidence radius given by equations 
-	float radius = z * R * sqrtf(p*(1-p)/n);
+	float radius = z * R * sqrtf( p*(1-p) /   renderer->totalPhotons()  );
 
 	return new SurfaceRadiosityEvaluation(r, radius);
 }

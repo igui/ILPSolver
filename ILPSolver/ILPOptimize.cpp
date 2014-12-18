@@ -27,29 +27,30 @@ ILP::ILP():
 #include "optimizations/SurfaceRadiosityEvaluation.h"
 static void reevalCandidate(Logger *logger, OptimizationFunction *optimizationFunction, Evaluation *candidateObj)
 {
-	static const float tries = 2000;
+	static const float tries = 400;
 	
 	auto candidate = (SurfaceRadiosityEvaluation *)candidateObj;
-	float diff = 0;
 	float mid = 0;
+	float M2 = 0;
 	int inRange = 0;
 
-	for(int i = 0; i < tries; ++i)
-	{
+	for(int i = 1; i <= tries; ++i){
 		auto candidateReeval = (SurfaceRadiosityEvaluation *)(optimizationFunction->evaluateFast());
-		mid += candidateReeval->val();
-		float absDiff = candidate->val() - candidateReeval->val();
-		diff += absDiff * absDiff;
-		switch(candidate->compare(candidateReeval)){
-		case EvaluationResult::SIMILAR: case EvaluationResult::EQUAL:
-			++inRange;
+		
+		float x = candidateReeval->val();
+		float delta = x - mid;
+		mid += delta / i;
+		M2 += delta * (x - mid);
+
+		float diff = candidate->val() - x;
+		if(fabsf(diff) < candidate->radius()){
+			inRange++;
 		}
 	}
 
-	diff = sqrtf(diff/tries);
-	mid /= tries;
+	float diff = sqrtf(M2 / tries);
 
-	logger->log("%8.2f\t%8.2f\t%8.2f\t%8.2f\t%d\n", candidate->val(), mid, candidate->radius(), diff, inRange);
+	logger->log("%8.2f\t%8.2f\t%8.2f\t%8.2f\t%0.2f\t%0.2f\n", candidate->val(), mid, candidate->radius(), diff, inRange/(float)tries, diff * 1.96f);
 }
 
 static int getRetriesForRadius(float radius)

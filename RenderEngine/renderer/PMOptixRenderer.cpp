@@ -569,7 +569,7 @@ std::vector<float> PMOptixRenderer::getRadiance()
 float PMOptixRenderer::getEmittedPower()
 {
 	auto powerEmittedPtr = (float *) m_powerEmittedBuffer->map();
-	float res = *powerEmittedPtr;
+	float res = *powerEmittedPtr / 2.0f;
 	m_powerEmittedBuffer->unmap();
 	return res;
 }

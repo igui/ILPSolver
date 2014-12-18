@@ -487,7 +487,7 @@ void PMOptixRenderer::countHitCountPerObject()
 	cudaDeviceSynchronize();
 
 	unsigned int *m_photonsEmittedHost = (unsigned int *) m_photonsEmittedBuffer->map();
-	m_totalPhotons =  m_photonWidth * m_photonWidth +  m_photonsEmittedHost[0];
+	m_totalPhotons =  m_photonWidth * m_photonWidth;
 	m_photonsEmittedBuffer->unmap();
 
 	nvtxRangePop();
