@@ -15,7 +15,7 @@
 Light Light::createParalelogram(const char *name,  Vector3 power, Vector3 position, Vector3 v1, Vector3 v2 )
 {
 	Light res;
-	res.power = Vector3(1.0f);
+	res.power = power;
 	res.position = position;
 	res.originalPosition = position;
 	res.v1 = v1;
