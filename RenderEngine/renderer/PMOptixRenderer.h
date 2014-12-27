@@ -87,7 +87,6 @@ private:
     optix::Buffer m_randomStatesBuffer;
 	optix::Buffer m_hitCountBuffer;
 	optix::Buffer m_rawRadianceBuffer;
-	optix::Buffer m_photonsEmittedBuffer;
 	optix::Buffer m_powerEmittedBuffer;
 	optix::uint3 m_gridSize;
     float m_spatialHashMapCellSize;
@@ -103,7 +102,6 @@ private:
 	std::vector<std::string> m_objectIdToName;
 	QMap<QString, optix::Group>* m_groups;
 	QMap<QString, QList<int>> *m_lights; // a mapping to Light name to light position into m_lightBuffer
-	unsigned int m_totalPhotons;
 	Logger *m_logger;
 
 };

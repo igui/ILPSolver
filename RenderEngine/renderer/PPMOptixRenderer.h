@@ -62,7 +62,6 @@ private:
     optix::Buffer m_volumetricPhotonsBuffer;
     optix::Buffer m_lightBuffer;
     optix::Buffer m_randomStatesBuffer;
-	optix::Buffer m_photonsEmittedBuffer;
 
     unsigned int m_photonKdTreeSize;
     unsigned long long m_numberOfPhotonsLastFrame;

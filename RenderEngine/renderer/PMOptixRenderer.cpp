@@ -41,8 +41,7 @@ PMOptixRenderer::PMOptixRenderer() :
     m_height(10),
 	m_photonWidth(10),
 	m_groups(new QMap<QString, Group>()),
-	m_lights(new QMap<QString, QList<int>>()),
-	m_totalPhotons(0)
+	m_lights(new QMap<QString, QList<int>>())
 {
     try
     {
@@ -137,11 +136,6 @@ void PMOptixRenderer::initialize(const ComputeDevice & device, Logger *logger)
 	m_photons->setSize(getNumPhotons());
     m_context["photons"]->set( m_photons );
 	m_context["photonsSize"]->setUint(getNumPhotons());
-
-	m_photonsEmittedBuffer = m_context->createBuffer(RT_BUFFER_INPUT_OUTPUT);
-	m_photonsEmittedBuffer->setFormat(RT_FORMAT_UNSIGNED_INT);
-	m_photonsEmittedBuffer->setSize(1);
-	m_context["photonsEmitted"]->set(m_photonsEmittedBuffer);
 
 	m_powerEmittedBuffer = m_context->createBuffer(RT_BUFFER_INPUT_OUTPUT);
 	m_powerEmittedBuffer->setFormat(RT_FORMAT_FLOAT);
@@ -387,10 +381,6 @@ void PMOptixRenderer::render(unsigned int photonLaunchWidth, unsigned int height
         m_context["camera"]->setUserData( sizeof(Camera), &camera );
 
 		int numSteps = generateOutput ? 7 : 3;
-
-		auto photonsEmittedPtr = (unsigned int *) m_photonsEmittedBuffer->map();
-		*photonsEmittedPtr = 0;
-		m_photonsEmittedBuffer->unmap();
 
 		auto powerEmittedPtr = (float *) m_powerEmittedBuffer->map();
 		*powerEmittedPtr = 0;
@@ -684,5 +674,5 @@ Buffer PMOptixRenderer::outputBuffer()
 
 unsigned int PMOptixRenderer::totalPhotons()
 {
-	return m_totalPhotons;
+	return m_photonWidth * m_photonWidth;
 }
