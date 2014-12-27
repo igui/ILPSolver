@@ -15,6 +15,7 @@
 #include "renderer/Hitpoint.h"
 #include "renderer/ShadowPRD.h"
 #include "renderer/helpers/light.h"
+#include "math/Sphere.h"
 
 using namespace optix;
 
@@ -25,6 +26,7 @@ rtBuffer<RandomState, 2> randomStates;
 rtBuffer<Light, 1> lights;
 rtDeclareVariable(uint2, launchIndex, rtLaunchIndex, );
 rtDeclareVariable(ShadowPRD, shadowPrd, rtPayload, );
+rtDeclareVariable(Sphere, sceneBoundingSphere, , );
 
 RT_PROGRAM void kernel()
 {
@@ -62,8 +64,8 @@ RT_PROGRAM void kernel()
             int randomLightIndex = intmin(int(sample*numLights), lights.size()-1);
             Light & light = lights[randomLightIndex];
             float scale = numLights;
-            float3 lightContrib = getLightContribution(light, rec.position, rec.normal, sceneRootObject, randomStates[launchIndex]);
-            avgLightRadiance += scale * lightContrib;
+			float3 lightContrib = getLightContribution(light, rec.position, rec.normal, sceneRootObject, randomStates[launchIndex], sceneBoundingSphere);
+			avgLightRadiance += scale * lightContrib;
         }
 
         directRadiance = rec.attenuation*avgLightRadiance/numShadowSamples;

@@ -7,13 +7,16 @@
 #pragma once
 
 #include "renderer/Light.h"
+#include "renderer/helpers/samplers.h"
 #include "random.h"
 #include "helpers.h"
 #include "renderer/ShadowPRD.h"
 #include "renderer/TransmissionPRD.h"
+#include "math/Sphere.h"
+
 
 optix::float3 __inline __device__ getLightContribution(const Light & light, const optix::float3 & rec_position, 
-    const optix::float3 & rec_normal, const rtObject & rootObject, RandomState & randomState)
+    const optix::float3 & rec_normal, const rtObject & rootObject, RandomState & randomState, const Sphere & boundingSphere)
 {
     float lightFactor = 1;
 
@@ -35,6 +38,14 @@ optix::float3 __inline __device__ getLightContribution(const Light & light, cons
         // Todo find correct direct light for spot light
         lightFactor = 0;
     }
+	else if(light.lightType == Light::DIRECTIONAL)
+	{
+		float3 direction = normalize(light.direction);
+		float2 sample = getRandomUniformFloat2(&randomState);
+		auto discCenter = (float3) boundingSphere.center - boundingSphere.radius * direction;
+		pointOnLight = sampleUnitHemisphereCos(-direction, sample) * boundingSphere.radius * 0.1f + discCenter;
+		lightFactor = 2.0f;
+	}
 
     float3 towardsLight = pointOnLight - rec_position;
     lightDistance = optix::length(towardsLight);

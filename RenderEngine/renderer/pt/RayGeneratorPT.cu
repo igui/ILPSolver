@@ -17,6 +17,7 @@
 #include "renderer/helpers/random.h"
 #include "renderer/helpers/light.h"
 #include "renderer/helpers/camera.h"
+#include "math/Sphere.h"
 
 using namespace optix;
 
@@ -30,6 +31,8 @@ rtDeclareVariable(uint, localIterationNumber, , );
 rtDeclareVariable(RadiancePRD, radiancePrd, rtPayload, );
 rtDeclareVariable(optix::Ray, ray, rtCurrentRay, );
 rtDeclareVariable(int, ptDirectLightSampling, ,);
+rtDeclareVariable(Sphere, sceneBoundingSphere, , );
+
 
 static __device__ __inline float3 averageInNewRadiance(const float3 newRadiance, const float3 oldRadiance, const float localIterationNumber)
 {
@@ -91,7 +94,7 @@ RT_PROGRAM void generateRay()
                 Light & light = lights[randomLightIndex];
                 float scale = numLights;
 
-                float3 lightContrib = scale*getLightContribution(light, radiancePrd.position, radiancePrd.normal, sceneRootObject, radiancePrd.randomState);
+				float3 lightContrib = scale*getLightContribution(light, radiancePrd.position, radiancePrd.normal, sceneRootObject, radiancePrd.randomState, sceneBoundingSphere);
                 accumLightRadiancePreBrdf += lightContrib;
             }
 
