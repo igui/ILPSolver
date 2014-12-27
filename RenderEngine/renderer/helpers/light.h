@@ -44,14 +44,18 @@ optix::float3 __inline __device__ getLightContribution(const Light & light, cons
 		float2 sample = getRandomUniformFloat2(&randomState);
 		auto discCenter = (float3) boundingSphere.center - boundingSphere.radius * direction;
 		pointOnLight = sampleUnitHemisphereCos(-direction, sample) * boundingSphere.radius * 0.1f + discCenter;
-		lightFactor = 2.0f;
+		lightFactor = 1.0f;
 	}
 
     float3 towardsLight = pointOnLight - rec_position;
-    lightDistance = optix::length(towardsLight);
-    towardsLight = towardsLight / lightDistance;
-    float n_dot_l = maxf(0, optix::dot(rec_normal, towardsLight));
-    lightFactor *= n_dot_l / (M_PIf*lightDistance*lightDistance);
+	lightDistance = optix::length(towardsLight);
+	towardsLight = towardsLight / lightDistance;
+
+	if(light.lightType != Light::DIRECTIONAL)
+	{
+		float n_dot_l = maxf(0, optix::dot(rec_normal, towardsLight));
+		lightFactor *= n_dot_l / (M_PIf*lightDistance*lightDistance);
+	}
 
     if(light.lightType == Light::AREA)
     {
@@ -77,6 +81,7 @@ optix::float3 __inline __device__ getLightContribution(const Light & light, cons
 #endif
         */
         //printf("Point on light:%.2f %.2f %.2f shadowPrd.attenuation %.2f\n", pointOnLight.x, pointOnLight.y, pointOnLight.z, shadowPrd.attenuation);
+
         return light.power*lightFactor;
     }
 

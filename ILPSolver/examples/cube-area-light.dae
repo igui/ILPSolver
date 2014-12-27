@@ -5,8 +5,8 @@
       <author>Blender User</author>
       <authoring_tool>Blender 2.70.0 commit date:2014-04-10, commit time:11:49, hash:f93bc76</authoring_tool>
     </contributor>
-    <created>2014-12-25T23:56:29</created>
-    <modified>2014-12-25T23:56:29</modified>
+    <created>2014-12-27T20:20:16</created>
+    <modified>2014-12-27T20:20:16</modified>
     <unit name="meter" meter="1"/>
     <up_axis>Z_UP</up_axis>
   </asset>
@@ -35,7 +35,7 @@
     <light id="Sun-light" name="Sun.001">
       <technique_common>
         <directional>
-          <color sid="color">500 500 500</color>
+          <color sid="color">1 1 1</color>
         </directional>
       </technique_common>
       <extra>
@@ -61,7 +61,7 @@
           <clipsta>0.5</clipsta>
           <compressthresh>0.04999995</compressthresh>
           <dist sid="blender_dist">25</dist>
-          <energy sid="blender_energy">500</energy>
+          <energy sid="blender_energy">1</energy>
           <falloff_type>2</falloff_type>
           <filtertype>0</filtertype>
           <flag>0</flag>
@@ -363,11 +363,11 @@
         </instance_geometry>
       </node>
       <node id="Sun" name="Sun" type="NODE">
-        <matrix sid="transform">-0.7913308 -0.01820745 -0.611117 -2.354061 -0.1660929 -0.9555628 0.2435422 6.122907 -0.588395 0.2942246 0.7531422 4.546467 0 0 0 1</matrix>
+        <matrix sid="transform">0.8344233 -0.3401598 -0.4336231 -2.140032 0.5504331 0.474984 0.6865957 5.476111 -0.0275882 -0.811592 0.5835729 7.449382 0 0 0 1</matrix>
         <instance_light url="#Sun-light"/>
       </node>
       <node id="Suzanne" name="Suzanne" type="NODE">
-        <matrix sid="transform">0.8718028 0.2469004 0.423084 1.292699 -0.4375729 0.7807627 0.4460264 1.586282 -0.2202041 -0.5739772 0.788708 1.051839 0 0 0 1</matrix>
+        <matrix sid="transform">0.8718028 0.2469004 0.423084 1.309787 -0.4375729 0.7807627 0.4460264 5.339489 -0.2202041 -0.5739772 0.788708 1.051839 0 0 0 1</matrix>
         <instance_geometry url="#Suzanne-mesh">
           <bind_material>
             <technique_common>
