@@ -5,8 +5,8 @@
       <author>Blender User</author>
       <authoring_tool>Blender 2.70.0 commit date:2014-04-10, commit time:11:49, hash:f93bc76</authoring_tool>
     </contributor>
-    <created>2014-11-16T14:49:46</created>
-    <modified>2014-11-16T14:49:46</modified>
+    <created>2014-12-28T18:04:39</created>
+    <modified>2014-12-28T18:04:39</modified>
     <unit name="meter" meter="1"/>
     <up_axis>Z_UP</up_axis>
   </asset>
@@ -88,26 +88,20 @@
     <effect id="Emitive-effect">
       <profile_COMMON>
         <technique sid="common">
-          <phong>
+          <lambert>
             <emission>
-              <color sid="emission">32 32 32 1</color>
+              <color sid="emission">1 1 1 1</color>
             </emission>
             <ambient>
               <color sid="ambient">0 0 0 1</color>
             </ambient>
             <diffuse>
-              <color sid="diffuse">0.64 0.64 0.64 1</color>
+              <color sid="diffuse">0.8 0.8 0.8 1</color>
             </diffuse>
-            <specular>
-              <color sid="specular">0.5 0.5 0.5 1</color>
-            </specular>
-            <shininess>
-              <float sid="shininess">50</float>
-            </shininess>
             <index_of_refraction>
               <float sid="index_of_refraction">1</float>
             </index_of_refraction>
-          </phong>
+          </lambert>
         </technique>
       </profile_COMMON>
     </effect>
@@ -314,7 +308,7 @@
         </instance_geometry>
       </node>
       <node id="EmitiveLight" name="EmitiveLight" type="NODE">
-        <matrix sid="transform">1 0 0 6.473584 0 1 0 9.005166 0 0 1 0.8429227 0 0 0 1</matrix>
+        <matrix sid="transform">1 0 0 5.68278 0 1 0 19.75451 0 0 1 0.8429227 0 0 0 1</matrix>
         <instance_geometry url="#EmitiveLight-mesh">
           <bind_material>
             <technique_common>
@@ -324,7 +318,7 @@
         </instance_geometry>
       </node>
       <node id="Ceiling" name="Ceiling" type="NODE">
-        <matrix sid="transform">-6.313169 -2.56158e-13 1.90652e-6 1.857717 2.56158e-13 -6.313169 0 -0.8532267 -1.90652e-6 0 -6.313169 4.519451 0 0 0 1</matrix>
+        <matrix sid="transform">-18.17259 -7.37357e-13 5.48797e-6 -8.250628 7.37357e-13 -18.17259 0 8.923803 -5.48797e-6 0 -18.17259 4.519451 0 0 0 1</matrix>
         <instance_geometry url="#Ceiling-mesh">
           <bind_material>
             <technique_common>
