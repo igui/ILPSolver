@@ -90,7 +90,7 @@
     <ClInclude Include="optimizations\SurfaceRadiosityEvaluation.h" />
   </ItemGroup>
   <ItemGroup>
-    <CudaCompile Include="optimizations\SurfaceRadiosity.cu">
+    <CudaCompile Include="optimizations\OptimizationFunction.cu">
       <NvccCompilation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">compile</NvccCompilation>
     </CudaCompile>
   </ItemGroup>

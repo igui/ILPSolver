@@ -87,13 +87,13 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <CudaCompile Include="optimizations\SurfaceRadiosity.cu">
-      <Filter>optimizations</Filter>
-    </CudaCompile>
-  </ItemGroup>
-  <ItemGroup>
     <Xml Include="examples\conference.xml">
       <Filter>examples</Filter>
     </Xml>
+  </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="optimizations\OptimizationFunction.cu">
+      <Filter>optimizations</Filter>
+    </CudaCompile>
   </ItemGroup>
 </Project>

@@ -5,7 +5,7 @@
 #include <thrust/copy.h>
 #include "renderer/helpers/optix.h"
 #include "renderer/helpers/nsight.h"
-#include "SurfaceRadiosity.h"
+#include "OptimizationFunction.h"
 #include "renderer/PMOptixRenderer.h"
 #include <QImage>
 
@@ -53,14 +53,14 @@ __global__ void transformFloatToRGB(optix::float3 *floatColorBuffer, optix::ucha
 	byteColorBuffer[dstIndex] = colorByte;
 }
 
-void SurfaceRadiosity::saveImage(const QString& fileName)
+void OptimizationFunction::saveImage(const QString& fileName)
 {
 	// convert float3 image data to 24 bit RGB
 	nvtxRangePushA("convertImageToRGB");
     int deviceNumber = 0;
-	cudaSetDevice(renderer->deviceOrdinal());
+	cudaSetDevice(m_renderer->deviceOrdinal());
 
-	auto rendererOutputBuffer = renderer->outputBuffer();
+	auto rendererOutputBuffer = m_renderer->outputBuffer();
 	auto floatOutputBuffer = getThrustDevicePtr<optix::float3>(rendererOutputBuffer, deviceNumber);
 	auto floatOutputBufferPtr = thrust::raw_pointer_cast(&floatOutputBuffer[0]);
 

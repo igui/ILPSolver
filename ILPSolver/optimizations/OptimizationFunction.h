@@ -3,17 +3,38 @@
 #include <QStringList>
 
 class Evaluation;
-class QString;
+class PMOptixRenderer;
+class QImage;
+class Logger;
+class Scene;
+class Camera;
 
 class OptimizationFunction
 {
 public:
-	virtual Evaluation *evaluateFast() = 0;
-	virtual Evaluation *evaluateRadiosity() = 0;
-	virtual void saveImage(const QString &fileName) = 0;
 	virtual QStringList header() = 0;
-	virtual ~OptimizationFunction(void);
+	Evaluation *evaluateRadiosity();
+	Evaluation *evaluateFast();
+	void saveImage(const QString &fileName);	
+	virtual ~OptimizationFunction();
 protected:
-	OptimizationFunction(void);
+	OptimizationFunction(PMOptixRenderer *renderer, Scene *scene, Logger *logger);
+	PMOptixRenderer *renderer();
+	virtual Evaluation *genEvaluation() = 0;
+private:
+	void saveImageAsync(const QString& fileName, QImage* image);
+
+
+private:
+	static const unsigned int sampleImageWidth;
+	static const unsigned int sampleImageHeight;
+	static const unsigned int defaultPhotonWidth;
+	static const float gammaCorrection;
+
+	PMOptixRenderer *m_renderer;
+	Scene *scene;
+	Logger *logger;
+	// for sampling images
+	Camera *sampleCamera; 
 };
 
