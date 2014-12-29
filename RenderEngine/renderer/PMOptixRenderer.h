@@ -49,6 +49,7 @@ public:
 	RENDER_ENGINE_EXPORT_API std::vector<float> getRadiance();
 	RENDER_ENGINE_EXPORT_API float getEmittedPower();
 	RENDER_ENGINE_EXPORT_API void transformNode(const QString &nodeName, const optix::Matrix4x4 &transformation);
+	RENDER_ENGINE_EXPORT_API void setLightDirection(const QString &lightName, const Vector3 &direction);
 	RENDER_ENGINE_EXPORT_API void setNodeTransformation(const QString &nodeName, const optix::Matrix4x4 &transformation);
 	RENDER_ENGINE_EXPORT_API int deviceOrdinal() const;
 	RENDER_ENGINE_EXPORT_API optix::Buffer outputBuffer();

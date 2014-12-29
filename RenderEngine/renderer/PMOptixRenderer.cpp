@@ -599,6 +599,20 @@ void PMOptixRenderer::setNodeTransformation(const QString &nodeName, const optix
 	transformNodeImpl(nodeName, transformation, false);
 }
 
+void PMOptixRenderer::setLightDirection(const QString &lightName, const Vector3 &direction)
+{
+	// update the light buffer if node is a light
+	if(!m_lights->contains(lightName)){
+		throw std::invalid_argument(("Invalid light: " + lightName).toStdString());
+	}
+
+	auto lightIndexes = (*m_lights)[lightName];
+	Light* lightsHost = (Light*)m_lightBuffer->map();
+	for(auto lightIndexesIt = lightIndexes.cbegin(); lightIndexesIt != lightIndexes.cend(); ++lightIndexesIt){
+		lightsHost[*lightIndexesIt].setDirection(direction);
+	}
+    m_lightBuffer->unmap();
+}
 
 void PMOptixRenderer::transformNodeImpl(const QString &nodeName, const optix::Matrix4x4 &transformation, bool preMultiply)
 {
