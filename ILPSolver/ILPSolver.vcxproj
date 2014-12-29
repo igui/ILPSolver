@@ -57,6 +57,8 @@
   <ItemGroup>
     <ClCompile Include="conditions\LightInSurfacePosition.cpp" />
     <ClCompile Include="Configuration.cpp" />
+    <ClCompile Include="conditions\DirectionalLight.cpp" />
+    <ClCompile Include="conditions\DirectionalLightPosition.cpp" />
     <ClCompile Include="FileLogger.cpp" />
     <ClCompile Include="ILPLog.cpp" />
     <ClCompile Include="ILPRead.cpp" />
@@ -79,6 +81,8 @@
     <ClInclude Include="conditions\Condition.h" />
     <ClInclude Include="conditions\LightInSurfacePosition.h" />
     <ClInclude Include="Configuration.h" />
+    <ClInclude Include="conditions\DirectionalLight.h" />
+    <ClInclude Include="conditions\DirectionalLightPosition.h" />
     <ClInclude Include="FileLogger.h" />
     <ClInclude Include="optimizations\Evaluation.h" />
     <ClInclude Include="ILP.h" />
@@ -101,6 +105,8 @@
     <None Include="examples\cube.dae">
       <SubType>Designer</SubType>
     </None>
+    <None Include="examples\directional.blend" />
+    <None Include="examples\directional.dae" />
   </ItemGroup>
   <ItemGroup>
     <None Include="examples\cube.xml">
@@ -111,6 +117,7 @@
     <Xml Include="examples\conference.xml">
       <SubType>Designer</SubType>
     </Xml>
+    <Xml Include="examples\directional.xml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

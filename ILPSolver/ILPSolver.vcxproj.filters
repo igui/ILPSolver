@@ -26,6 +26,12 @@
     <ClCompile Include="FileLogger.cpp" />
     <ClCompile Include="ILPLog.cpp" />
     <ClCompile Include="ILPOptimize.cpp" />
+    <ClCompile Include="conditions\DirectionalLight.cpp">
+      <Filter>conditions</Filter>
+    </ClCompile>
+    <ClCompile Include="conditions\DirectionalLightPosition.cpp">
+      <Filter>conditions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ILP.h" />
@@ -57,6 +63,12 @@
     </ClInclude>
     <ClInclude Include="Configuration.h" />
     <ClInclude Include="FileLogger.h" />
+    <ClInclude Include="conditions\DirectionalLightPosition.h">
+      <Filter>conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="conditions\DirectionalLight.h">
+      <Filter>conditions</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="examples\cube.blend">
@@ -74,6 +86,12 @@
     <None Include="examples\conference.dae">
       <Filter>examples</Filter>
     </None>
+    <None Include="examples\directional.blend">
+      <Filter>examples</Filter>
+    </None>
+    <None Include="examples\directional.dae">
+      <Filter>examples</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="examples">
@@ -88,6 +106,9 @@
   </ItemGroup>
   <ItemGroup>
     <Xml Include="examples\conference.xml">
+      <Filter>examples</Filter>
+    </Xml>
+    <Xml Include="examples\directional.xml">
       <Filter>examples</Filter>
     </Xml>
   </ItemGroup>
