@@ -9,6 +9,7 @@
 #include <optixu/optixu_matrix_namespace.h>
 #include "render_engine_export_api.h"
 #include <cstring>
+#include <stdexcept>
 
 
 
@@ -106,6 +107,14 @@ void Light::transform(const optix::Matrix4x4& transform)
 void Light::setTransform(const optix::Matrix4x4& transform)
 {
 	transformImpl(transform, false);
+}
+
+void Light::setDirection(const Vector3& direction)
+{
+	if(lightType != DIRECTIONAL){
+		throw std::logic_error("Light must be directional");
+	}
+	this->direction = optix::normalize(direction);
 }
 
 void Light::transformImpl(const optix::Matrix4x4& transform, bool preMultiply)
