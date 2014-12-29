@@ -42,8 +42,8 @@ optix::float3 __inline __device__ getLightContribution(const Light & light, cons
 	{
 		float3 direction = normalize(light.direction);
 		float2 sample = getRandomUniformFloat2(&randomState);
-		auto discCenter = (float3) boundingSphere.center - boundingSphere.radius * direction;
-		pointOnLight = sampleUnitHemisphereCos(-direction, sample) * boundingSphere.radius * 0.1f + discCenter;
+		auto discCenter = (float3) boundingSphere.center - 1000.0f * boundingSphere.radius * direction;
+		pointOnLight = sampleDisc(sample, discCenter, boundingSphere.radius * 10.0f, direction);
 		lightFactor = 1.0f;
 	}
 
