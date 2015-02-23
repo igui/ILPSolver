@@ -52,6 +52,7 @@ public:
 	RENDER_ENGINE_EXPORT_API void setLightDirection(const QString &lightName, const Vector3 &direction);
 	RENDER_ENGINE_EXPORT_API void setNodeTransformation(const QString &nodeName, const optix::Matrix4x4 &transformation);
 	RENDER_ENGINE_EXPORT_API int deviceOrdinal() const;
+	RENDER_ENGINE_EXPORT_API const std::vector<std::string>& objectToNameMapping() const;
 	RENDER_ENGINE_EXPORT_API optix::Buffer outputBuffer();
 	RENDER_ENGINE_EXPORT_API unsigned int totalPhotons();
 
@@ -72,6 +73,7 @@ private:
 	void resizeBuffers(unsigned int width, unsigned int height, unsigned int generateOutput);
 	void countHitCountPerObject();
 	void transformNodeImpl(const QString &nodeName, const optix::Matrix4x4 &transformation, bool preMultiply);
+	optix::Program createProgram(const std::string& filename, const std::string programName);
 	
 	optix::Context m_context;
     optix::Buffer m_outputBuffer;
