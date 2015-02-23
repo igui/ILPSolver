@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <input>
   <!-- Scene path (relative to this file) -->
-  <scene path="cube.dae"/>
+  <scene path="directional.dae"/>
 
   <!-- print output images and log on "./output" folder -->
   <output path="output"/>
   
   <!-- Optimization variables -->
   <conditions>
-    <lightInSurface id="EmitiveLight" surface="Ceiling"></lightInSurface>
+    <directionalLight id="Sun"/>
   </conditions>
 
   <!-- Which aspects of the scene must be optimized  -->
-  <objectives maxIterations="5000">
-    <!-- Maximize radiance on floor surface with 95% and radius of 5 W -->
-    <maximizeRadiance surface="Cube" confidenceIntervalRadius="5"></maximizeRadiance>
+  <objectives maxIterations="200">
+    <!-- Maximize radiance on Cube surface  -->
+    <maximizeRadiance surface="Suzanne" confidenceIntervalRadius="5"/>
   </objectives>  
 </input>

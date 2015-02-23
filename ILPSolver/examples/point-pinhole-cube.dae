@@ -5,8 +5,8 @@
       <author>Blender User</author>
       <authoring_tool>Blender 2.70.0 commit date:2014-04-10, commit time:11:49, hash:f93bc76</authoring_tool>
     </contributor>
-    <created>2015-02-22T22:21:27</created>
-    <modified>2015-02-22T22:21:27</modified>
+    <created>2015-02-22T22:19:19</created>
+    <modified>2015-02-22T22:19:19</modified>
     <unit name="meter" meter="1"/>
     <up_axis>Z_UP</up_axis>
   </asset>
@@ -34,9 +34,12 @@
   <library_lights>
     <light id="Sun-light" name="Sun">
       <technique_common>
-        <directional>
+        <point>
           <color sid="color">30 30 30</color>
-        </directional>
+          <constant_attenuation>1</constant_attenuation>
+          <linear_attenuation>0</linear_attenuation>
+          <quadratic_attenuation>0.001599967</quadratic_attenuation>
+        </point>
       </technique_common>
       <extra>
         <technique profile="blender">
@@ -93,7 +96,7 @@
           <sun_effect_type>0</sun_effect_type>
           <sun_intensity>4</sun_intensity>
           <sun_size>1.000002</sun_size>
-          <type>1</type>
+          <type>0</type>
         </technique>
       </extra>
     </light>

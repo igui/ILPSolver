@@ -5,8 +5,8 @@
       <author>Blender User</author>
       <authoring_tool>Blender 2.70.0 commit date:2014-04-10, commit time:11:49, hash:f93bc76</authoring_tool>
     </contributor>
-    <created>2015-01-29T23:40:09</created>
-    <modified>2015-01-29T23:40:09</modified>
+    <created>2015-02-22T21:49:41</created>
+    <modified>2015-02-22T21:49:41</modified>
     <unit name="meter" meter="1"/>
     <up_axis>Z_UP</up_axis>
   </asset>
@@ -31,6 +31,73 @@
       </extra>
     </camera>
   </library_cameras>
+  <library_lights>
+    <light id="Sun-light" name="Sun">
+      <technique_common>
+        <directional>
+          <color sid="color">1 1 1</color>
+        </directional>
+      </technique_common>
+      <extra>
+        <technique profile="blender">
+          <adapt_thresh>0.000999987</adapt_thresh>
+          <area_shape>0</area_shape>
+          <area_size>0.1</area_size>
+          <area_sizey>0.1</area_sizey>
+          <area_sizez>0.1</area_sizez>
+          <atm_distance_factor>1</atm_distance_factor>
+          <atm_extinction_factor>1</atm_extinction_factor>
+          <atm_turbidity>2</atm_turbidity>
+          <att1>0</att1>
+          <att2>1</att2>
+          <backscattered_light>1</backscattered_light>
+          <bias>1</bias>
+          <blue>1</blue>
+          <buffers>1</buffers>
+          <bufflag>0</bufflag>
+          <bufsize>512</bufsize>
+          <buftype>2</buftype>
+          <clipend>40</clipend>
+          <clipsta>0.5</clipsta>
+          <compressthresh>0.04999995</compressthresh>
+          <dist sid="blender_dist">25</dist>
+          <energy sid="blender_energy">1</energy>
+          <falloff_type>2</falloff_type>
+          <filtertype>0</filtertype>
+          <flag>0</flag>
+          <gamma sid="blender_gamma">1</gamma>
+          <green>1</green>
+          <halo_intensity sid="blnder_halo_intensity">1</halo_intensity>
+          <horizon_brightness>1</horizon_brightness>
+          <mode>8193</mode>
+          <ray_samp>1</ray_samp>
+          <ray_samp_method>1</ray_samp_method>
+          <ray_samp_type>0</ray_samp_type>
+          <ray_sampy>1</ray_sampy>
+          <ray_sampz>1</ray_sampz>
+          <red>1</red>
+          <samp>3</samp>
+          <shadhalostep>0</shadhalostep>
+          <shadow_b sid="blender_shadow_b">0</shadow_b>
+          <shadow_g sid="blender_shadow_g">0</shadow_g>
+          <shadow_r sid="blender_shadow_r">0</shadow_r>
+          <sky_colorspace>2</sky_colorspace>
+          <sky_exposure>1</sky_exposure>
+          <skyblendfac>1</skyblendfac>
+          <skyblendtype>1</skyblendtype>
+          <soft>3</soft>
+          <spotblend>0.15</spotblend>
+          <spotsize>45</spotsize>
+          <spread>1</spread>
+          <sun_brightness>1</sun_brightness>
+          <sun_effect_type>0</sun_effect_type>
+          <sun_intensity>1</sun_intensity>
+          <sun_size>1</sun_size>
+          <type>1</type>
+        </technique>
+      </extra>
+    </light>
+  </library_lights>
   <library_images/>
   <library_effects>
     <effect id="Red-effect">
@@ -44,7 +111,7 @@
               <color sid="ambient">0 0 0 1</color>
             </ambient>
             <diffuse>
-              <color sid="diffuse">0.8 0.8 0.8 1</color>
+              <color sid="diffuse">1 0 0.02102089 1</color>
             </diffuse>
             <index_of_refraction>
               <float sid="index_of_refraction">1</float>
@@ -53,7 +120,7 @@
         </technique>
       </profile_COMMON>
     </effect>
-    <effect id="Material-effect">
+    <effect id="Grey-effect">
       <profile_COMMON>
         <technique sid="common">
           <phong>
@@ -79,26 +146,6 @@
         </technique>
       </profile_COMMON>
     </effect>
-    <effect id="Emitive-effect">
-      <profile_COMMON>
-        <technique sid="common">
-          <lambert>
-            <emission>
-              <color sid="emission">1 1 1 1</color>
-            </emission>
-            <ambient>
-              <color sid="ambient">0 0 0 1</color>
-            </ambient>
-            <diffuse>
-              <color sid="diffuse">0.8 0.8 0.8 1</color>
-            </diffuse>
-            <index_of_refraction>
-              <float sid="index_of_refraction">1</float>
-            </index_of_refraction>
-          </lambert>
-        </technique>
-      </profile_COMMON>
-    </effect>
     <effect id="Green-effect">
       <profile_COMMON>
         <technique sid="common">
@@ -110,7 +157,7 @@
               <color sid="ambient">0 0 0 1</color>
             </ambient>
             <diffuse>
-              <color sid="diffuse">0.8 0.8 0.8 1</color>
+              <color sid="diffuse">0 1 0.1114258 1</color>
             </diffuse>
             <index_of_refraction>
               <float sid="index_of_refraction">1</float>
@@ -124,11 +171,8 @@
     <material id="Red-material" name="Red">
       <instance_effect url="#Red-effect"/>
     </material>
-    <material id="Material-material" name="Material">
-      <instance_effect url="#Material-effect"/>
-    </material>
-    <material id="Emitive-material" name="Emitive">
-      <instance_effect url="#Emitive-effect"/>
+    <material id="Grey-material" name="Grey">
+      <instance_effect url="#Grey-effect"/>
     </material>
     <material id="Green-material" name="Green">
       <instance_effect url="#Green-effect"/>
@@ -171,9 +215,9 @@
     <geometry id="Floor-mesh" name="Floor">
       <mesh>
         <source id="Floor-mesh-positions">
-          <float_array id="Floor-mesh-positions-array" count="12">-1 -1 0 1 -1 0 -1 1 0 1 1 0</float_array>
+          <float_array id="Floor-mesh-positions-array" count="24">-1 -1 0 1 -1 0 -1 1 0 1 1 0 -1 -1 -0.01404029 1 -1 -0.01404029 -1 1 -0.01404029 1 1 -0.01404029</float_array>
           <technique_common>
-            <accessor source="#Floor-mesh-positions-array" count="4" stride="3">
+            <accessor source="#Floor-mesh-positions-array" count="8" stride="3">
               <param name="X" type="float"/>
               <param name="Y" type="float"/>
               <param name="Z" type="float"/>
@@ -181,89 +225,67 @@
           </technique_common>
         </source>
         <source id="Floor-mesh-normals">
-          <float_array id="Floor-mesh-normals-array" count="6">0 0 1 0 0 1</float_array>
+          <float_array id="Floor-mesh-normals-array" count="36">0 0 1 0 0 -1 0 1 0 1 0 0 0 -1 0 -1 0 0 0 0 1 0 0 -1 0 1 0 1 0 0 0 -1 0 -1 0 0</float_array>
           <technique_common>
-            <accessor source="#Floor-mesh-normals-array" count="2" stride="3">
+            <accessor source="#Floor-mesh-normals-array" count="12" stride="3">
               <param name="X" type="float"/>
               <param name="Y" type="float"/>
               <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="Floor-mesh-colors">
+          <float_array id="Floor-mesh-colors-array" count="108">1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</float_array>
+          <technique_common>
+            <accessor source="#Floor-mesh-colors-array" count="36" stride="3">
+              <param name="R" type="float"/>
+              <param name="G" type="float"/>
+              <param name="B" type="float"/>
             </accessor>
           </technique_common>
         </source>
         <vertices id="Floor-mesh-vertices">
           <input semantic="POSITION" source="#Floor-mesh-positions"/>
         </vertices>
-        <polylist material="Material-material" count="2">
+        <polylist material="Grey-material" count="12">
           <input semantic="VERTEX" source="#Floor-mesh-vertices" offset="0"/>
           <input semantic="NORMAL" source="#Floor-mesh-normals" offset="1"/>
-          <vcount>3 3 </vcount>
-          <p>0 0 1 0 3 0 2 1 0 1 3 1</p>
+          <input semantic="COLOR" source="#Floor-mesh-colors" offset="2"/>
+          <vcount>3 3 3 3 3 3 3 3 3 3 3 3 </vcount>
+          <p>0 0 0 1 0 1 3 0 2 4 1 3 6 1 4 7 1 5 3 2 6 7 2 7 6 2 8 1 3 9 5 3 10 7 3 11 0 4 12 4 4 13 5 4 14 2 5 15 6 5 16 4 5 17 2 6 18 0 6 19 3 6 20 5 7 21 4 7 22 7 7 23 2 8 24 3 8 25 6 8 26 3 9 27 1 9 28 7 9 29 1 10 30 0 10 31 5 10 32 0 11 33 2 11 34 4 11 35</p>
         </polylist>
       </mesh>
     </geometry>
-    <geometry id="EmitiveLight-mesh" name="EmitiveLight">
+    <geometry id="Cube_001-mesh" name="Cube.001">
       <mesh>
-        <source id="EmitiveLight-mesh-positions">
-          <float_array id="EmitiveLight-mesh-positions-array" count="12">1.691587 -1.093161 3.634279 -0.3084133 -1.092842 3.634309 1.691905 0.906823 3.626291 -0.3080947 0.9071413 3.626321</float_array>
+        <source id="Cube_001-mesh-positions">
+          <float_array id="Cube_001-mesh-positions-array" count="24">-2.2 -2.2 -2.2 -2.2 2.2 -2.2 2.2 2.2 -2.2 2.2 -2.2 -2.2 -2.2 -2.2 2.2 -2.2 2.2 2.2 2.2 2.2 2.2 2.2 -2.2 2.2</float_array>
           <technique_common>
-            <accessor source="#EmitiveLight-mesh-positions-array" count="4" stride="3">
+            <accessor source="#Cube_001-mesh-positions-array" count="8" stride="3">
               <param name="X" type="float"/>
               <param name="Y" type="float"/>
               <param name="Z" type="float"/>
             </accessor>
           </technique_common>
         </source>
-        <source id="EmitiveLight-mesh-normals">
-          <float_array id="EmitiveLight-mesh-normals-array" count="6">-1.5895e-5 -0.003994166 -0.999992 -1.54171e-5 -0.00399369 -0.9999921</float_array>
+        <source id="Cube_001-mesh-normals">
+          <float_array id="Cube_001-mesh-normals-array" count="36">-1 0 0 0 1 0 1 0 0 0 -1 0 0 0 -1 0 0 1 -1 0 0 0 1 0 1 0 0 0 -1 0 0 0 -1 0 0 1</float_array>
           <technique_common>
-            <accessor source="#EmitiveLight-mesh-normals-array" count="2" stride="3">
+            <accessor source="#Cube_001-mesh-normals-array" count="12" stride="3">
               <param name="X" type="float"/>
               <param name="Y" type="float"/>
               <param name="Z" type="float"/>
             </accessor>
           </technique_common>
         </source>
-        <vertices id="EmitiveLight-mesh-vertices">
-          <input semantic="POSITION" source="#EmitiveLight-mesh-positions"/>
+        <vertices id="Cube_001-mesh-vertices">
+          <input semantic="POSITION" source="#Cube_001-mesh-positions"/>
         </vertices>
-        <polylist material="Emitive-material" count="2">
-          <input semantic="VERTEX" source="#EmitiveLight-mesh-vertices" offset="0"/>
-          <input semantic="NORMAL" source="#EmitiveLight-mesh-normals" offset="1"/>
-          <vcount>3 3 </vcount>
-          <p>0 0 1 0 3 0 2 1 0 1 3 1</p>
-        </polylist>
-      </mesh>
-    </geometry>
-    <geometry id="Ceiling-mesh" name="Ceiling">
-      <mesh>
-        <source id="Ceiling-mesh-positions">
-          <float_array id="Ceiling-mesh-positions-array" count="12">-1 -1 0 1 -1 0 -1 1 0 1 1 0</float_array>
-          <technique_common>
-            <accessor source="#Ceiling-mesh-positions-array" count="4" stride="3">
-              <param name="X" type="float"/>
-              <param name="Y" type="float"/>
-              <param name="Z" type="float"/>
-            </accessor>
-          </technique_common>
-        </source>
-        <source id="Ceiling-mesh-normals">
-          <float_array id="Ceiling-mesh-normals-array" count="6">0 0 1 0 0 1</float_array>
-          <technique_common>
-            <accessor source="#Ceiling-mesh-normals-array" count="2" stride="3">
-              <param name="X" type="float"/>
-              <param name="Y" type="float"/>
-              <param name="Z" type="float"/>
-            </accessor>
-          </technique_common>
-        </source>
-        <vertices id="Ceiling-mesh-vertices">
-          <input semantic="POSITION" source="#Ceiling-mesh-positions"/>
-        </vertices>
-        <polylist material="Green-material" count="2">
-          <input semantic="VERTEX" source="#Ceiling-mesh-vertices" offset="0"/>
-          <input semantic="NORMAL" source="#Ceiling-mesh-normals" offset="1"/>
-          <vcount>3 3 </vcount>
-          <p>0 0 1 0 3 0 2 1 0 1 3 1</p>
+        <polylist material="Green-material" count="12">
+          <input semantic="VERTEX" source="#Cube_001-mesh-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#Cube_001-mesh-normals" offset="1"/>
+          <vcount>3 3 3 3 3 3 3 3 3 3 3 3 </vcount>
+          <p>4 0 5 0 1 0 5 1 6 1 2 1 6 2 7 2 3 2 7 3 4 3 0 3 0 4 1 4 2 4 7 5 6 5 5 5 0 6 4 6 1 6 1 7 5 7 2 7 2 8 6 8 3 8 3 9 7 9 0 9 3 10 0 10 2 10 4 11 7 11 5 11</p>
         </polylist>
       </mesh>
     </geometry>
@@ -290,24 +312,18 @@
         <instance_geometry url="#Floor-mesh">
           <bind_material>
             <technique_common>
-              <instance_material symbol="Material-material" target="#Material-material"/>
+              <instance_material symbol="Grey-material" target="#Grey-material"/>
             </technique_common>
           </bind_material>
         </instance_geometry>
       </node>
-      <node id="EmitiveLight" name="EmitiveLight" type="NODE">
-        <matrix sid="transform">1 0 0 -4.24914 0 1 0 5.408404 0 0 1 0.8429227 0 0 0 1</matrix>
-        <instance_geometry url="#EmitiveLight-mesh">
-          <bind_material>
-            <technique_common>
-              <instance_material symbol="Emitive-material" target="#Emitive-material"/>
-            </technique_common>
-          </bind_material>
-        </instance_geometry>
+      <node id="Sun" name="Sun" type="NODE">
+        <matrix sid="transform">1 0 0 -6.381189 0 1 0 -0.09124374 0 0 1 3.235884 0 0 0 1</matrix>
+        <instance_light url="#Sun-light"/>
       </node>
       <node id="Ceiling" name="Ceiling" type="NODE">
-        <matrix sid="transform">-18.17259 -7.37357e-13 5.48797e-6 -8.250628 7.37357e-13 -18.17259 0 8.923803 -5.48797e-6 0 -18.17259 4.519451 0 0 0 1</matrix>
-        <instance_geometry url="#Ceiling-mesh">
+        <matrix sid="transform">2.169812 0 0 -4.480976 0 2.339341 0 5.650905 0 0 0.01717356 6.648058 0 0 0 1</matrix>
+        <instance_geometry url="#Cube_001-mesh">
           <bind_material>
             <technique_common>
               <instance_material symbol="Green-material" target="#Green-material"/>
