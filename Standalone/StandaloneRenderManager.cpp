@@ -18,7 +18,7 @@
 
 StandaloneRenderManager::StandaloneRenderManager(QApplication & qApplication, Application & application, const ComputeDevice& device) :
     m_device(device),
-    m_renderer(new PPMOptixRenderer()), 
+    m_renderer(new PMOptixRenderer()), 
     m_nextIterationNumber(0),
     m_outputBuffer(NULL),
     m_currentScene(NULL),
@@ -56,13 +56,41 @@ StandaloneRenderManager::~StandaloneRenderManager()
 void StandaloneRenderManager::start()
 {
     m_application.setRendererStatus(RendererStatus::INITIALIZING_ENGINE);
-	m_renderer->initialize(m_device, &m_logger);
+	try {
+		m_renderer->initialize(m_device, &m_logger);
+	} catch(std::exception& ex)
+	{
+		emit renderManagerError(ex.what());
+	}
 }
 
 void StandaloneRenderManager::onContinueRayTracing()
 {
     renderNextIteration();
     continueRayTracingIfRunningAsync();
+}
+
+static void logHitCount(Logger *logger, OptixRenderer *renderer)
+{
+	PMOptixRenderer *pmOptixRenderer = dynamic_cast<PMOptixRenderer *>(renderer);
+	if(!pmOptixRenderer)
+		return;
+	
+	auto objectIdToName = pmOptixRenderer->objectToNameMapping();
+	auto radiances = pmOptixRenderer->getRadiance();
+	auto hitCounts = pmOptixRenderer->getHitCount();
+	logger->log("Hits \n");
+	
+	int sumHits = 0;
+	for(int i = 0; i < hitCounts.size(); ++i)
+	{
+		auto hitCount = hitCounts.at(i);
+		auto radiance = radiances.at(i);
+		logger->log("\t%20s: %10d\t%10f\n", objectIdToName.at(i).c_str(), hitCount, radiance);
+		sumHits += hitCount;
+	}
+
+	logger->log("Hit ratio: %0.2f\n", (float)sumHits / pmOptixRenderer->totalPhotons());
 }
 
 void StandaloneRenderManager::renderNextIteration()
@@ -107,6 +135,8 @@ void StandaloneRenderManager::renderNextIteration()
             fillRenderStatistics();
             m_nextIterationNumber++;
 			//m_application.setRunningStatus(RunningStatus::PAUSE);
+
+			logHitCount(&m_logger, m_renderer);
         }
     }
     catch(const std::exception & E)
@@ -116,12 +146,6 @@ void StandaloneRenderManager::renderNextIteration()
         emit renderManagerError(error);
     }
 }
-
-/*
-unsigned long long StandaloneRenderManager::getIterationNumber() const
-{
-    return m_nextIterationNumber-1;
-}*/
 
 void StandaloneRenderManager::fillRenderStatistics()
 {
