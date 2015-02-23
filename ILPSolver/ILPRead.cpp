@@ -8,6 +8,7 @@
 #include <QAbstractXmlNodeModel>
 #include <QDebug>
 #include "conditions/LightInSurface.h"
+#include "conditions/DirectionalLight.h"
 #include "optimizations/SurfaceRadiosity.h"
 
 
@@ -37,6 +38,49 @@ void ILP::readScene(QFile &file, const QString& fileName)
 	inited = true;
 }
 
+static Condition *readLightInSurface(Scene *scene, const QDomElement& element)
+{
+	QString id = element.attribute("id");
+	QString surface = element.attribute("surface");
+
+	if(id.isEmpty())
+		throw std::logic_error("id can't be empty");
+	if(surface.isEmpty())
+		throw std::logic_error("surface can't be empty");
+
+	qDebug() << "condition: LightInSurface id: " + id + ", surface: " + surface;
+
+	return new LightInSurface(scene, id, surface);
+}
+
+static Condition *readDirectionalLight(Scene *scene, const QDomElement& element)
+{
+	QString id = element.attribute("id");
+
+	if(id.isEmpty())
+		throw std::logic_error("id can't be empty");
+
+	qDebug() << "condition: DirectionalLight id: " + id;
+
+	return new DirectionalLight(scene, id);
+}
+
+static Condition *readUnknownCondition(Scene *, const QDomElement&)
+{
+	return NULL;
+}
+
+static Condition *readConditionElement(Scene *scene, const QDomElement& element)
+{
+	auto readFunc = readUnknownCondition;
+
+	if(element.tagName() == "lightInSurface")
+		readFunc = readLightInSurface;
+	else if(element.tagName() == "directionalLight")
+		readFunc = readDirectionalLight;
+	
+	return readFunc(scene, element);
+}
 
 void ILP::readConditions(QDomDocument& xml)
 {
@@ -50,20 +94,9 @@ void ILP::readConditions(QDomDocument& xml)
 		for(int j = 0; j < conditionNodes.length(); ++j)
 		{
 			auto lightInSurfaceNode = conditionNodes.at(j).toElement();
-			if(lightInSurfaceNode.tagName() != "lightInSurface")
-				continue;
-
-			QString id = lightInSurfaceNode.attribute("id");
-			QString surface = lightInSurfaceNode.attribute("surface");
-
-			if(id.isEmpty())
-				throw std::logic_error("id can't be empty");
-			if(surface.isEmpty())
-				throw std::logic_error("surface can't be empty");
-
-			qDebug() << "condition: LightInSurface id: " + id + ", surface: " + surface;
-
-			conditions.append(new LightInSurface(scene, id, surface));
+			auto condition = readConditionElement(scene, lightInSurfaceNode);
+			if(condition)
+				conditions.append(condition);
 		}
 	}
 

@@ -5,11 +5,15 @@
 class DirectionalLightPosition: public ConditionPosition
 {
 public:
-	DirectionalLightPosition(const QString& lightId, const optix::float3 direction);
+	DirectionalLightPosition(const QString& lightId, const optix::float3& direction);
 	virtual void apply(PMOptixRenderer *) const;
+	
+	optix::float3 direction() const;
+	QString lightId() const;
+
 	virtual QStringList info() const;
 private:
-	QString lightId;
-	optix::float3 direction;
+	QString m_lightId;
+	optix::float3 m_direction;
 };
 

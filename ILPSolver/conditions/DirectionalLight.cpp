@@ -25,11 +25,37 @@ DirectionalLight::DirectionalLight(Scene *scene, const QString& lightId):
 	initialDirection = light->direction;
 }
 
+static optix::float2 toSphericalCoord(const optix::float3& v)
+{
+	return optix::make_float2(
+		acosf(v.z),
+		atan2f(v.y, v.x)
+	);
+}
+
+static optix::float3 toCartesianCoord(const optix::float2& phitheta)
+{
+	auto length = optix::length(phitheta);
+
+    return length * optix::make_float3(
+		sinf(phitheta.x) * cosf(phitheta.y),
+		sinf(phitheta.x) * sinf(phitheta.y),
+		cosf(phitheta.x)
+	);
+}
 
 ConditionPosition *DirectionalLight::findNeighbour(ConditionPosition *from, float radius, unsigned int) const
 {
-	// TODO implement
-	throw std::logic_error("Not implemented");
+	auto directionalLightPosition = (DirectionalLightPosition *)from;
+	auto sphericalDirection = toSphericalCoord(directionalLightPosition->direction());
+
+	auto sample = qrand() / (float) RAND_MAX;
+	auto rotation = 2.0f * M_PI * radius * (optix::make_float2(sample, 1.0f - sample) - 0.5f);
+	
+	return new DirectionalLightPosition(
+		directionalLightPosition->lightId(),
+		toCartesianCoord(sphericalDirection + rotation)
+	);
 }
 
 ConditionPosition *DirectionalLight::initial() const
