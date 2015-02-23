@@ -2,4 +2,4 @@
 
 #include <string>
 
-std::string relativePathToExe(const char *path);
+std::string relativePathToExe(const std::string &path);
