@@ -84,6 +84,26 @@ static __device__ void generatePhotonOriginAndDirection(const Light& light, Rand
         float3 pointOnDisc = sampleDisc(sample1, origin+light.direction, sinf(light.angle/2), light.direction);
         direction = normalize(pointOnDisc-origin);
     }
+	else if(light.lightType == Light::DIRECTIONAL)
+	{
+		direction = light.direction;
+
+		// Good enough (~0.13)
+		// origin = sampleUnitSphere(sample1) * sceneBoundingSphere.radius + sceneBoundingSphere.center;
+		// photonPowerFactor = 1;
+		
+		// Too few photons (~0.00)
+		// origin = sampleUnitSphere(sample1) * sceneBoundingSphere.radius * 10 + sceneBoundingSphere.center;
+		// photonPowerFactor = 10;
+
+		// Good enough (~0.25)
+		// origin = sampleDisc(sample1, (float3)sceneBoundingSphere.center - sceneBoundingSphere.radius * direction, sceneBoundingSphere.radius, direction);
+		// photonPowerFactor = 1;
+
+		// Test
+		origin = sampleDisc(sample1, (float3)sceneBoundingSphere.center - sceneBoundingSphere.radius * direction, sceneBoundingSphere.radius, direction);
+		photonPowerFactor = 1;
+	}
 }
 
 RT_PROGRAM void generator()
