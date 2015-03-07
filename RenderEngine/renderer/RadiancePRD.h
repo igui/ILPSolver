@@ -33,3 +33,4 @@ struct RadiancePRD
 #define PRD_HIT_SPECULAR (1<<28u)
 #define PRD_HIT_NON_SPECULAR (1<<27u)
 #define PRD_PATH_TRACING (1<<26u)
+#define PRD_IN_HOLE (1<<26u)

@@ -75,9 +75,3 @@ RT_PROGRAM void kernel()
     directRadianceBuffer[launchIndex] = directRadiance;
     
 }
-
-RT_PROGRAM void gatherAnyHitOnNonEmitter()
-{
-    shadowPrd.attenuation = 0.0f;
-    rtTerminateRay();
-}

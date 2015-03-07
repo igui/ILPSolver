@@ -74,6 +74,7 @@
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="material\Glass.h" />
     <ClInclude Include="util\RelPath.h" />
     <ClInclude Include="logging\DummyLogger.h" />
     <ClInclude Include="logging\SignalLogger.hxx" />
@@ -109,7 +110,7 @@
     <ClInclude Include="material\DiffuseEmitter.h" />
     <ClInclude Include="renderer\Hitpoint.h" />
     <ClInclude Include="material\Diffuse.h" />
-    <ClInclude Include="material\Glass.h" />
+    <ClInclude Include="material\Hole.h" />
     <ClInclude Include="material\Material.h" />
     <ClInclude Include="material\ParticipatingMedium.h" />
     <ClInclude Include="clientserver\RenderServerRenderRequest.h" />
@@ -137,6 +138,7 @@
     <ClCompile Include="logging\DummyLogger.cpp" />
     <ClCompile Include="logging\Logger.cpp" />
     <ClCompile Include="logging\SignalLogger.cpp" />
+    <ClCompile Include="material\Glass.cpp" />
     <ClCompile Include="math\AAB.cpp" />
     <ClCompile Include="math\Sphere.cpp" />
     <ClCompile Include="renderer\PMOptixRenderer.cpp" />
@@ -157,7 +159,7 @@
     <ClCompile Include="renderer\Light.cpp" />
     <ClCompile Include="material\Diffuse.cpp" />
     <ClCompile Include="material\DiffuseEmitter.cpp" />
-    <ClCompile Include="material\Glass.cpp" />
+    <ClCompile Include="material\Hole.cpp" />
     <ClCompile Include="material\Material.cpp" />
     <ClCompile Include="material\ParticipatingMedium.cpp" />
     <ClCompile Include="renderer\Camera.cpp" />
@@ -175,6 +177,7 @@
     <CudaCompile Include="geometry_instance\Sphere.cu" />
     <CudaCompile Include="geometry_instance\TriangleMesh.cu" />
     <CudaCompile Include="material\DiffuseEmitter.cu" />
+    <CudaCompile Include="material\Glass.cu" />
     <CudaCompile Include="material\Mirror.cu" />
     <CudaCompile Include="material\Texture.cu" />
     <CudaCompile Include="renderer\pm\PMDirectRadianceEstimation.cu" />
@@ -186,7 +189,7 @@
     <CudaCompile Include="material\Diffuse.cu">
       <AdditionalCompilerOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">-use_fast_math</AdditionalCompilerOptions>
     </CudaCompile>
-    <CudaCompile Include="material\Glass.cu" />
+    <CudaCompile Include="material\Hole.cu" />
     <CudaCompile Include="material\ParticipatingMedium.cu" />
     <CudaCompile Include="renderer\ppm\DirectRadianceEstimation.cu" />
     <CudaCompile Include="renderer\ppm\Output.cu" />

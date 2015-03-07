@@ -8,8 +8,8 @@
 #include "renderer/RayType.h"
 #include "util/RelPath.h"
 
-bool Material::m_hasLoadedOptixAnyHitProgram = false;
-optix::Program Material::m_optixAnyHitProgram;
+bool Material::m_hasLoadedOptixClosestHitProgram = false;
+optix::Program Material::m_optixClosestHitProgram;
 
 Material::Material():
 	m_objectId(-1)
@@ -34,10 +34,10 @@ void Material::setObjectId(unsigned int objectId)
 
 void Material::registerMaterialWithShadowProgram( optix::Context & context, optix::Material & material )
 {
-    if(!m_hasLoadedOptixAnyHitProgram)
+    if(!m_hasLoadedOptixClosestHitProgram)
     {
-        m_optixAnyHitProgram = context->createProgramFromPTXFile( relativePathToExe("DirectRadianceEstimation.cu.ptx"), "gatherAnyHitOnNonEmitter");
-        m_hasLoadedOptixAnyHitProgram = true;
+        m_optixClosestHitProgram = context->createProgramFromPTXFile( relativePathToExe("DirectRadianceEstimation.cu.ptx"), "gatherClosestHitOnNonEmmiter");
+        m_hasLoadedOptixClosestHitProgram = true;
     }
-    material->setAnyHitProgram(RayType::SHADOW, m_optixAnyHitProgram);
+	material->setClosestHitProgram(RayType::SHADOW, m_optixClosestHitProgram);
 }

@@ -20,7 +20,7 @@ protected:
 	virtual void registerGeometryInstanceValues( optix::GeometryInstance & instance ) = 0;
     static void registerMaterialWithShadowProgram(optix::Context & context, optix::Material & material);
 private:
-    static bool m_hasLoadedOptixAnyHitProgram;
-    static optix::Program m_optixAnyHitProgram;
+    static bool m_hasLoadedOptixClosestHitProgram;
+    static optix::Program m_optixClosestHitProgram;
 	unsigned int m_objectId;
 };

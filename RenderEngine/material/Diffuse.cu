@@ -53,6 +53,13 @@ RT_PROGRAM void closestHitRadiance()
     float3 worldShadingNormal = normalize( rtTransformNormal( RT_OBJECT_TO_WORLD, shadingNormal ) );
     float3 hitPoint = ray.origin + tHit*ray.direction;
 
+	if(radiancePrd.flags & PRD_IN_HOLE)
+	{
+		Ray newRay(hitPoint, ray.direction, ray.ray_type, 0.0001);
+		rtTrace(sceneRootObject, newRay, radiancePrd);
+		return;
+	}
+
     radiancePrd.flags |= PRD_HIT_NON_SPECULAR;
     radiancePrd.attenuation *= Kd;
     radiancePrd.normal = worldShadingNormal;
@@ -78,6 +85,14 @@ RT_PROGRAM void closestHitPhoton()
 {
     float3 worldShadingNormal = normalize( rtTransformNormal( RT_OBJECT_TO_WORLD, shadingNormal ) );
     float3 hitPoint = ray.origin + tHit*ray.direction;
+
+	if(photonPrd.inHole)
+	{
+		Ray newRay(hitPoint, ray.direction, ray.ray_type, 0.0001);
+		rtTrace(sceneRootObject, newRay, photonPrd);
+		return;
+	}
+
     float3 newPhotonDirection;
 
     if(photonPrd.depth >= 1 && photonPrd.numStoredPhotons < maxPhotonDepositsPerEmitted)

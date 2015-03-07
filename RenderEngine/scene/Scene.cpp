@@ -13,6 +13,7 @@
 #include "material/Diffuse.h"
 #include "material/DiffuseEmitter.h"
 #include "material/Glass.h"
+#include "material/Hole.h"
 #include "material/Mirror.h"
 #include "material/Texture.h"
 #include "material/ParticipatingMedium.h"
@@ -221,6 +222,13 @@ void Scene::loadSceneMaterials()
             m_materials.push_back(material);
             continue;
         }
+
+		if(material->Get(AI_MATKEY_REFRACTI, indexOfRefraction) == AI_SUCCESS && indexOfRefraction < 1.0f)
+		{
+			Material* material = new Hole();
+            m_materials.push_back(material);
+            continue;
+		}
 
         // Reflective/mirror material
         aiColor3D reflectiveColor;

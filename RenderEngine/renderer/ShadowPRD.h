@@ -8,4 +8,5 @@
 struct ShadowPRD
 {
     float attenuation;
+	bool inHole;
 };

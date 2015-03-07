@@ -75,8 +75,19 @@ RT_PROGRAM void kernel()
     
 }
 
-RT_PROGRAM void gatherAnyHitOnNonEmitter()
+rtDeclareVariable(optix::Ray, ray, rtCurrentRay, );
+rtDeclareVariable(float, tHit, rtIntersectionDistance, );
+
+RT_PROGRAM void gatherClosestHitOnNonEmmiter()
 {
-    shadowPrd.attenuation = 0.0f;
-    rtTerminateRay();
+	if(shadowPrd.inHole)
+	{
+		float3 hitPoint = ray.origin + tHit*ray.direction;
+		Ray newRay(hitPoint, ray.direction, ray.ray_type, 0.0001);
+		rtTrace(sceneRootObject, newRay, shadowPrd);
+	}
+	else
+	{
+		shadowPrd.attenuation = 0.0f;
+	}
 }

@@ -1,9 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="material\Glass.cpp">
-      <Filter>material</Filter>
-    </ClCompile>
     <ClCompile Include="material\Material.cpp">
       <Filter>material</Filter>
     </ClCompile>
@@ -103,12 +100,15 @@
       <Filter>material</Filter>
     </ClCompile>
     <ClCompile Include="util\RelPath.cpp" />
+    <ClCompile Include="material\Hole.cpp">
+      <Filter>material</Filter>
+    </ClCompile>
+    <ClCompile Include="material\Glass.cpp">
+      <Filter>material</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="select.h" />
-    <ClInclude Include="material\Glass.h">
-      <Filter>material</Filter>
-    </ClInclude>
     <ClInclude Include="material\Material.h">
       <Filter>material</Filter>
     </ClInclude>
@@ -266,6 +266,12 @@
     <ClInclude Include="util\RelPath.h">
       <Filter>util</Filter>
     </ClInclude>
+    <ClInclude Include="material\Hole.h">
+      <Filter>material</Filter>
+    </ClInclude>
+    <ClInclude Include="material\Glass.h">
+      <Filter>material</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="material">
@@ -309,9 +315,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <CudaCompile Include="material\Glass.cu">
-      <Filter>material</Filter>
-    </CudaCompile>
     <CudaCompile Include="material\Diffuse.cu">
       <Filter>material</Filter>
     </CudaCompile>
@@ -383,6 +386,12 @@
     </CudaCompile>
     <CudaCompile Include="renderer\OptixRenderer_SpatialHash.cu">
       <Filter>renderer</Filter>
+    </CudaCompile>
+    <CudaCompile Include="material\Hole.cu">
+      <Filter>material</Filter>
+    </CudaCompile>
+    <CudaCompile Include="material\Glass.cu">
+      <Filter>material</Filter>
     </CudaCompile>
   </ItemGroup>
 </Project>
