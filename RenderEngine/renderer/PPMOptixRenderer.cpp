@@ -118,6 +118,7 @@ void PPMOptixRenderer::initialize(const ComputeDevice & device, Logger *logger)
     m_context["emittedPhotonsPerIterationFloat"]->setFloat(float(EMITTED_PHOTONS_PER_ITERATION));
     m_context["photonLaunchWidth"]->setUint(PHOTON_LAUNCH_WIDTH);
     m_context["participatingMedium"]->setUint(0);
+	m_context["storefirstHitPhotons"]->setUint(0);
 
     // An empty scene root node
     optix::Group group = m_context->createGroup();
@@ -431,6 +432,8 @@ void PPMOptixRenderer::renderNextIteration(unsigned long long iterationNumber, u
 
     try
     {
+		m_context["storefirstHitPhotons"]->setUint(0); // don't store first hits as it will use radiance to calculate shadows
+
         // If the width and height of the current render request has changed, we must resize buffers
         if(details.getWidth() != m_width || details.getHeight() != m_height)
         {

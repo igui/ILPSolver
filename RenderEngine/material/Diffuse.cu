@@ -29,6 +29,7 @@ rtDeclareVariable(float, tHit, rtIntersectionDistance, );
 rtDeclareVariable(float3, geometricNormal, attribute geometricNormal, ); 
 rtDeclareVariable(float3, shadingNormal, attribute shadingNormal, ); 
 
+rtDeclareVariable(uint, storefirstHitPhotons, ,);
 rtBuffer<Photon, 1> photons;
 rtBuffer<Hitpoint, 2> raytracePassOutputBuffer;
 rtDeclareVariable(rtObject, sceneRootObject, , );
@@ -95,7 +96,7 @@ RT_PROGRAM void closestHitPhoton()
 
     float3 newPhotonDirection;
 
-    if(photonPrd.depth >= 1 && photonPrd.numStoredPhotons < maxPhotonDepositsPerEmitted)
+	if(storefirstHitPhotons && photonPrd.depth == 0 || photonPrd.depth >= 1 && photonPrd.numStoredPhotons < maxPhotonDepositsPerEmitted)
     {
 		storePhoton(photonPrd.power, hitPoint, ray.direction, objectId);
     }

@@ -88,6 +88,7 @@ void PMOptixRenderer::initialize(const ComputeDevice & device, Logger *logger)
     m_context["ppmRadiusSquared"]->setFloat(0.f);
     m_context["emittedPhotonsPerIterationFloat"]->setFloat(0.f);
     m_context["photonLaunchWidth"]->setUint(0);
+	m_context["storefirstHitPhotons"]->setUint(0);
 
     // An empty scene root node
     optix::Group group = m_context->createGroup();
@@ -349,15 +350,15 @@ void PMOptixRenderer::compile()
 void PMOptixRenderer::renderNextIteration(unsigned long long iterationNumber, unsigned long long localIterationNumber, float PPMRadius, 
                                         const RenderServerRenderRequestDetails & details)
 {
-	render(512, details.getHeight(), details.getWidth(), details.getCamera(), true);
+	render(512, details.getHeight(), details.getWidth(), details.getCamera(), true, false);
 }
 
 void PMOptixRenderer::genPhotonMap(unsigned int photonLaunchWidth)
 {
-	render(photonLaunchWidth, 10, 10, Camera(), false);
+	render(photonLaunchWidth, 10, 10, Camera(), false, true);
 }
 
-void PMOptixRenderer::render(unsigned int photonLaunchWidth, unsigned int height, unsigned int width, const Camera camera, bool generateOutput)
+void PMOptixRenderer::render(unsigned int photonLaunchWidth, unsigned int height, unsigned int width, const Camera camera, bool generateOutput, bool storefirstHitPhotons)
 {
 	//m_logger->log("START\n");
     if(!m_initialized)
@@ -371,6 +372,8 @@ void PMOptixRenderer::render(unsigned int photonLaunchWidth, unsigned int height
 
     try
     {
+		m_context["storefirstHitPhotons"]->setUint(storefirstHitPhotons);
+
         // If the width and height of the current render request has changed, we must resize buffers
 		if(width != m_width || height != m_height || photonLaunchWidth != m_photonWidth)
         {
@@ -446,7 +449,7 @@ void PMOptixRenderer::render(unsigned int photonLaunchWidth, unsigned int height
         //
         // PPM Indirect Estimation (using the photon map)
         //
-        if(generateOutput){
+		if(generateOutput && !storefirstHitPhotons){
 			double start = sutilCurrentTime();
             nvtx::ScopedRange r("OptixEntryPoint::INDIRECT_RADIANCE_ESTIMATION");
             m_context->launch(OptixEntryPoint::PPM_INDIRECT_RADIANCE_ESTIMATION_PASS,

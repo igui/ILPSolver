@@ -27,7 +27,7 @@ OptimizationFunction::~OptimizationFunction(void)
 
 Evaluation *OptimizationFunction::evaluateRadiosity()
 {
-	m_renderer->render(defaultPhotonWidth, sampleImageHeight, sampleImageWidth, *sampleCamera, true);
+	m_renderer->render(defaultPhotonWidth, sampleImageHeight, sampleImageWidth, *sampleCamera, true, true);
 	return genEvaluation();
 }
 
