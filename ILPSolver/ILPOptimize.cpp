@@ -24,38 +24,6 @@ ILP::ILP():
 {
 }
 
-#include "optimizations/SurfaceRadiosityEvaluation.h"
-static void reevalCandidate(Logger *logger, OptimizationFunction *optimizationFunction, Evaluation *candidateObj)
-{
-	static const int tries = 400;
-	
-	auto candidate = (SurfaceRadiosityEvaluation *)candidateObj;
-	float mid = 0;
-	float M2 = 0;
-	auto evals = std::vector<SurfaceRadiosityEvaluation *>(tries);
-
-	for(int i = 1; i <= tries; ++i){
-		auto candidateReeval = (SurfaceRadiosityEvaluation *)(optimizationFunction->evaluateFast());
-		evals[i-1] = candidateReeval;
-		
-		float x = candidateReeval->val();
-		float delta = x - mid;
-		mid += delta / i;
-		M2 += delta * (x - mid);
-	}
-
-	int inRange = 0;
-	for(auto eval: evals)
-	{
-		if(fabs(eval->val() - mid) <= eval->radius())
-			++inRange;
-	}
-
-	float diff = sqrtf(M2 / tries-1);
-
-	logger->log("%8.2f\t%8.2f\t%8.2f\t%8.2f\t%0.2f\t%0.2f\n", candidate->val(), mid, candidate->radius(), diff, inRange/(float)tries, diff * 1.96f);
-}
-
 static int getRetriesForRadius(float radius)
 {
 	int res = ceilf(sqrtf(radius) * 200.0f);
@@ -174,7 +142,6 @@ bool ILP::findFirstImprovement(QVector<Configuration> &configurations, float max
 		}
 		auto candidate = optimizationFunction->evaluateFast();
 		logIterationResults(positions, candidate);
-		reevalCandidate(logger, optimizationFunction, candidate); 
 		++currentIteration;
 		
 		// crop worse solutions
