@@ -32,6 +32,12 @@
     <ClCompile Include="conditions\DirectionalLightPosition.cpp">
       <Filter>conditions</Filter>
     </ClCompile>
+    <ClCompile Include="conditions\HoleInQuad.cpp">
+      <Filter>conditions</Filter>
+    </ClCompile>
+    <ClCompile Include="conditions\HoleInQuadPosition.cpp">
+      <Filter>conditions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ILP.h" />
@@ -67,6 +73,12 @@
       <Filter>conditions</Filter>
     </ClInclude>
     <ClInclude Include="conditions\DirectionalLight.h">
+      <Filter>conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="conditions\HoleInQuad.h">
+      <Filter>conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="conditions\HoleInQuadPosition.h">
       <Filter>conditions</Filter>
     </ClInclude>
   </ItemGroup>

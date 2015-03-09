@@ -60,6 +60,8 @@
     <ClCompile Include="conditions\DirectionalLight.cpp" />
     <ClCompile Include="conditions\DirectionalLightPosition.cpp" />
     <ClCompile Include="FileLogger.cpp" />
+    <ClCompile Include="conditions\HoleInQuad.cpp" />
+    <ClCompile Include="conditions\HoleInQuadPosition.cpp" />
     <ClCompile Include="ILPLog.cpp" />
     <ClCompile Include="ILPRead.cpp" />
     <ClCompile Include="optimizations\Evaluation.cpp" />
@@ -84,6 +86,8 @@
     <ClInclude Include="conditions\DirectionalLight.h" />
     <ClInclude Include="conditions\DirectionalLightPosition.h" />
     <ClInclude Include="FileLogger.h" />
+    <ClInclude Include="conditions\HoleInQuad.h" />
+    <ClInclude Include="conditions\HoleInQuadPosition.h" />
     <ClInclude Include="optimizations\Evaluation.h" />
     <ClInclude Include="ILP.h" />
     <ClInclude Include="Interval.h" />
