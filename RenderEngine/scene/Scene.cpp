@@ -29,7 +29,8 @@ Scene::Scene(Logger *logger)
       m_importer(new Assimp::Importer()),
       m_numTriangles(0),
       m_sceneFile(NULL),
-	  m_logger(logger)
+	  m_logger(logger),
+	  m_hasAnyHoleMaterial(false)
 {
 
 }
@@ -164,6 +165,7 @@ Scene* Scene::createFromFile(Logger *logger, const char* filename )
 void Scene::loadSceneMaterials()
 {
     //m_logger->log("NUM MATERIALS: %d\n", m_scene->mNumMaterials);
+	m_hasAnyHoleMaterial = false;
     for(unsigned int i = 0; i < m_scene->mNumMaterials; i++)
     {
         aiMaterial* material = m_scene->mMaterials[i];
@@ -223,10 +225,12 @@ void Scene::loadSceneMaterials()
             continue;
         }
 
+		// Hole Material
 		if(material->Get(AI_MATKEY_REFRACTI, indexOfRefraction) == AI_SUCCESS && indexOfRefraction < 1.0f)
 		{
 			Material* material = new Hole();
             m_materials.push_back(material);
+			m_hasAnyHoleMaterial = true;
             continue;
 		}
 
@@ -600,7 +604,7 @@ optix::Group Scene::getGroupFromNode(optix::Context & context, aiNode* node, QVe
 
 optix::GeometryInstance Scene::getGeometryInstance( optix::Context & context, optix::Geometry & geometry, Material* material )
 {
-    optix::Material optix_material = material->getOptixMaterial(context);
+	optix::Material optix_material = material->getOptixMaterial(context, m_hasAnyHoleMaterial);
     optix::GeometryInstance instance = context->createGeometryInstance( geometry, &optix_material, &optix_material+1 );
     material->registerInstanceValues(instance);
     return instance;

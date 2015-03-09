@@ -18,7 +18,7 @@ private:
     float m_inverseArea;
 public:
     DiffuseEmitter(const Vector3 & power, const Vector3 & Kd);
-    virtual optix::Material getOptixMaterial(optix::Context & context);
+    virtual optix::Material getOptixMaterial(optix::Context & context, bool useHoleCheckProgram);
     virtual void registerGeometryInstanceValues(optix::GeometryInstance & instance);
     Vector3 getPower() const;
     void setInverseArea(float inverseArea);

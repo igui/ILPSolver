@@ -16,7 +16,7 @@ Diffuse::Diffuse(const Vector3 & Kd)
     this->Kd = Kd;
 }
 
-optix::Material Diffuse::getOptixMaterial(optix::Context & context)
+optix::Material Diffuse::getOptixMaterial(optix::Context & context, bool useHoleCheckProgram)
 {
     if(!m_optixMaterialIsCreated)
     {
@@ -29,7 +29,7 @@ optix::Material Diffuse::getOptixMaterial(optix::Context & context)
         m_optixMaterial->setClosestHitProgram(RayType::PHOTON_IN_PARTICIPATING_MEDIUM, photonProgram);
         m_optixMaterial->validate();
 
-        this->registerMaterialWithShadowProgram(context, m_optixMaterial);
+		this->registerMaterialWithShadowProgram(context, m_optixMaterial, useHoleCheckProgram);
         m_optixMaterialIsCreated = true;
     }
     return m_optixMaterial;

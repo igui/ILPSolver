@@ -78,7 +78,7 @@ RT_PROGRAM void kernel()
 rtDeclareVariable(optix::Ray, ray, rtCurrentRay, );
 rtDeclareVariable(float, tHit, rtIntersectionDistance, );
 
-RT_PROGRAM void gatherClosestHitOnNonEmmiter()
+RT_PROGRAM void gatherClosestHitOnNonEmmiterHoleCheck()
 {
 	if(shadowPrd.inHole)
 	{
@@ -90,4 +90,10 @@ RT_PROGRAM void gatherClosestHitOnNonEmmiter()
 	{
 		shadowPrd.attenuation = 0.0f;
 	}
+}
+
+RT_PROGRAM void gatherAnyHitOnNonEmmiterFast()
+{
+	shadowPrd.attenuation = 0.0f;
+	rtTerminateRay();
 }

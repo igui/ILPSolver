@@ -14,7 +14,7 @@ public:
     Texture(const QString & textureAbsoluteFilePath);
     Texture(const QString & textureAbsoluteFilePath, const QString & normalMapAbsoluteFilePath);
     virtual ~Texture();
-    virtual optix::Material getOptixMaterial(optix::Context & context);
+    virtual optix::Material getOptixMaterial(optix::Context & context, bool useHoleCheckProgram);
     virtual void registerGeometryInstanceValues(optix::GeometryInstance & instance);
 	virtual Material* clone();
 

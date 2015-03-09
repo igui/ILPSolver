@@ -12,7 +12,7 @@ class Mirror : public Material
 {
 public:
     Mirror(const Vector3 & Kr);
-    virtual optix::Material getOptixMaterial(optix::Context & context);
+    virtual optix::Material getOptixMaterial(optix::Context & context, bool useHoleCheckProgram);
     virtual void registerGeometryInstanceValues(optix::GeometryInstance & instance);
 	virtual Material* clone();
 private:

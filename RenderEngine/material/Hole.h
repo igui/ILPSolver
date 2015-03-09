@@ -15,7 +15,7 @@ private:
     static optix::Material m_optixMaterial;
 public:
     Hole();
-    virtual optix::Material getOptixMaterial(optix::Context & context);
+    virtual optix::Material getOptixMaterial(optix::Context & context, bool useHoleCheckProgram);
     virtual void registerGeometryInstanceValues(optix::GeometryInstance & instance);
 	virtual Material* clone();
 };

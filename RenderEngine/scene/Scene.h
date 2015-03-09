@@ -84,6 +84,7 @@ private:
     Camera m_defaultCamera;
     AAB m_sceneAABB;
     unsigned int m_numTriangles;
+	bool m_hasAnyHoleMaterial;
 	Logger *m_logger;
 
 	// mappings to retrieve object info

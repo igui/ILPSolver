@@ -16,5 +16,5 @@ protected:
 protected:
     virtual optix::Geometry getOptixGeometry( optix::Context & context) = 0;
 public:
-    optix::GeometryInstance getOptixGeometryInstance(optix::Context & context);
+    optix::GeometryInstance getOptixGeometryInstance(optix::Context & context, bool useHoleCheckProgram);
 };

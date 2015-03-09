@@ -16,7 +16,7 @@ Mirror::Mirror(const Vector3 & Kr)
     this->Kr = Kr;
 }
 
-optix::Material Mirror::getOptixMaterial(optix::Context & context)
+optix::Material Mirror::getOptixMaterial(optix::Context & context, bool useHoleCheckProgram)
 {
     if(!m_optixMaterialIsCreated)
     {
@@ -27,7 +27,7 @@ optix::Material Mirror::getOptixMaterial(optix::Context & context)
         m_optixMaterial->setClosestHitProgram(RayType::RADIANCE_IN_PARTICIPATING_MEDIUM, radianceProgram);
         m_optixMaterial->setClosestHitProgram(RayType::PHOTON, photonProgram);
         m_optixMaterial->setClosestHitProgram(RayType::PHOTON_IN_PARTICIPATING_MEDIUM, photonProgram);
-        this->registerMaterialWithShadowProgram(context, m_optixMaterial);
+		this->registerMaterialWithShadowProgram(context, m_optixMaterial, useHoleCheckProgram);
         m_optixMaterialIsCreated = true;
     }
     return m_optixMaterial;

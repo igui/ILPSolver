@@ -8,8 +8,10 @@
 #include "renderer/RayType.h"
 #include "util/RelPath.h"
 
-bool Material::m_hasLoadedOptixClosestHitProgram = false;
-optix::Program Material::m_optixClosestHitProgram;
+bool Material::m_hasLoadedShadowProgramHoleCheck = false;
+bool Material::m_hasLoadedShadowProgramFast = false;
+optix::Program Material::m_shadowProgramHoleCheck;
+optix::Program Material::m_shadowProgramFast;
 
 Material::Material():
 	m_objectId(-1)
@@ -32,12 +34,24 @@ void Material::setObjectId(unsigned int objectId)
 	this->m_objectId = objectId;
 }
 
-void Material::registerMaterialWithShadowProgram( optix::Context & context, optix::Material & material )
+void Material::registerMaterialWithShadowProgram( optix::Context & context, optix::Material & material, bool useHoleCheckProgram)
 {
-    if(!m_hasLoadedOptixClosestHitProgram)
-    {
-        m_optixClosestHitProgram = context->createProgramFromPTXFile( relativePathToExe("DirectRadianceEstimation.cu.ptx"), "gatherClosestHitOnNonEmmiter");
-        m_hasLoadedOptixClosestHitProgram = true;
-    }
-	material->setClosestHitProgram(RayType::SHADOW, m_optixClosestHitProgram);
+	if(useHoleCheckProgram)
+	{
+		if(!m_hasLoadedShadowProgramHoleCheck)
+		{
+			m_shadowProgramHoleCheck = context->createProgramFromPTXFile( relativePathToExe("DirectRadianceEstimation.cu.ptx"), "gatherClosestHitOnNonEmmiterHoleCheck");
+			m_hasLoadedShadowProgramHoleCheck = true;
+		}
+		material->setClosestHitProgram(RayType::SHADOW, m_shadowProgramHoleCheck);
+	}
+	else
+	{
+		if(!m_hasLoadedShadowProgramFast)
+		{
+			m_shadowProgramFast = context->createProgramFromPTXFile( relativePathToExe("DirectRadianceEstimation.cu.ptx"), "gatherAnyHitOnNonEmmiterFast");
+			m_hasLoadedShadowProgramFast = true;
+		}
+		material->setAnyHitProgram(RayType::SHADOW, m_shadowProgramFast);
+	}
 }

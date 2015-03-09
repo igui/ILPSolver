@@ -17,7 +17,7 @@ Glass::Glass( float indexOfRefraction, const Vector3 & Ks )
     this->Ks = Ks;
 }
 
-optix::Material Glass::getOptixMaterial(optix::Context & context)
+optix::Material Glass::getOptixMaterial(optix::Context & context, bool useHoleCheckProgram)
 {
     if(!m_optixMaterialIsCreated)
     {
@@ -37,7 +37,7 @@ optix::Material Glass::getOptixMaterial(optix::Context & context)
         m_optixMaterial->setClosestHitProgram(RayType::PHOTON_IN_PARTICIPATING_MEDIUM, photonClosestProgram);
        // m_optixMaterial->setAnyHitProgram(RayType::PHOTON_IN_PARTICIPATING_MEDIUM, photonAnyHitProgram);
 
-        this->registerMaterialWithShadowProgram(context, m_optixMaterial);
+		this->registerMaterialWithShadowProgram(context, m_optixMaterial, useHoleCheckProgram);
         m_optixMaterialIsCreated = true;
     }
     

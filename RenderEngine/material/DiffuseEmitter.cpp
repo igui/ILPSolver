@@ -19,7 +19,7 @@ DiffuseEmitter::DiffuseEmitter(const Vector3 & power, const Vector3 & Kd)
     m_power.z *= Kd.z;
 }
 
-optix::Material DiffuseEmitter::getOptixMaterial(optix::Context & context)
+optix::Material DiffuseEmitter::getOptixMaterial(optix::Context & context, bool useHoleCheckProgram)
 {
     if(!m_optixMaterialIsCreated)
     {
@@ -29,7 +29,7 @@ optix::Material DiffuseEmitter::getOptixMaterial(optix::Context & context)
         m_optixMaterial->setClosestHitProgram(RayType::RADIANCE_IN_PARTICIPATING_MEDIUM, radianceProgram);
         m_optixMaterial->setClosestHitProgram(RayType::PHOTON, context->createProgramFromPTXFile( relativePathToExe("DiffuseEmitter.cu.ptx"), "closestHitPhoton") );
         m_optixMaterial->setAnyHitProgram(RayType::SHADOW, context->createProgramFromPTXFile( relativePathToExe("DiffuseEmitter.cu.ptx"), "gatherAnyHitOnEmitter"));
-        this->registerMaterialWithShadowProgram(context, m_optixMaterial);
+		this->registerMaterialWithShadowProgram(context, m_optixMaterial, useHoleCheckProgram);
         m_optixMaterialIsCreated = true;
     }
     return m_optixMaterial;

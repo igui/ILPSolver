@@ -15,7 +15,7 @@ Hole::Hole( )
 {
 }
 
-optix::Material Hole::getOptixMaterial(optix::Context & context)
+optix::Material Hole::getOptixMaterial(optix::Context & context, bool useHoleCheckProgram)
 {
     if(!m_optixMaterialIsCreated)
     {

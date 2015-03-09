@@ -11,16 +11,18 @@ class Material
 public:
 	Material();
     virtual ~Material();
-    virtual optix::Material getOptixMaterial(optix::Context & context) = 0;
+    virtual optix::Material getOptixMaterial(optix::Context & context, bool useHoleCheckProgram) = 0;
 	virtual Material* clone() = 0;
 	void registerInstanceValues(optix::GeometryInstance & instance);
 
 	void setObjectId(unsigned int objectId);
 protected:
 	virtual void registerGeometryInstanceValues( optix::GeometryInstance & instance ) = 0;
-    static void registerMaterialWithShadowProgram(optix::Context & context, optix::Material & material);
+    static void registerMaterialWithShadowProgram(optix::Context & context, optix::Material & material, bool useHoleCheckProgram);
 private:
-    static bool m_hasLoadedOptixClosestHitProgram;
-    static optix::Program m_optixClosestHitProgram;
+    static bool m_hasLoadedShadowProgramHoleCheck;
+    static optix::Program m_shadowProgramHoleCheck;
+	static bool m_hasLoadedShadowProgramFast;
+    static optix::Program m_shadowProgramFast;
 	unsigned int m_objectId;
 };

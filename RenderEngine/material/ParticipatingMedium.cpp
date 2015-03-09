@@ -16,7 +16,7 @@ ParticipatingMedium::ParticipatingMedium(float sigma_s, float sigma_a)
 {
 }
 
-optix::Material ParticipatingMedium::getOptixMaterial(optix::Context & context)
+optix::Material ParticipatingMedium::getOptixMaterial(optix::Context & context, bool useHoleCheckProgram)
 {
     if(!m_optixMaterialIsCreated)
     {
@@ -30,7 +30,7 @@ optix::Material ParticipatingMedium::getOptixMaterial(optix::Context & context)
         m_optixMaterial->setClosestHitProgram(RayType::PHOTON, photonProgram);
         m_optixMaterial->setClosestHitProgram(RayType::PHOTON_IN_PARTICIPATING_MEDIUM, photonProgram);
         
-        this->registerMaterialWithShadowProgram(context, m_optixMaterial);
+		this->registerMaterialWithShadowProgram(context, m_optixMaterial, useHoleCheckProgram);
 
         m_optixMaterialIsCreated = true;
     }
