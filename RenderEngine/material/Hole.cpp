@@ -22,7 +22,7 @@ optix::Material Hole::getOptixMaterial(optix::Context & context, bool useHoleChe
         m_optixMaterial = context->createMaterial();
         optix::Program radianceClosestProgram = context->createProgramFromPTXFile( relativePathToExe("Hole.cu.ptx"), "closestHitRadiance");
         optix::Program photonClosestProgram = context->createProgramFromPTXFile( relativePathToExe("Hole.cu.ptx"), "closestHitPhoton");
-		optix::Program shadowClosestProgram = context->createProgramFromPTXFile( relativePathToExe("Hole.cu.ptx"), "closestHitPhoton");
+		optix::Program shadowClosestProgram = context->createProgramFromPTXFile( relativePathToExe("Hole.cu.ptx"), "closestHitShadow");
 
         m_optixMaterial->setClosestHitProgram(RayType::RADIANCE, radianceClosestProgram);
         m_optixMaterial->setClosestHitProgram(RayType::RADIANCE_IN_PARTICIPATING_MEDIUM, radianceClosestProgram);
