@@ -54,15 +54,6 @@
     <ClCompile Include="util\sutil.c">
       <Filter>util</Filter>
     </ClCompile>
-    <ClCompile Include="util\imageformats\libtga\tga.c">
-      <Filter>util\tga</Filter>
-    </ClCompile>
-    <ClCompile Include="util\imageformats\libtga\tgaread.c">
-      <Filter>util\tga</Filter>
-    </ClCompile>
-    <ClCompile Include="util\imageformats\libtga\tgawrite.c">
-      <Filter>util\tga</Filter>
-    </ClCompile>
     <ClCompile Include="material\Mirror.cpp">
       <Filter>material</Filter>
     </ClCompile>
@@ -163,12 +154,6 @@
     </ClInclude>
     <ClInclude Include="util\sutil.h">
       <Filter>util</Filter>
-    </ClInclude>
-    <ClInclude Include="util\imageformats\libtga\tga.h">
-      <Filter>util\tga</Filter>
-    </ClInclude>
-    <ClInclude Include="util\imageformats\libtga\tgaconfig.h">
-      <Filter>util\tga</Filter>
     </ClInclude>
     <ClInclude Include="renderer\helpers\optix.h">
       <Filter>renderer\helpers</Filter>
@@ -291,9 +276,6 @@
     </Filter>
     <Filter Include="util">
       <UniqueIdentifier>{7673db97-e80d-47f3-948d-a39d6c2679b3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="util\tga">
-      <UniqueIdentifier>{c1622240-656a-4d2e-b26a-e69137640d83}</UniqueIdentifier>
     </Filter>
     <Filter Include="renderer">
       <UniqueIdentifier>{27bc8333-94f9-4f28-9a15-2a10d9591802}</UniqueIdentifier>

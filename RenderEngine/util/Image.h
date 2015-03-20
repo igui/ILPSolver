@@ -8,6 +8,10 @@
 #pragma once
 class QString;
 class QFile;
+
+#include <QImage>
+
+// An RGBA formatted image 
 class Image
 {
 public:
@@ -18,9 +22,5 @@ public:
     const unsigned char* constData() const;
 
 private:
-    void loadImageFromTga( const QFile & image );
-    unsigned int m_width;
-    unsigned int m_height;
-    unsigned int m_depth;
-    unsigned char* m_imageData;
+	QImage m_image;
 };

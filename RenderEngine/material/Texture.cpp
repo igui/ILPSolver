@@ -28,8 +28,6 @@ Texture::Texture(const QString & textureAbsoluteFilePath, const QString & normal
 
 Texture::~Texture()
 {
-    delete m_diffuseImage;
-    delete m_normalMapImage;
 }
 
 void Texture::loadDiffuseImage( const QString & textureAbsoluteFilePath )
@@ -37,6 +35,11 @@ void Texture::loadDiffuseImage( const QString & textureAbsoluteFilePath )
     try
     {
         m_diffuseImage = new Image(textureAbsoluteFilePath);
+
+		if(!m_diffuseImage->getHeight() || !m_diffuseImage->getWidth())
+		{
+			throw std::logic_error("Invalid image");
+		}
     }
     catch(const std::exception & e)
     {
@@ -107,9 +110,10 @@ optix::TextureSampler Texture::createTextureSamplerFromBuffer( optix::Context & 
     optix::TextureSampler sampler = context->createTextureSampler();
     sampler->setWrapMode(0, RT_WRAP_REPEAT);
     sampler->setWrapMode(1, RT_WRAP_REPEAT);
+	sampler->setWrapMode(2, RT_WRAP_REPEAT );
     sampler->setFilteringModes(RT_FILTER_LINEAR, RT_FILTER_LINEAR, RT_FILTER_NONE);
     sampler->setIndexingMode(RT_TEXTURE_INDEX_NORMALIZED_COORDINATES);
-    sampler->setMaxAnisotropy(4.f);
+    sampler->setMaxAnisotropy(1.f);
     sampler->setArraySize(1);
     sampler->setReadMode(RT_TEXTURE_READ_NORMALIZED_FLOAT);
     sampler->setMipLevelCount(1);
@@ -120,8 +124,9 @@ optix::TextureSampler Texture::createTextureSamplerFromBuffer( optix::Context & 
 optix::Buffer Texture::createBufferFromImage(optix::Context & context, const Image & image )
 {
     optix::Buffer buffer = context->createBuffer(RT_BUFFER_INPUT, RT_FORMAT_UNSIGNED_BYTE4, image.getWidth(), image.getHeight());
-    optix::char4* buffer_Host = (optix::char4*)buffer->map();
-    memcpy(buffer_Host, image.constData(), image.getWidth()*image.getHeight()*4*sizeof(unsigned char));
+    optix::uchar4* buffer_Host = (optix::uchar4*)buffer->map();
+	unsigned int imageSize = image.getWidth()*image.getHeight()*4*sizeof(unsigned char);
+    memcpy(buffer_Host, image.constData(), imageSize);
     buffer->unmap();
     return buffer;
 }

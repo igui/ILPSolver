@@ -31,6 +31,7 @@ rtDeclareVariable(float3, tangent, attribute tangent, );
 rtDeclareVariable(float3, bitangent, attribute bitangent, ); 
 rtDeclareVariable(float2, textureCoordinate, attribute textureCoordinate, ); 
 
+rtDeclareVariable(uint, storefirstHitPhotons, ,);
 rtBuffer<Photon, 1> photons;
 rtTextureSampler<uchar4, 2, cudaReadModeNormalizedFloat> diffuseSampler;
 rtTextureSampler<uchar4, 2, cudaReadModeNormalizedFloat> normalMapSampler;
@@ -66,6 +67,13 @@ RT_PROGRAM void closestHitRadiance()
     float3 worldShadingNormal = normalize(rtTransformNormal(RT_OBJECT_TO_WORLD, shadingNormal));
     float3 hitPoint = ray.origin + tHit*ray.direction;
 
+	if(radiancePrd.flags & PRD_IN_HOLE)
+	{
+		Ray newRay(hitPoint, ray.direction, ray.ray_type, 0.0001);
+		rtTrace(sceneRootObject, newRay, radiancePrd);
+		return;
+	}
+
     float3 normal = worldShadingNormal;
     if(hasNormals)
     {
@@ -98,6 +106,15 @@ RT_PROGRAM void closestHitPhoton()
 {
     float3 worldShadingNormal = normalize(rtTransformNormal( RT_OBJECT_TO_WORLD, shadingNormal));
     float3 normal = worldShadingNormal;
+	float3 hitPoint = ray.origin + tHit*ray.direction;
+
+	if(photonPrd.inHole)
+	{
+		Ray newRay(hitPoint, ray.direction, ray.ray_type, 0.0001);
+		rtTrace(sceneRootObject, newRay, photonPrd);
+		return;
+	}
+
     if(hasNormals)
     {
         float3 worldTangent = normalize(rtTransformNormal(RT_OBJECT_TO_WORLD, tangent));
@@ -105,11 +122,11 @@ RT_PROGRAM void closestHitPhoton()
         normal = getNormalMappedNormal(worldShadingNormal, worldTangent, worldBitangent, 
                         tex2D(normalMapSampler, textureCoordinate.x, textureCoordinate.y));
     }
-    float3 hitPoint = ray.origin + tHit*ray.direction;
+    
     float3 newPhotonDirection;
 
     // Record hit if it has bounced at least once
-    if(photonPrd.depth >= 1)
+    if(storefirstHitPhotons && photonPrd.depth == 0 || photonPrd.depth >= 1 && photonPrd.numStoredPhotons < maxPhotonDepositsPerEmitted)
     {
         Photon photon (photonPrd.power, hitPoint, ray.direction, objectId);
         STORE_PHOTON(photon);
