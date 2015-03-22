@@ -9,7 +9,7 @@
 #include <QFile>
 #include <QString>
 #include <QImage>
-#include "imageformats/libtga/tga.h"
+
 
 Image::Image(const QString & imageCompletePath)
 {   
