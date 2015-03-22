@@ -64,6 +64,7 @@ RT_PROGRAM void closestHitPhoton()
 {
 	photonPrd.inHole = !photonPrd.inHole;
 
+	photonPrd.depth++;
     if (photonPrd.depth <= MAX_PHOTON_TRACE_DEPTH)
     {
 		float3 hitPoint = ray.origin + tHit*ray.direction;
