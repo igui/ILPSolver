@@ -82,6 +82,7 @@ void PMOptixRenderer::initialize(const ComputeDevice & device, Logger *logger)
     m_context->setRayTypeCount(RayType::NUM_RAY_TYPES);
     m_context->setEntryPointCount(OptixEntryPoint::NUM_PASSES-1);
     m_context->setStackSize(1596);
+	m_context->setPrintEnabled(true);
 
     m_context["maxPhotonDepositsPerEmitted"]->setUint(MAX_PHOTON_COUNT);
     m_context["ppmRadius"]->setFloat(0.f);

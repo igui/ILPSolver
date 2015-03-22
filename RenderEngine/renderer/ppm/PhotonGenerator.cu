@@ -151,6 +151,8 @@ RT_PROGRAM void miss()
 rtDeclareVariable(float3, exceptionErrorColor, , );
 RT_PROGRAM void exception()
 {
-    printf("Exception Photon!\n");
+	const unsigned int code = rtGetExceptionCode();
+    printf("Exception Photon: %d!\n", code);
+	rtPrintExceptionDetails();
     photonPrd.power = make_float3(0,0,0);
 }
