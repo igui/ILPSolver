@@ -60,8 +60,8 @@
     <ClCompile Include="conditions\DirectionalLight.cpp" />
     <ClCompile Include="conditions\DirectionalLightPosition.cpp" />
     <ClCompile Include="FileLogger.cpp" />
-    <ClCompile Include="conditions\HoleInQuad.cpp" />
-    <ClCompile Include="conditions\HoleInQuadPosition.cpp" />
+    <ClCompile Include="conditions\HoleInSurface.cpp" />
+    <ClCompile Include="conditions\HoleInSurfacePosition.cpp" />
     <ClCompile Include="ILPLog.cpp" />
     <ClCompile Include="ILPRead.cpp" />
     <ClCompile Include="optimizations\Evaluation.cpp" />
@@ -86,8 +86,8 @@
     <ClInclude Include="conditions\DirectionalLight.h" />
     <ClInclude Include="conditions\DirectionalLightPosition.h" />
     <ClInclude Include="FileLogger.h" />
-    <ClInclude Include="conditions\HoleInQuad.h" />
-    <ClInclude Include="conditions\HoleInQuadPosition.h" />
+    <ClInclude Include="conditions\HoleInSurface.h" />
+    <ClInclude Include="conditions\HoleInSurfacePosition.h" />
     <ClInclude Include="optimizations\Evaluation.h" />
     <ClInclude Include="ILP.h" />
     <ClInclude Include="Interval.h" />
@@ -111,6 +111,10 @@
     </None>
     <None Include="examples\directional.blend" />
     <None Include="examples\directional.dae" />
+    <None Include="examples\hole.blend" />
+    <None Include="examples\hole.dae">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="examples\cube.xml">
@@ -122,6 +126,10 @@
       <SubType>Designer</SubType>
     </Xml>
     <Xml Include="examples\directional.xml" />
+    <Xml Include="examples\hole.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="examples\suzanne.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -32,10 +32,10 @@
     <ClCompile Include="conditions\DirectionalLightPosition.cpp">
       <Filter>conditions</Filter>
     </ClCompile>
-    <ClCompile Include="conditions\HoleInQuad.cpp">
+    <ClCompile Include="conditions\HoleInSurface.cpp">
       <Filter>conditions</Filter>
     </ClCompile>
-    <ClCompile Include="conditions\HoleInQuadPosition.cpp">
+    <ClCompile Include="conditions\HoleInSurfacePosition.cpp">
       <Filter>conditions</Filter>
     </ClCompile>
   </ItemGroup>
@@ -75,10 +75,10 @@
     <ClInclude Include="conditions\DirectionalLight.h">
       <Filter>conditions</Filter>
     </ClInclude>
-    <ClInclude Include="conditions\HoleInQuad.h">
+    <ClInclude Include="conditions\HoleInSurface.h">
       <Filter>conditions</Filter>
     </ClInclude>
-    <ClInclude Include="conditions\HoleInQuadPosition.h">
+    <ClInclude Include="conditions\HoleInSurfacePosition.h">
       <Filter>conditions</Filter>
     </ClInclude>
   </ItemGroup>
@@ -104,6 +104,12 @@
     <None Include="examples\directional.dae">
       <Filter>examples</Filter>
     </None>
+    <None Include="examples\hole.blend">
+      <Filter>examples</Filter>
+    </None>
+    <None Include="examples\hole.dae">
+      <Filter>examples</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="examples">
@@ -123,10 +129,18 @@
     <Xml Include="examples\directional.xml">
       <Filter>examples</Filter>
     </Xml>
+    <Xml Include="examples\hole.xml">
+      <Filter>examples</Filter>
+    </Xml>
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="optimizations\OptimizationFunction.cu">
       <Filter>optimizations</Filter>
     </CudaCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="examples\suzanne.png">
+      <Filter>examples</Filter>
+    </Image>
   </ItemGroup>
 </Project>
