@@ -1,19 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <input>
   <!-- Scene path (relative to this file) -->
-  <scene path="directional.dae"/>
+  <scene path="hole.dae"/>
 
   <!-- print output images and log on "./output" folder -->
   <output path="output"/>
-  
+
   <!-- Optimization variables -->
   <conditions>
-    <directionalLight id="Sun"/>
+    <holeInSurface id="Hole" surface="Cube"/>
   </conditions>
 
   <!-- Which aspects of the scene must be optimized  -->
-  <objectives maxIterations="200">
-    <!-- Maximize radiance on Cube surface  -->
+  <objectives maxIterations="1000">
     <maximizeRadiance surface="Suzanne"/>
-  </objectives>  
+  </objectives>
 </input>

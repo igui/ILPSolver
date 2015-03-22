@@ -8,12 +8,12 @@
   
   <!-- Optimization variables -->
   <conditions>
-    <lightInSurface id="EmitiveLight" surface="Ceiling"></lightInSurface>
+    <lightInSurface id="EmitiveLight" surface="Ceiling"/>
   </conditions>
 
   <!-- Which aspects of the scene must be optimized  -->
   <objectives maxIterations="1000">
     <!-- Maximize radiance on floor surface with 95% and radius of 5 W -->
-    <maximizeRadiance surface="Cube" confidenceIntervalRadius="5"></maximizeRadiance>
+    <maximizeRadiance surface="Cube"/>
   </objectives>  
 </input>

@@ -21,6 +21,6 @@
   <!-- Which aspects of the scene must be optimized  -->
   <objectives maxIterations="50000">
     <!-- Maximize radiance on floor surface with 95% and radius of 5 W -->
-    <maximizeRadiance surface="Table" confidenceIntervalRadius="5"></maximizeRadiance>
+    <maximizeRadiance surface="Table"/>
   </objectives>
 </input>
