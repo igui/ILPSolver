@@ -15,7 +15,7 @@ class Evaluation;
 class SurfaceRadiosity: public OptimizationFunction
 {
 public:
-	SurfaceRadiosity(Logger *logger, PMOptixRenderer *renderer, Scene *scene, const QString &surfaceId, float confidenceIntervalRadius);
+	SurfaceRadiosity(Logger *logger, PMOptixRenderer *renderer, Scene *scene, const QString &surfaceId);
 	virtual QStringList header();
 protected:
 	virtual Evaluation *genEvaluation();
@@ -23,6 +23,5 @@ private:
 	QString surfaceId;
 	int objectId;
 	float surfaceArea;
-	float confidenceIntervalRadius;
 };
 

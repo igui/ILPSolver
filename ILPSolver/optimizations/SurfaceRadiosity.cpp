@@ -5,11 +5,10 @@
 #include <renderer/PMOptixRenderer.h>
 
 
-SurfaceRadiosity::SurfaceRadiosity(Logger *logger, PMOptixRenderer *renderer, Scene *scene, const QString &surfaceId, float confidenceIntervalRadius):
+SurfaceRadiosity::SurfaceRadiosity(Logger *logger, PMOptixRenderer *renderer, Scene *scene, const QString &surfaceId):
 	OptimizationFunction(renderer, scene, logger),
 	surfaceId(surfaceId),
-	objectId(scene->getObjectId(surfaceId)),
-	confidenceIntervalRadius(confidenceIntervalRadius)
+	objectId(scene->getObjectId(surfaceId))
 {
 	if(objectId < 0)
 		throw std::invalid_argument(("There isn't any object named " + surfaceId + " in the scene").toStdString());
