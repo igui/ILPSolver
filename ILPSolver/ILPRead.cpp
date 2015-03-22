@@ -8,6 +8,7 @@
 #include <QAbstractXmlNodeModel>
 #include <QDebug>
 #include "conditions/LightInSurface.h"
+#include "conditions/HoleInSurface.h"
 #include "conditions/DirectionalLight.h"
 #include "optimizations/SurfaceRadiosity.h"
 
@@ -48,9 +49,24 @@ static Condition *readLightInSurface(Scene *scene, const QDomElement& element)
 	if(surface.isEmpty())
 		throw std::logic_error("surface can't be empty");
 
-	qDebug() << "condition: LightInSurface id: " + id + ", surface: " + surface;
+	qDebug("condition: Light in Surface id: %s, surface: %s", qPrintable(id), qPrintable(surface));
 
 	return new LightInSurface(scene, id, surface);
+}
+
+static Condition *readHoleInSurface(Scene *scene, const QDomElement& element)
+{
+	QString id = element.attribute("id");
+	QString surface = element.attribute("surface");
+
+	if(id.isEmpty())
+		throw std::logic_error("id can't be empty");
+	if(surface.isEmpty())
+		throw std::logic_error("surface can't be empty");
+
+	qDebug("condition: Hole in Surface id: %s, surface: %s", qPrintable(id), qPrintable(surface));
+
+	return new HoleInSurface(scene, id, surface);
 }
 
 static Condition *readDirectionalLight(Scene *scene, const QDomElement& element)
@@ -60,7 +76,7 @@ static Condition *readDirectionalLight(Scene *scene, const QDomElement& element)
 	if(id.isEmpty())
 		throw std::logic_error("id can't be empty");
 
-	qDebug() << "condition: DirectionalLight id: " + id;
+	qDebug("condition: Directional Light id: %s", qPrintable(id));
 
 	return new DirectionalLight(scene, id);
 }
@@ -76,6 +92,8 @@ static Condition *readConditionElement(Scene *scene, const QDomElement& element)
 
 	if(element.tagName() == "lightInSurface")
 		readFunc = readLightInSurface;
+	else if(element.tagName() == "holeInSurface")
+		readFunc = readHoleInSurface;
 	else if(element.tagName() == "directionalLight")
 		readFunc = readDirectionalLight;
 	
@@ -93,8 +111,8 @@ void ILP::readConditions(QDomDocument& xml)
 		auto conditionNodes = conditionParentNode.childNodes();
 		for(int j = 0; j < conditionNodes.length(); ++j)
 		{
-			auto lightInSurfaceNode = conditionNodes.at(j).toElement();
-			auto condition = readConditionElement(scene, lightInSurfaceNode);
+			auto conditionElement = conditionNodes.at(j).toElement();
+			auto condition = readConditionElement(scene, conditionElement);
 			if(condition)
 				conditions.append(condition);
 		}
@@ -157,18 +175,12 @@ void ILP::readOptimizationFunction(QDomDocument& xml)
 				throw std::logic_error("only an objective must be set");
 
 			QString surface = maximizeRadianceNode.attribute("surface");
-			bool conversionOk;
-			float confidenceIntervalRadius = maximizeRadianceNode.attribute("confidenceIntervalRadius").toDouble(&conversionOk);
-			if(!conversionOk){
-				throw std::logic_error("Invalid confidenceIntervalRadius format");
-			}
-
 			if(surface.isEmpty())
 				throw std::logic_error("surface can't be empty");
 
-			optimizationFunction = new SurfaceRadiosity(logger, renderer, scene, surface, confidenceIntervalRadius);
+			optimizationFunction = new SurfaceRadiosity(logger, renderer, scene, surface);
 
-			qDebug() << "objective: SurfaceRadiosity on " + surface;
+			qDebug("objective: maximize Surface Radiosity on %s", qPrintable(surface));
 		}
 	}
 
