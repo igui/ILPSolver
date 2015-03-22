@@ -1,27 +1,27 @@
-#include "HoleInQuadPosition.h"
+#include "HoleInSurfacePosition.h"
 #include "renderer/PMOptixRenderer.h"
 #include <QLocale>
 
 
-HoleInQuadPosition::HoleInQuadPosition(const QString& nodeName, optix::float3 initialPosition, const optix::Matrix4x4 &transformation):
+HoleInSurfacePosition::HoleInSurfacePosition(const QString& nodeName, optix::float3 initialPosition, const optix::Matrix4x4 &transformation):
 	nodeName(nodeName),
 	initialPosition(initialPosition),
 	m_transformation(transformation)
 {
 }
 
-optix::Matrix4x4 HoleInQuadPosition::transformation() const
+optix::Matrix4x4 HoleInSurfacePosition::transformation() const
 {
 	return m_transformation;
 }
 
- void HoleInQuadPosition::apply(PMOptixRenderer *renderer) const
+ void HoleInSurfacePosition::apply(PMOptixRenderer *renderer) const
  {
 	 renderer->setNodeTransformation(nodeName, m_transformation);	
  }
 
 
- QStringList HoleInQuadPosition::info() const
+ QStringList HoleInSurfacePosition::info() const
 {
 	QLocale locale; 
 	auto position4 = m_transformation * make_float4(initialPosition, 1.0f);

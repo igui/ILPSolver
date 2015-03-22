@@ -5,10 +5,10 @@
 
 class PMOptixRenderer;
 
-class HoleInQuadPosition: public ConditionPosition
+class HoleInSurfacePosition: public ConditionPosition
 {
 public:
-	HoleInQuadPosition(const QString& nodeName, optix::float3 initialPosition, const optix::Matrix4x4 &transformation);
+	HoleInSurfacePosition(const QString& nodeName, optix::float3 initialPosition, const optix::Matrix4x4 &transformation);
 	virtual void apply(PMOptixRenderer *) const;
 	optix::Matrix4x4 transformation() const; 
 	virtual QStringList info() const;

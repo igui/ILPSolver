@@ -1,12 +1,13 @@
 #pragma once
 #include "Condition.h"
+#include "scene/Scene.h"
 #include <QString>
 #include <optixu_matrix_namespace.h>
 
-class HoleInQuad : public Condition
+class HoleInSurface : public Condition
 {
 public:
-	HoleInQuad(const QString& nodeId, const optix::float3 base, optix::float3 v1, optix::float3 v2);
+	HoleInSurface(Scene *scene, const QString& nodeId, const QString& surfaceId);
 	
 	virtual ConditionPosition *findNeighbour(ConditionPosition *from, float radius, unsigned int retries) const;
 	virtual ConditionPosition *initial() const;
