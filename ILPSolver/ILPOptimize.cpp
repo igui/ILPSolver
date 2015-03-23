@@ -87,24 +87,24 @@ Configuration ILP::processInitialConfiguration()
 	return initialConfig;
 }
 
-static bool appendAndRemoveWorse(QVector<Configuration> &currentEvals, Evaluation *candidate, QVector<ConditionPosition *> &positions)
+static bool appendAndRemoveWorse(QVector<Configuration> &bestConfigs, Evaluation *candidate, QVector<ConditionPosition *> &positions)
 {
-	QVector<Configuration> evals = currentEvals;
-	currentEvals.clear();
+	QVector<Configuration> newBestConfigs;
 
-	bool candidateIsGoodEnough = false;
-	for(auto i = 0; i < evals.size(); ++i){
-		auto comp = candidate->compare(evals.at(i).evaluation());
-		if(comp != EvaluationResult::BETTER){
-			currentEvals.append(evals.at(i));
-		}			
+	for(auto config: bestConfigs){
+		auto comp = candidate->compare(config.evaluation());
 
-		if(!candidateIsGoodEnough && comp != EvaluationResult::WORSE){
-			candidateIsGoodEnough = true;
-			currentEvals.append(Configuration(candidate, positions));
+		if(comp == EvaluationResult::WORSE){
+			return false;
+		}
+		else if (comp != EvaluationResult::BETTER){
+			newBestConfigs.append(config);
 		}
 	}
-	return candidateIsGoodEnough;
+	newBestConfigs.append(Configuration(candidate, positions));
+	bestConfigs = newBestConfigs;
+
+	return true;
 }
 
 bool ILP::findFirstImprovement(QVector<Configuration> &configurations, float maxRadius, float shuffleRadius, int retries)
