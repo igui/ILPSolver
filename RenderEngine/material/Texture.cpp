@@ -53,6 +53,12 @@ void Texture::loadNormalMapImage( const QString & normalMapAbsoluteFilePath )
     try
     {
         m_normalMapImage = new Image(normalMapAbsoluteFilePath);
+
+		if(!m_diffuseImage->getHeight() || !m_diffuseImage->getWidth())
+		{
+			throw std::logic_error("Invalid image");
+		}
+
         printf("Loaded normals: %s\n", normalMapAbsoluteFilePath.toLatin1().constData());
     }
     catch(const std::exception & e)
