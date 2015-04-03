@@ -81,7 +81,7 @@ void PMOptixRenderer::initialize(const ComputeDevice & device, Logger *logger)
 
     m_context->setRayTypeCount(RayType::NUM_RAY_TYPES);
     m_context->setEntryPointCount(OptixEntryPoint::NUM_PASSES-1);
-    m_context->setStackSize(1596);
+    m_context->setStackSize(4096);
 	m_context->setPrintEnabled(true);
 
     m_context["maxPhotonDepositsPerEmitted"]->setUint(MAX_PHOTON_COUNT);
@@ -361,6 +361,8 @@ void PMOptixRenderer::genPhotonMap(unsigned int photonLaunchWidth)
 
 void PMOptixRenderer::render(unsigned int photonLaunchWidth, unsigned int height, unsigned int width, const Camera camera, bool generateOutput, bool storefirstHitPhotons)
 {
+	//storefirstHitPhotons = true;
+
 	//m_logger->log("START\n");
     if(!m_initialized)
     {
@@ -437,7 +439,7 @@ void PMOptixRenderer::render(unsigned int photonLaunchWidth, unsigned int height
         }
 
         // Trace viewing rays
-        if(generateOutput){
+		if(generateOutput){
 			double start = sutilCurrentTime();
             nvtx::ScopedRange r("OptixEntryPoint::RAYTRACE_PASS");
             m_context->launch( OptixEntryPoint::PPM_RAYTRACE_PASS,
