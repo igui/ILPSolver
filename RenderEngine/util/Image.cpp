@@ -35,13 +35,13 @@ Image::Image(const QString & imageCompletePath)
         throw std::exception(error.toLatin1().constData());
 	}
 
-	m_image = image.convertToFormat(QImage::Format_RGBA8888);
+	// image is mirrored vertically for Blender export compatibility
+	m_image = image.convertToFormat(QImage::Format_RGBA8888).mirrored(false, true);
     if(m_image.isNull())
     {
         QString string = QString("Image is null.");
         throw std::exception(string.toLatin1().constData());
     }
-
 }
 
 Image::~Image(void)
