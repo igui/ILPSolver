@@ -90,7 +90,7 @@ RT_PROGRAM void closestHitRadiance()
     
     if(radiancePrd.flags & PRD_PATH_TRACING)
     {
-        radiancePrd.randomNewDirection = sampleUnitHemisphereCos(worldShadingNormal, getRandomUniformFloat2(&radiancePrd.randomState));
+        radiancePrd.randomNewDirection = sampleUnitHemisphereCos(normal, getRandomUniformFloat2(&radiancePrd.randomState));
     }
 
     float4 value = tex2D( diffuseSampler, textureCoordinate.x, textureCoordinate.y );
@@ -166,7 +166,7 @@ RT_PROGRAM void closestHitPhoton()
         return;
 #endif
 
-    newPhotonDirection = sampleUnitHemisphereCos(worldShadingNormal, getRandomUniformFloat2(&photonPrd.randomState));
+    newPhotonDirection = sampleUnitHemisphereCos(normal, getRandomUniformFloat2(&photonPrd.randomState));
     optix::Ray newRay( hitPoint, newPhotonDirection, RayType::PHOTON, 0.01 );
     rtTrace(sceneRootObject, newRay, photonPrd);
 }
