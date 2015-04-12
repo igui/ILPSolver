@@ -140,7 +140,15 @@ bool ILP::findFirstImprovement(QVector<Configuration> &configurations, float max
 		for(auto it = neighbourPosition.begin(); it != neighbourPosition.end(); ++it){
 			(*it)->apply(renderer);
 		}
+
+		// TODO use evaluate fast
 		auto candidate = optimizationFunction->evaluateFast();
+		/*auto candidate = optimizationFunction->evaluateRadiosity();
+		auto imagePath = outputDir.filePath(
+			QString("solution-%1.png").arg(currentIteration, 4, 10, QLatin1Char('0'))
+		);
+		optimizationFunction->saveImage(imagePath);*/
+
 		logIterationResults(positions, candidate);
 		++currentIteration;
 		

@@ -7,7 +7,14 @@
 class HoleInSurface : public Condition
 {
 public:
-	HoleInSurface(Scene *scene, const QString& nodeId, const QString& surfaceId);
+	HoleInSurface(Scene *scene,
+		const QString& nodeId,
+		const QString& surfaceId,
+		int surfaceVertexAIndex = 0,
+		int surfaceVertexBIndex = 1,
+		int surfaceVertexCIndex = 2,
+		int surfaceVertexDIndex = 3
+	);
 	
 	virtual ConditionPosition *findNeighbour(ConditionPosition *from, float radius, unsigned int retries) const;
 	virtual ConditionPosition *initial() const;

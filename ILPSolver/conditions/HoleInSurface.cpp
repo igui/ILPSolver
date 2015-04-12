@@ -3,12 +3,33 @@
 #include <cmath>
 #include <qDebug>
 
-HoleInSurface::HoleInSurface(Scene *scene, const QString& nodeId, const QString& surfaceId):
+
+static void checkVertexIndex(const QString& surfaceId, const QVector<Vector3>& objectPoints, int index, const QString &vertexName)
+{
+	if(index > objectPoints.length() || index < 0)
+		throw std::invalid_argument(
+			qPrintable(
+				QString("%1: invalid vertex %2 index: %3")
+					.arg(surfaceId)
+					.arg(vertexName)
+					.arg(index)
+					)
+			);
+}
+
+HoleInSurface::HoleInSurface(Scene *scene,
+							 const QString& nodeId,
+							 const QString& surfaceId,
+							 int surfaceVertexAIndex,
+							 int surfaceVertexBIndex,
+							 int surfaceVertexCIndex,
+							 int surfaceVertexDIndex):
 	m_nodeId(nodeId)
 {
 	int holeObjectId = scene->getObjectId(nodeId);
 	if(holeObjectId < 0)
 		throw std::invalid_argument(("There isn't any object named " + surfaceId + " in the scene").toStdString());
+	
 	/*QVector<Vector3> holePoints = scene->getObjectPoints(holeObjectId);
 	qDebug("%s: %d vertices", qPrintable(nodeId), holePoints.length());
 	for(auto point: holePoints){
@@ -22,18 +43,22 @@ HoleInSurface::HoleInSurface(Scene *scene, const QString& nodeId, const QString&
 		throw std::invalid_argument(("There isn't any object named " + surfaceId + " in the scene").toStdString());
 
 	QVector<Vector3> objectPoints = scene->getObjectPoints(objectId);
-	if(objectPoints.length() < 4)
-		throw std::invalid_argument((surfaceId + " must have 4 vertices").toStdString());
 
-	/*qDebug("%s: %d vertices", qPrintable(surfaceId), objectPoints.length());
-	for(auto point: objectPoints){
-		qDebug() << "Point: " << point.x << point.y << point.z;
-	}*/
+	checkVertexIndex(surfaceId, objectPoints, surfaceVertexAIndex, "A");
+	checkVertexIndex(surfaceId, objectPoints, surfaceVertexBIndex, "B");
+	checkVertexIndex(surfaceId, objectPoints, surfaceVertexCIndex, "C");
+	checkVertexIndex(surfaceId, objectPoints, surfaceVertexDIndex, "D");
 
-	base = objectPoints[0];
+	qDebug("%s: %d vertices", qPrintable(surfaceId), objectPoints.length());
+	for(int i = 0; i < objectPoints.length(); ++i){
+		auto point = objectPoints.at(i);
+		qDebug() << "Point " << i << ": " << point.x << point.y << point.z;
+	}
+
+	base = objectPoints[surfaceVertexAIndex];
 	
-	optix::float3 pointA = (optix::float3) objectPoints[1] - (optix::float3)objectPoints[0];
-	optix::float3 pointB = (optix::float3) objectPoints[2] - (optix::float3)objectPoints[0];
+	optix::float3 pointA = (optix::float3) objectPoints[surfaceVertexBIndex] - (optix::float3)objectPoints[surfaceVertexAIndex];
+	optix::float3 pointB = (optix::float3) objectPoints[surfaceVertexCIndex] - (optix::float3)objectPoints[surfaceVertexAIndex];
 
 	u = normalize(pointA);
 	v = normalize(cross(cross(pointA, pointB), pointA));
@@ -41,7 +66,7 @@ HoleInSurface::HoleInSurface(Scene *scene, const QString& nodeId, const QString&
 	a = optix::make_float2(dot(u, pointA), dot(v, pointA));
 	b = optix::make_float2(dot(u, pointB), dot(v, pointB));
 
-	optix::float3 pointC = (optix::float3) objectPoints[3] - (optix::float3) objectPoints[0];
+	optix::float3 pointC = (optix::float3) objectPoints[surfaceVertexDIndex] - (optix::float3) objectPoints[surfaceVertexAIndex];
 
 	c = optix::make_float2( dot(u, pointC), dot(v, pointC));
 

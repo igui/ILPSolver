@@ -5,6 +5,8 @@
 #include "optimizations/OptimizationFunction.h"
 #include "optimizations/Evaluation.h"
 #include "conditions/ConditionPosition.h"
+#include "conditions/HoleInSurfacePosition.h"
+#include <qDebug>
 
 const QString ILP::logFileName("solutions.csv");
 
@@ -65,13 +67,19 @@ void ILP::logIterationResults(QVector<ConditionPosition *> positions, Evaluation
 	
 	out << currentIteration << ';';
 
+	qDebug("Iteration: %d", currentIteration);
+
 	for(auto positionsIt = positions.cbegin(); positionsIt != positions.cend(); ++positionsIt){
 		auto info = (*positionsIt)->info();
+		qDebug() <<  info;
+		auto col3 =  dynamic_cast<HoleInSurfacePosition *>(*positionsIt)->transformation().getCol(3);
+		qDebug("Transformation: (%0.2f, %0.2f, %0.2f)", col3.x, col3.y, col3.z);
 		for(auto infoIt = info.begin(); infoIt != info.end(); ++infoIt){
 			out << *infoIt  << ';';
 		}
 	}
 	out << evaluation->info() << '\n';
+	qDebug("\tResult: %s", qPrintable(evaluation->infoShort()));
 	file.close(); 
 }
 

@@ -8,7 +8,8 @@
 
   <!-- Optimization variables -->
   <conditions>
-    <holeInSurface id="Hole" surface="Cube"/>
+    <holeInSurface id="Hole" surface="Cube" vertexAIndex="1" vertexBIndex="0" vertexCIndex="2" vertexDIndex="3">
+    </holeInSurface>
   </conditions>
 
   <!-- Which aspects of the scene must be optimized  -->

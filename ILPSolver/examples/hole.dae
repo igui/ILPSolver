@@ -5,8 +5,8 @@
       <author>Blender User</author>
       <authoring_tool>Blender 2.70.0 commit date:2014-04-10, commit time:11:49, hash:f93bc76</authoring_tool>
     </contributor>
-    <created>2015-03-30T02:26:51</created>
-    <modified>2015-03-30T02:26:51</modified>
+    <created>2015-04-11T16:06:48</created>
+    <modified>2015-04-11T16:06:48</modified>
     <unit name="meter" meter="1"/>
     <up_axis>Z_UP</up_axis>
   </asset>
@@ -519,7 +519,7 @@
         </instance_geometry>
       </node>
       <node id="Hole" name="Hole" type="NODE">
-        <matrix sid="transform">0.05 0 0 -1 0 0.2691822 0 0.6544171 0 0 0.2675738 0.3114818 0 0 0 1</matrix>
+        <matrix sid="transform">0.05 0 0 -1 0 0.2691822 0 -0.7 0 0 0.2675738 0.3 0 0 0 1</matrix>
         <instance_geometry url="#Cube_002-mesh">
           <bind_material>
             <technique_common>
