@@ -156,6 +156,12 @@ void MainWindowBase::onSetCameraToDefault()
     m_application.setCameraToSceneDefault();
 }
 
+void MainWindowBase::onChangeRenderMethodPM()
+{
+	m_application.setRenderMethod(RenderMethod::PHOTON_MAPPING);
+    emit renderRestart();
+}
+
 void MainWindowBase::onChangeRenderMethodPPM()
 {
     m_application.setRenderMethod(RenderMethod::PROGRESSIVE_PHOTON_MAPPING);

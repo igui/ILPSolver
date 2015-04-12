@@ -195,7 +195,10 @@ padding-right:40px;
   </action>
   <action name="actionClassical_Photon_Mapping">
    <property name="text">
-    <string>Classical Photon Mapping</string>
+    <string>Photon Mapping</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
    </property>
   </action>
  </widget>
@@ -363,6 +366,22 @@ padding-right:40px;
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actionClassical_Photon_Mapping</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindowBase</receiver>
+   <slot>onChangeRenderMethodPM()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>799</x>
+     <y>539</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>onActionAbout()</slot>
@@ -376,5 +395,6 @@ padding-right:40px;
   <slot>onReloadLastScene()</slot>
   <slot>onActionOpenBuiltInScene()</slot>
   <slot>onActionSaveImagePPM()</slot>
+  <slot>onChangeRenderMethodPM()</slot>
  </slots>
 </ui>

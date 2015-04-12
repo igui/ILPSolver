@@ -36,6 +36,7 @@ signals:
 
 private slots:
     GUI_EXPORT_API_QT void onSetCameraToDefault();
+	GUI_EXPORT_API_QT void onChangeRenderMethodPM();
     GUI_EXPORT_API_QT void onChangeRenderMethodPPM();
     GUI_EXPORT_API_QT void onChangeRenderMethodPT();
     GUI_EXPORT_API_QT void onConfigureGPUDevices();

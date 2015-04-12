@@ -18,7 +18,7 @@
 
 StandaloneRenderManager::StandaloneRenderManager(QApplication & qApplication, Application & application, const ComputeDevice& device) :
     m_device(device),
-    m_renderer(new PMOptixRenderer()), 
+    m_renderer(NULL), 
     m_nextIterationNumber(0),
     m_outputBuffer(NULL),
     m_currentScene(NULL),
@@ -57,11 +57,23 @@ void StandaloneRenderManager::start()
 {
     m_application.setRendererStatus(RendererStatus::INITIALIZING_ENGINE);
 	try {
-		m_renderer->initialize(m_device, &m_logger);
+		//m_renderer->initialize(m_device, &m_logger);
 	} catch(std::exception& ex)
 	{
 		emit renderManagerError(ex.what());
 	}
+}
+
+void StandaloneRenderManager::reinitRenderer(OptixRenderer *newRenderer)
+{
+	if(m_renderer)
+	{
+		delete m_renderer;
+	}
+	m_renderer = newRenderer;
+	m_application.setRendererStatus(RendererStatus::INITIALIZING_ENGINE);
+	m_renderer->initialize(m_device, &m_logger);
+	m_compileScene = true;
 }
 
 void StandaloneRenderManager::onContinueRayTracing()
@@ -100,6 +112,15 @@ void StandaloneRenderManager::renderNextIteration()
         if(m_application.getRunningStatus() == RunningStatus::RUNNING && m_currentScene != NULL)
         {
             m_noEmittedSignals = true;
+
+			if(m_application.getRenderMethod() == RenderMethod::PHOTON_MAPPING && !dynamic_cast<PMOptixRenderer *>(m_renderer))
+			{
+				reinitRenderer(new PMOptixRenderer());
+			}
+			else if(m_application.getRenderMethod() != RenderMethod::PHOTON_MAPPING && !dynamic_cast<PPMOptixRenderer *>(m_renderer))
+			{
+				reinitRenderer(new PPMOptixRenderer());
+			}
 
             if(m_compileScene)
             {

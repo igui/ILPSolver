@@ -14,7 +14,7 @@
 Application::Application(QApplication & qApplication) :
     m_sequenceNumber(0),
     m_runningStatus(RunningStatus::STOPPED),
-    m_renderMethod(RenderMethod::PROGRESSIVE_PHOTON_MAPPING),
+	m_renderMethod(RenderMethod::PHOTON_MAPPING),
     m_rendererStatus(RendererStatus::NOT_INITIALIZED)
 {
     qRegisterMetaType<RunningStatus::E>("RunningStatus::E");

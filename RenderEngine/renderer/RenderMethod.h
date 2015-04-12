@@ -11,6 +11,7 @@ namespace RenderMethod
     {
         PATH_TRACING,
         PROGRESSIVE_PHOTON_MAPPING,
+		PHOTON_MAPPING,
         NONE
     };
 }

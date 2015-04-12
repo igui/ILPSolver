@@ -47,6 +47,7 @@ private slots:
 private:
     void fillRenderStatistics();
     void continueRayTracingIfRunningAsync();
+	void reinitRenderer(OptixRenderer *newRenderer);
 
     Application & m_application;
     unsigned long long m_nextIterationNumber;
