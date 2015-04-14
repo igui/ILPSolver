@@ -12,7 +12,10 @@
 #include "optimizations/OptimizationFunction.h"
 #include "optimizations/Evaluation.h"
 #include "Configuration.h"
+#include <algorithm>
+#include <iterator>     
 #include <ctime>
+#include <qDebug>
 
 ILP::ILP():
 	scene(NULL),
@@ -22,6 +25,15 @@ ILP::ILP():
 	renderer(NULL),
 	inited(false)
 {
+}
+
+uint qHash(const QVector<int> &key, uint seed)
+{
+  std::size_t ret = 0;
+  for(auto& i : key) {
+    ret ^= i + 0x9e3779b9 + (ret << 6) + (ret >> 2);
+  }
+  return ret ^ seed;
 }
 
 static int getRetriesForRadius(float radius)
@@ -41,7 +53,7 @@ void ILP::optimize()
 		throw std::logic_error("ILP is not inited");
 	}
 
-	qsrand(time(NULL));
+	qsrand(std::time(NULL));
 
 	// first solution
 	QVector<Configuration> bestConfigurations;
@@ -136,19 +148,8 @@ bool ILP::findFirstImprovement(QVector<Configuration> &configurations, float max
 			continue; // no neighbours
 		}
 
-		// evaluate function
-		for(auto it = neighbourPosition.begin(); it != neighbourPosition.end(); ++it){
-			(*it)->apply(renderer);
-		}
-
-		// TODO use evaluate fast
-		auto candidate = optimizationFunction->evaluateFast();
-		/*auto candidate = optimizationFunction->evaluateRadiosity();
-		auto imagePath = outputDir.filePath(
-			QString("solution-%1.png").arg(currentIteration, 4, 10, QLatin1Char('0'))
-		);
-		optimizationFunction->saveImage(imagePath);*/
-
+		auto candidate = evaluateSolution(neighbourPosition);
+		
 		logIterationResults(positions, candidate);
 		++currentIteration;
 		
@@ -162,7 +163,9 @@ bool ILP::findFirstImprovement(QVector<Configuration> &configurations, float max
 		} else {	
 			if(!isGoodEnough) {
 				// removes candidate and positions from memory
-				delete candidate;
+				
+				// Don't delete candidate because it is stored for future references
+				//delete candidate;
 				for(auto it = neighbourPosition.begin(); it != neighbourPosition.end(); ++it){
 					delete *it;
 				}
@@ -172,6 +175,59 @@ bool ILP::findFirstImprovement(QVector<Configuration> &configurations, float max
 		}
 	}
 	return false;
+}
+
+Evaluation *ILP::evaluateSolution(const QVector<ConditionPosition *>& positions)
+{
+	// builds a mapped positions using relative dimension size
+	QVector<int> mappedPositions;
+	for(int conditionIdx = 0; conditionIdx < conditions.length(); ++conditionIdx) {
+		auto dimensions = conditions[conditionIdx]->dimensions();
+		for(int dimensionIdx = 0; dimensionIdx < dimensions.length(); ++dimensionIdx) {
+			auto normalizedPosition = positions[conditionIdx]->normalizedPosition();
+			mappedPositions.append(
+				qRound(meshSize * normalizedPosition[dimensionIdx] / dimensions[dimensionIdx])
+			);
+		}
+	}
+
+	
+	QStringList mappedPositionsStr;
+	std::transform(
+		mappedPositions.begin(),
+		mappedPositions.end(),
+		std::back_inserter(mappedPositionsStr),
+		[](const int& x) { return QString::number(x); }
+	);
+	qDebug() << "Mapped positions: " << mappedPositionsStr.join(", ") << "\n";
+
+
+	auto evaluation = evaluations[mappedPositions];
+	if(evaluation)
+	{
+		qDebug() << "Returning saved evaluation for " << mappedPositionsStr.join(", ") << ": " << evaluation->infoShort() << "\n";
+		return evaluation;
+	}
+	else
+	{
+		qDebug() << "Calculating evaluation for " << mappedPositionsStr.join(", ") << "\n";
+
+		for(auto position: positions) {
+			position->apply(renderer);
+		}
+
+		// TODO use evaluate fast
+		auto candidate = optimizationFunction->evaluateFast();
+		/*auto candidate = optimizationFunction->evaluateRadiosity();
+		auto imagePath = outputDir.filePath(
+			QString("solution-%1.png").arg(currentIteration, 4, 10, QLatin1Char('0'))
+		);
+		optimizationFunction->saveImage(imagePath);*/
+		
+		evaluations[mappedPositions] = candidate;
+
+		return candidate;
+	}
 }
 
 QVector<ConditionPosition *> ILP::findAllNeighbours(QVector<ConditionPosition *> &currentPositions, int optimizationsRetries,  float maxRadius)

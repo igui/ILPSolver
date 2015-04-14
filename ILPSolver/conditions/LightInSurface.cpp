@@ -50,6 +50,11 @@ LightInSurface::LightInSurface(Scene *scene, const QString& lightId, const QStri
 			);
 }
 
+QVector<float> LightInSurface::dimensions() const
+{
+	return QVector<float>() << length(a) << length(b);
+}
+
 ConditionPosition *LightInSurface::findNeighbour(ConditionPosition *from, float radius, unsigned int retries) const
 {
 	auto center4 =  ((LightInSurfacePosition *) from)->transformation() * optix::make_float4(base, 1.0f);
@@ -59,13 +64,17 @@ ConditionPosition *LightInSurface::findNeighbour(ConditionPosition *from, float 
 	if(retries <= 0){
 		return NULL; // no neighbour
 	}
+
+	auto normalizedPosition = QVector<float>() 
+		<< (optix::dot(neighbour - base, u) / length(a))
+		<< (optix::dot(neighbour - base, v) / length(b));
 	
 	// saves last movement
 	auto displacement = neighbour - center;
 	auto displacementTransformation = optix::Matrix4x4().identity().translate(displacement);
 	// applies currentTransformation to the renderer
 	auto currentTransformation = displacementTransformation * ((LightInSurfacePosition *) from)->transformation();
-	return new LightInSurfacePosition(m_lightId, base, currentTransformation);
+	return new LightInSurfacePosition(m_lightId, base, currentTransformation, normalizedPosition);
 }
 
 optix::float3 LightInSurface::generatePointNeighbourhood(optix::float3 centerWorldCoordinates, float radius, unsigned int& retries) const
@@ -109,7 +118,7 @@ bool LightInSurface::pointInSurface(optix::float2 point) const
 
 ConditionPosition *LightInSurface::initial() const 
 {
-	return new LightInSurfacePosition(m_lightId, base, optix::Matrix4x4::identity());
+	return new LightInSurfacePosition(m_lightId, base, optix::Matrix4x4::identity(), QVector<float>() << 0.0f << 0.0f);
 }
 
 QStringList LightInSurface::header() const

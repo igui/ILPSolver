@@ -89,6 +89,11 @@ HoleInSurface::HoleInSurface(Scene *scene,
 			);
 }
 
+QVector<float> HoleInSurface::dimensions() const
+{
+	return QVector<float>() << length(a) << length(b);
+}
+
 ConditionPosition *HoleInSurface::findNeighbour(ConditionPosition *from, float radius, unsigned int retries) const
 {
 	auto center4 =  ((HoleInSurfacePosition *) from)->transformation() * optix::make_float4(base, 1.0f);
@@ -98,13 +103,17 @@ ConditionPosition *HoleInSurface::findNeighbour(ConditionPosition *from, float r
 	if(retries <= 0){
 		return NULL; // no neighbour
 	}
+
+	auto normalizedPosition = QVector<float>() 
+		<< (optix::dot(neighbour - base, u) / length(a))
+		<< (optix::dot(neighbour - base, v) / length(b));
 	
 	// saves last movement
 	auto displacement = neighbour - center;
 	auto displacementTransformation = optix::Matrix4x4().identity().translate(displacement);
 	// applies currentTransformation to the renderer
 	auto currentTransformation = displacementTransformation * ((HoleInSurfacePosition *) from)->transformation();
-	return new HoleInSurfacePosition(m_nodeId, base, currentTransformation);
+	return new HoleInSurfacePosition(m_nodeId, base, currentTransformation, normalizedPosition);
 }
 
 optix::float3 HoleInSurface::generatePointNeighbourhood(optix::float3 centerWorldCoordinates, float radius, unsigned int& retries) const
@@ -148,7 +157,7 @@ bool HoleInSurface::pointInSurface(optix::float2 point) const
 
 ConditionPosition *HoleInSurface::initial() const 
 {
-	return new HoleInSurfacePosition(m_nodeId, base, optix::Matrix4x4::identity());
+	return new HoleInSurfacePosition(m_nodeId, base, optix::Matrix4x4::identity(), QVector<float>() << 0.0f << 0.0f);
 }
 
 QStringList HoleInSurface::header() const

@@ -3,16 +3,22 @@
 #include <QLocale>
 
 
-HoleInSurfacePosition::HoleInSurfacePosition(const QString& nodeName, optix::float3 initialPosition, const optix::Matrix4x4 &transformation):
+HoleInSurfacePosition::HoleInSurfacePosition(const QString& nodeName, optix::float3 initialPosition, const optix::Matrix4x4 &transformation, const QVector<float>& normalizedPosition):
 	nodeName(nodeName),
 	initialPosition(initialPosition),
-	m_transformation(transformation)
+	m_transformation(transformation),
+	m_normalizedPosition(normalizedPosition)
 {
 }
 
 optix::Matrix4x4 HoleInSurfacePosition::transformation() const
 {
 	return m_transformation;
+}
+
+QVector<float> HoleInSurfacePosition::normalizedPosition() const
+{
+	return m_normalizedPosition;
 }
 
  void HoleInSurfacePosition::apply(PMOptixRenderer *renderer) const

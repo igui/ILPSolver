@@ -1,14 +1,13 @@
 #include "DirectionalLightPosition.h"
 #include "renderer/PMOptixRenderer.h"
 #include <QLocale>
-
+#include <QVector>
 
 DirectionalLightPosition::DirectionalLightPosition(const QString& lightId, const optix::float3& direction):
 	m_lightId(lightId),
 	m_direction(optix::normalize(direction))
 {
 }
-
 
 void DirectionalLightPosition::apply(PMOptixRenderer *renderer) const
 {
@@ -25,6 +24,13 @@ QString DirectionalLightPosition::lightId() const
 	return m_lightId;
 }
 
+QVector<float> DirectionalLightPosition::normalizedPosition() const
+{
+	return (QVector<float>() << 
+		(1.0f + m_direction.x) / 2.0f << 
+		(1.0f + m_direction.y) / 2.0f <<
+		(1.0f + m_direction.x) / 2.0f) ;
+}
 
 QStringList DirectionalLightPosition::info() const
 {

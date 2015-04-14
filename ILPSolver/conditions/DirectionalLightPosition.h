@@ -2,10 +2,12 @@
 #include "ConditionPosition.h"
 #include <optixu/optixpp_namespace.h>
 
+
 class DirectionalLightPosition: public ConditionPosition
 {
 public:
 	DirectionalLightPosition(const QString& lightId, const optix::float3& direction);
+	virtual QVector<float> normalizedPosition() const;
 	virtual void apply(PMOptixRenderer *) const;
 	
 	optix::float3 direction() const;

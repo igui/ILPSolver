@@ -18,6 +18,7 @@ public:
 	
 	virtual ConditionPosition *findNeighbour(ConditionPosition *from, float radius, unsigned int retries) const;
 	virtual ConditionPosition *initial() const;
+	virtual QVector<float> dimensions() const;
 	virtual QStringList header() const;
 private:
 	bool pointInSurface(optix::float2 point) const;

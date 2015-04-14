@@ -25,6 +25,11 @@ DirectionalLight::DirectionalLight(Scene *scene, const QString& lightId):
 	initialDirection = light->direction;
 }
 
+QVector<float> DirectionalLight::dimensions() const
+{
+	return QVector<float>() << 1.0f << 1.0f << 1.0f;
+}
+
 static optix::float2 toSphericalCoord(const optix::float3& v)
 {
 	return optix::make_float2(

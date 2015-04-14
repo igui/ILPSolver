@@ -10,6 +10,7 @@
 #include "Configuration.h"
 #include <QVector>
 #include <QDir>
+#include <QHash>
 
 class Logger;
 class QFile;
@@ -19,6 +20,8 @@ class OptimizationFunction;
 class Evaluation;
 class QDomDocument;
 class Configuration;
+
+uint qHash(const QVector<int> &key, uint seed);
 
 class ILP
 {
@@ -47,6 +50,7 @@ private:
 	// optimization
 	Configuration processInitialConfiguration();
 	bool findFirstImprovement(QVector<Configuration> &currentEvals, float maxRadius, float suffleRadius, int retries);
+	Evaluation *evaluateSolution(const QVector<ConditionPosition *>& positions);
 	QVector<ConditionPosition *> findAllNeighbours(QVector<ConditionPosition *> &currentPositions, int retries, float maxRadius);
 	void logBestConfigurations(QVector<Configuration> &bestConfigurations);
 	
@@ -54,6 +58,8 @@ private:
 	bool inited;
 	Scene *scene;
 	QVector<Condition *> conditions;
+	int meshSize;
+	QHash<QVector<int>, Evaluation *> evaluations;
 	OptimizationFunction *optimizationFunction;
 	PMOptixRenderer *renderer;
 	int currentIteration;

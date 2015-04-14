@@ -136,6 +136,15 @@ void ILP::readConditions(QDomDocument& xml)
 		auto conditionParentNode = nodes.at(i).toElement();
 		if(conditionParentNode.tagName() != "conditions")
 			continue;
+
+		auto meshSizeStr = conditionParentNode.attribute("meshSize");
+		if(meshSizeStr.isEmpty())
+			throw std::logic_error("meshSize attribute must be present");
+		bool ok;
+		meshSize = meshSizeStr.toInt(&ok);
+		if(!ok || meshSize <= 0)
+			throw std::logic_error("meshSize attribute must be a non-negative integer");
+
 		auto conditionNodes = conditionParentNode.childNodes();
 		for(int j = 0; j < conditionNodes.length(); ++j)
 		{
@@ -144,6 +153,7 @@ void ILP::readConditions(QDomDocument& xml)
 			if(condition)
 				conditions.append(condition);
 		}
+		break;
 	}
 
 	if(conditions.empty())

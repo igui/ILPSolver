@@ -2,10 +2,11 @@
 #include "renderer/PMOptixRenderer.h"
 #include <QLocale>
 
-LightInSurfacePosition::LightInSurfacePosition(const QString &lightId, optix::float3 initialPosition, const optix::Matrix4x4 &transformation):
+LightInSurfacePosition::LightInSurfacePosition(const QString &lightId, optix::float3 initialPosition, const optix::Matrix4x4 &transformation, const QVector<float>& normalizedPosition):
 	lightId(lightId),
 	initialPosition(initialPosition),
-	m_transformation(transformation)
+	m_transformation(transformation),
+	m_normalizedPosition(normalizedPosition)
 {
 }
 
@@ -18,6 +19,11 @@ optix::Matrix4x4 LightInSurfacePosition::transformation() const
  {
 	 renderer->setNodeTransformation(lightId, m_transformation);	
  }
+
+QVector<float> LightInSurfacePosition::normalizedPosition() const
+{
+	return m_normalizedPosition;
+}
 
 
  QStringList LightInSurfacePosition::info() const

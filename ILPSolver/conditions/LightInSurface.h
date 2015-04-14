@@ -14,6 +14,7 @@ public:
 
 	virtual ConditionPosition *findNeighbour(ConditionPosition *center, float radius, unsigned int retries) const;
 	virtual ConditionPosition *initial() const;
+	virtual QVector<float> dimensions() const;
 	virtual QStringList header() const;
 	virtual ~LightInSurface();
 private:

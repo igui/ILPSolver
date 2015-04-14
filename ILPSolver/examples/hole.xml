@@ -7,7 +7,7 @@
   <output path="output"/>
 
   <!-- Optimization variables -->
-  <conditions>
+  <conditions meshSize="20">
     <holeInSurface id="Hole" surface="Cube" vertexAIndex="1" vertexBIndex="0" vertexCIndex="2" vertexDIndex="3">
     </holeInSurface>
   </conditions>
