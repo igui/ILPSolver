@@ -49,11 +49,11 @@ HoleInSurface::HoleInSurface(Scene *scene,
 	checkVertexIndex(surfaceId, objectPoints, surfaceVertexCIndex, "C");
 	checkVertexIndex(surfaceId, objectPoints, surfaceVertexDIndex, "D");
 
-	qDebug("%s: %d vertices", qPrintable(surfaceId), objectPoints.length());
+	/*qDebug("%s: %d vertices", qPrintable(surfaceId), objectPoints.length());
 	for(int i = 0; i < objectPoints.length(); ++i){
 		auto point = objectPoints.at(i);
 		qDebug() << "Point " << i << ": " << point.x << point.y << point.z;
-	}
+	}*/
 
 	base = objectPoints[surfaceVertexAIndex];
 	

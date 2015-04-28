@@ -16,7 +16,7 @@ SurfaceRadiosity::SurfaceRadiosity(Logger *logger, PMOptixRenderer *renderer, Sc
 }
 
 
-Evaluation *SurfaceRadiosity::genEvaluation()
+Evaluation *SurfaceRadiosity::genEvaluation(int nPhotons)
 {
 	const static float z = 1.96f;
 
@@ -25,16 +25,17 @@ Evaluation *SurfaceRadiosity::genEvaluation()
 	// p is the probability estimate n / (total hits on surfaces)
 	float p = (float) n / renderer()->totalPhotons();
 	// r is the surface radiosity estimate
-	float r = renderer()->getRadiance().at(objectId) / surfaceArea;
-	float R = renderer()->getEmittedPower() / surfaceArea;
+	float r = renderer()->getRadiance().at(objectId) / (surfaceArea * nPhotons);
+	float R = renderer()->getEmittedPower() / (surfaceArea * nPhotons);
+
 	// radius is the confidence radius given by equations 
 	float radius = z * R * sqrtf( p*(1-p) /   renderer()->totalPhotons()  );
 
-	return new SurfaceRadiosityEvaluation(r, radius);
+	return new SurfaceRadiosityEvaluation(r, radius, nPhotons);
 }
 
 
 QStringList SurfaceRadiosity::header()
 {
-	return QStringList() << "Radiosity min" << "Radiosity center" << "Radiosity max";
+	return QStringList() << "Radiosity min" << "Radiosity center" << "Radiosity max" << "Photons";
 }

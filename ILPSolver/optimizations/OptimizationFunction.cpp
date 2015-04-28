@@ -9,14 +9,15 @@
 
 const unsigned int OptimizationFunction::sampleImageHeight = 768;
 const unsigned int OptimizationFunction::sampleImageWidth = 1024;
-const unsigned int OptimizationFunction::defaultPhotonWidth = 512;
+const unsigned int OptimizationFunction::minPhotonWidth = 16;
 const float OptimizationFunction::gammaCorrection = 2.8f;
 
 OptimizationFunction::OptimizationFunction(PMOptixRenderer *renderer, Scene *scene, Logger *logger):
 	m_renderer(renderer),
 	scene(scene),
 	logger(logger),
-	sampleCamera(new Camera(scene->getDefaultCamera()))
+	sampleCamera(new Camera(scene->getDefaultCamera())),
+	maxPhotonWidth(renderer->getMaxPhotonWidth())
 {
 }
 
@@ -27,14 +28,23 @@ OptimizationFunction::~OptimizationFunction(void)
 
 Evaluation *OptimizationFunction::evaluateRadiosity()
 {
-	m_renderer->render(defaultPhotonWidth, sampleImageHeight, sampleImageWidth, *sampleCamera, true, true);
-	return genEvaluation();
+	m_renderer->render(maxPhotonWidth, sampleImageHeight, sampleImageWidth, *sampleCamera, true, true);
+	return genEvaluation(maxPhotonWidth * maxPhotonWidth);
 }
 
-Evaluation *OptimizationFunction::evaluateFast()
+Evaluation *OptimizationFunction::evaluateFast(float quality)
 {
-	m_renderer->genPhotonMap(defaultPhotonWidth);
-	return genEvaluation();
+	int photonWidth = std::max(
+				std::min(
+					// is good that the photon width is a multiple of 16
+					(unsigned int)(maxPhotonWidth * quality) & ~0xF, 
+					maxPhotonWidth
+				),
+				minPhotonWidth
+			);
+
+	m_renderer->genPhotonMap(photonWidth);
+	return genEvaluation(photonWidth * photonWidth);
 }
 
 PMOptixRenderer *OptimizationFunction::renderer()

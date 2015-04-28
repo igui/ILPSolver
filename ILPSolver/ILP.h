@@ -27,6 +27,7 @@ class ILP
 {
 private:
 	static const QString logFileName;
+	static const float fastEvaluationQuality;
 public:
 	ILP();
 	static ILP fromFile(Logger *logger, const QString& filePath, PMOptixRenderer *renderer);
@@ -51,6 +52,7 @@ private:
 	Configuration processInitialConfiguration();
 	bool findFirstImprovement(QVector<Configuration> &currentEvals, float maxRadius, float suffleRadius, int retries);
 	Evaluation *evaluateSolution(const QVector<ConditionPosition *>& positions);
+	Evaluation *reevalMaxQuality();
 	QVector<ConditionPosition *> findAllNeighbours(QVector<ConditionPosition *> &currentPositions, int retries, float maxRadius);
 	void logBestConfigurations(QVector<Configuration> &bestConfigurations);
 	

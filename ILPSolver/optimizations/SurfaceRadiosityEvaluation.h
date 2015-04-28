@@ -7,8 +7,9 @@ class SurfaceRadiosityEvaluation: public Evaluation
 private:
 	float m_val;
 	float m_radius;
+	int m_photons;
 public:
-	SurfaceRadiosityEvaluation(float val = 0.0f, float radius = 0.0f);
+	SurfaceRadiosityEvaluation(float val, float radius, int photons);
 
 	float val() const;
 	float radius() const;

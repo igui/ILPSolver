@@ -1,9 +1,10 @@
 #include "SurfaceRadiosityEvaluation.h"
 #include <QLocale>
 
-SurfaceRadiosityEvaluation::SurfaceRadiosityEvaluation(float val, float radius):
+SurfaceRadiosityEvaluation::SurfaceRadiosityEvaluation(float val, float radius, int photons):
  m_val(val),
- m_radius(radius)
+ m_radius(radius),
+ m_photons(photons)
 {
 }
 
@@ -37,12 +38,15 @@ float SurfaceRadiosityEvaluation::radius() const
 QString SurfaceRadiosityEvaluation:: info() const
 {
 	QLocale locale;
-	return locale.toString(m_val-m_radius, 'f', 2) + ";" + locale.toString(m_val, 'f', 2) + ";" + locale.toString(m_val+m_radius, 'f', 2);
+	return locale.toString(m_val-m_radius, 'f', 6) + ";" +
+		locale.toString(m_val, 'f', 6) + ";" +
+		locale.toString(m_val+m_radius, 'f', 6) + ";" +
+		locale.toString(m_photons);
 }
 
 QString SurfaceRadiosityEvaluation:: infoShort() const
 {
 	QLocale locale;
-	return locale.toString(m_val, 'f', 2);
+	return locale.toString(m_val, 'f', 6);
 }
 

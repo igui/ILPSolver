@@ -30,8 +30,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(MSBuildProjectDirectory);$(IncludePath);$(OPTIX_PATH)/include;$(OPTIX_PATH)/include/optixu;$(CUDA_INC_PATH);$(NVTOOLSEXT_PATH)\include;$(MSBuildProjectDirectory)\..\include;sutil/;$(QTDIR)\include;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtOpenGL;%(AdditionalIncludeDirectories);$(CUDA_PATH)/include;$(CARVE_PATH)/include</IncludePath>
-    <LibraryPath>$(LibraryPath);$(SolutionDir)\lib;$(NVTOOLSEXT_PATH)\lib\x64;$(CUDA_PATH)\lib\x64;$(QTDIR)\lib;$(ASSIMP_PATH)\lib\x64;$(OPTIX_PATH)\lib64;$(FREEGLUT_PATH)\lib\x64;$(CARVE_PATH)\lib</LibraryPath>
+    <IncludePath>$(MSBuildProjectDirectory);$(IncludePath);$(OPTIX_PATH)/include;$(OPTIX_PATH)/include/optixu;$(CUDA_INC_PATH);$(NVTOOLSEXT_PATH)\include;$(MSBuildProjectDirectory)\..\include;sutil/;$(QTDIR)\include;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtOpenGL;%(AdditionalIncludeDirectories);$(CUDA_PATH)/include</IncludePath>
+    <LibraryPath>$(LibraryPath);$(SolutionDir)\lib;$(NVTOOLSEXT_PATH)\lib\x64;$(CUDA_PATH)\lib\x64;$(QTDIR)\lib;$(ASSIMP_PATH)\lib\x64;$(OPTIX_PATH)\lib64;$(FREEGLUT_PATH)\lib\x64</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -45,7 +45,7 @@
     </ClCompile>
     <Link>
       <SubSystem>NotSet</SubSystem>
-      <AdditionalDependencies>cudart.lib;Qt5Cored.lib;Qt5Guid.lib;assimp.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;optix.1.lib;cuda.lib;optixu.1.lib;glu32.lib;opengl32.lib;winmm.lib;freeglut.lib;carve.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>cudart.lib;Qt5Cored.lib;Qt5Guid.lib;assimp.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;optix.1.lib;cuda.lib;optixu.1.lib;glu32.lib;opengl32.lib;winmm.lib;freeglut.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <TargetMachine>MachineX64</TargetMachine>
       <EntryPointSymbol>
       </EntryPointSymbol>

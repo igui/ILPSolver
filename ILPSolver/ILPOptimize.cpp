@@ -17,6 +17,8 @@
 #include <ctime>
 #include <qDebug>
 
+const float ILP::fastEvaluationQuality = 0.25f;
+
 ILP::ILP():
 	scene(NULL),
 	optimizationFunction(NULL),
@@ -87,7 +89,7 @@ void ILP::optimize()
 Configuration ILP::processInitialConfiguration()
 {
 	logIterationHeader();
-	auto initialEval = optimizationFunction->evaluateFast();
+	auto initialEval = optimizationFunction->evaluateFast(1.0f);
 	auto initialPositions = QVector<ConditionPosition *>();
 	for(auto conditionIt = conditions.begin(); conditionIt != conditions.end(); ++conditionIt){
 		initialPositions.append((*conditionIt)->initial());
@@ -101,6 +103,11 @@ Configuration ILP::processInitialConfiguration()
 
 static bool appendAndRemoveWorse(QVector<Configuration> &bestConfigs, Evaluation *candidate, QVector<ConditionPosition *> &positions)
 {
+	if(!candidate)
+	{
+		return false;
+	}
+
 	QVector<Configuration> newBestConfigs;
 
 	for(auto config: bestConfigs){
@@ -149,28 +156,34 @@ bool ILP::findFirstImprovement(QVector<Configuration> &configurations, float max
 		}
 
 		auto candidate = evaluateSolution(neighbourPosition);
-		
-		logIterationResults(positions, candidate);
+		if(candidate != NULL) {
+			logIterationResults(positions, candidate);
+		}
 		++currentIteration;
 		
 		// crop worse solutions
+		// TODO use new algorithm
 		bool isGoodEnough = appendAndRemoveWorse(configurations, candidate, neighbourPosition);
 
 		// evaluate if the solution is an improvement
-		if(isGoodEnough && configurations.length() == 1){
-			logger->log("Better solution: %s\n", candidate->infoShort().toStdString().c_str());
-			return true; 
-		} else {	
-			if(!isGoodEnough) {
-				// removes candidate and positions from memory
-				
-				// Don't delete candidate because it is stored for future references
-				//delete candidate;
-				for(auto it = neighbourPosition.begin(); it != neighbourPosition.end(); ++it){
-					delete *it;
-				}
-			} else {
+		if(isGoodEnough){
+			if(configurations.length() == 1) {
+				candidate = reevalMaxQuality();
+				auto oldCandidate = configurations.first().setEvaluation(candidate);
+				logger->log("Better solution: %s. Reevaluated: %s\n", qPrintable(oldCandidate->infoShort()), qPrintable(candidate->infoShort()));
+				delete oldCandidate;
+				return true; 
+			}
+			else {
 				logger->log("Probable solution: %s\n", candidate->infoShort().toStdString().c_str());
+			}
+		} else {
+			// removes candidate and positions from memory
+				
+			// Don't delete candidate because it is stored for future references
+			//delete candidate;
+			for(auto it = neighbourPosition.begin(); it != neighbourPosition.end(); ++it){
+				delete *it;
 			}
 		}
 	}
@@ -186,7 +199,7 @@ Evaluation *ILP::evaluateSolution(const QVector<ConditionPosition *>& positions)
 		for(int dimensionIdx = 0; dimensionIdx < dimensions.length(); ++dimensionIdx) {
 			auto normalizedPosition = positions[conditionIdx]->normalizedPosition();
 			mappedPositions.append(
-				qRound(meshSize * normalizedPosition[dimensionIdx] / dimensions[dimensionIdx])
+				floorf(meshSize * normalizedPosition[dimensionIdx] / dimensions[dimensionIdx])
 			);
 		}
 	}
@@ -199,25 +212,25 @@ Evaluation *ILP::evaluateSolution(const QVector<ConditionPosition *>& positions)
 		std::back_inserter(mappedPositionsStr),
 		[](const int& x) { return QString::number(x); }
 	);
-	qDebug() << "Mapped positions: " << mappedPositionsStr.join(", ") << "\n";
+	//qDebug() << "Mapped positions: " << mappedPositionsStr.join(", ") << "\n";
 
 
 	auto evaluation = evaluations[mappedPositions];
 	if(evaluation)
 	{
-		qDebug() << "Returning saved evaluation for " << mappedPositionsStr.join(", ") << ": " << evaluation->infoShort() << "\n";
-		return evaluation;
+		//qDebug() << "Returning saved evaluation for " << mappedPositionsStr.join(", ") << ": " << evaluation->infoShort() << "\n";
+		return NULL;
 	}
 	else
 	{
-		qDebug() << "Calculating evaluation for " << mappedPositionsStr.join(", ") << "\n";
+		//qDebug() << "Calculating evaluation for " << mappedPositionsStr.join(", ") << "\n";
 
 		for(auto position: positions) {
 			position->apply(renderer);
 		}
 
 		// TODO use evaluate fast
-		auto candidate = optimizationFunction->evaluateFast();
+		auto candidate = optimizationFunction->evaluateFast(fastEvaluationQuality);
 		/*auto candidate = optimizationFunction->evaluateRadiosity();
 		auto imagePath = outputDir.filePath(
 			QString("solution-%1.png").arg(currentIteration, 4, 10, QLatin1Char('0'))
@@ -228,6 +241,11 @@ Evaluation *ILP::evaluateSolution(const QVector<ConditionPosition *>& positions)
 
 		return candidate;
 	}
+}
+
+Evaluation *ILP::reevalMaxQuality()
+{
+	return optimizationFunction->evaluateFast(1.0f);
 }
 
 QVector<ConditionPosition *> ILP::findAllNeighbours(QVector<ConditionPosition *> &currentPositions, int optimizationsRetries,  float maxRadius)

@@ -126,7 +126,9 @@
       <SubType>Designer</SubType>
     </Xml>
     <Xml Include="examples\directional.xml" />
-    <Xml Include="examples\hole.xml" />
+    <Xml Include="examples\hole.xml">
+      <SubType>Designer</SubType>
+    </Xml>
   </ItemGroup>
   <ItemGroup>
     <Image Include="examples\suzanne.png" />

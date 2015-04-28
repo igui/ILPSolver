@@ -12,6 +12,7 @@ public:
 	Configuration();
 	Configuration(Evaluation *evaluation, const QVector<ConditionPosition *> &positions);
 	Evaluation *evaluation() const;
+	Evaluation *setEvaluation(Evaluation *evaluation);
 	QVector<ConditionPosition *> positions() const;
 	~Configuration();
 private:

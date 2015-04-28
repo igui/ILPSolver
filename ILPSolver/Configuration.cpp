@@ -16,6 +16,14 @@ Evaluation *Configuration::evaluation() const
 	return m_evaluation;
 }
 
+Evaluation *Configuration::setEvaluation(Evaluation *evaluation) 
+{
+	auto old = m_evaluation;
+	m_evaluation = evaluation;
+	return old;
+}
+
+
 QVector<ConditionPosition *> Configuration::positions() const
 {
 	return m_positions;

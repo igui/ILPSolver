@@ -697,6 +697,12 @@ unsigned int PMOptixRenderer::totalPhotons()
 	return m_photonWidth * m_photonWidth;
 }
 
+unsigned int PMOptixRenderer::getMaxPhotonWidth()
+{
+	int deviceOrdinal = m_context->getEnabledDevices().front();
+	return (m_context->getAvailableDeviceMemory(deviceOrdinal) / (1 << 20)) & ~0xF;
+}
+
 const std::vector<std::string>& PMOptixRenderer::objectToNameMapping() const
 {
 	return m_objectIdToName;

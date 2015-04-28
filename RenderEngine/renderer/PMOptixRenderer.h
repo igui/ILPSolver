@@ -55,6 +55,7 @@ public:
 	RENDER_ENGINE_EXPORT_API const std::vector<std::string>& objectToNameMapping() const;
 	RENDER_ENGINE_EXPORT_API optix::Buffer outputBuffer();
 	RENDER_ENGINE_EXPORT_API unsigned int totalPhotons();
+	RENDER_ENGINE_EXPORT_API unsigned int getMaxPhotonWidth();
 
     const static unsigned int PHOTON_GRID_MAX_SIZE;
 private:

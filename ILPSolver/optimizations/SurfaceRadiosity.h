@@ -18,7 +18,7 @@ public:
 	SurfaceRadiosity(Logger *logger, PMOptixRenderer *renderer, Scene *scene, const QString &surfaceId);
 	virtual QStringList header();
 protected:
-	virtual Evaluation *genEvaluation();
+	virtual Evaluation *genEvaluation(int nPhotons);
 private:
 	QString surfaceId;
 	int objectId;
