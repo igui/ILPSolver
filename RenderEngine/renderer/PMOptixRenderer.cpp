@@ -699,8 +699,15 @@ unsigned int PMOptixRenderer::totalPhotons()
 
 unsigned int PMOptixRenderer::getMaxPhotonWidth()
 {
+	static const double k = 0.075f;
+
 	int deviceOrdinal = m_context->getEnabledDevices().front();
-	return (m_context->getAvailableDeviceMemory(deviceOrdinal) / (1 << 20)) & ~0xF;
+	RTsize totalMemory;
+	m_context->getDeviceAttribute(deviceOrdinal, RT_DEVICE_ATTRIBUTE_TOTAL_MEMORY, sizeof(RTsize), &totalMemory);
+
+	auto w = sqrtf(totalMemory * k / (double)sizeof(Photon));
+
+	return ((int)w) & ~0xf;
 }
 
 const std::vector<std::string>& PMOptixRenderer::objectToNameMapping() const
