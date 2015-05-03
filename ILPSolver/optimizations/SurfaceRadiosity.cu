@@ -1,3 +1,4 @@
+#include "SurfaceRadiosity.h"
 #include <cuda.h>
 #include <optix_world.h>
 #include <thrust/device_vector.h>
@@ -5,7 +6,6 @@
 #include <thrust/copy.h>
 #include "renderer/helpers/optix.h"
 #include "renderer/helpers/nsight.h"
-#include "OptimizationFunction.h"
 #include "renderer/PMOptixRenderer.h"
 #include <QImage>
 
@@ -53,7 +53,7 @@ __global__ void transformFloatToRGB(optix::float3 *floatColorBuffer, optix::ucha
 	byteColorBuffer[dstIndex] = colorByte;
 }
 
-void OptimizationFunction::saveImage(const QString& fileName)
+void SurfaceRadiosity::saveImage(const QString& fileName)
 {
 	// convert float3 image data to 24 bit RGB
 	nvtxRangePushA("convertImageToRGB");

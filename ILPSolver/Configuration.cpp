@@ -5,18 +5,18 @@ Configuration::Configuration():
 {
 }
 
-Configuration::Configuration(Evaluation *evaluation, const QVector<ConditionPosition *> &positions):
+Configuration::Configuration(SurfaceRadiosityEvaluation *evaluation, const QVector<ConditionPosition *> &positions):
 		m_evaluation(evaluation),
 		m_positions(positions)
 {
 }
 
-Evaluation *Configuration::evaluation() const
+SurfaceRadiosityEvaluation *Configuration::evaluation() const
 {
 	return m_evaluation;
 }
 
-Evaluation *Configuration::setEvaluation(Evaluation *evaluation) 
+SurfaceRadiosityEvaluation *Configuration::setEvaluation(SurfaceRadiosityEvaluation *evaluation) 
 {
 	auto old = m_evaluation;
 	m_evaluation = evaluation;

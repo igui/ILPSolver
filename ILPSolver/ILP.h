@@ -8,6 +8,7 @@
 #include "scene/Scene.h"
 #include "renderer/PMOptixRenderer.h"
 #include "Configuration.h"
+#include "Interval.h"
 #include <QVector>
 #include <QDir>
 #include <QHash>
@@ -16,8 +17,8 @@ class Logger;
 class QFile;
 class QString;
 class Condition;
-class OptimizationFunction;
-class Evaluation;
+class SurfaceRadiosity;
+class SurfaceRadiosityEvaluation;
 class QDomDocument;
 class Configuration;
 
@@ -46,23 +47,30 @@ private:
 	// logging
 	void cleanOutputDir();
 	void logIterationHeader();
-	void logIterationResults(QVector<ConditionPosition *>positions, Evaluation *evaluation);
+	void logIterationResults(QVector<ConditionPosition *>positions, SurfaceRadiosityEvaluation *evaluation, const QString& iterationComment);
 
 	// optimization
 	Configuration processInitialConfiguration();
-	bool findFirstImprovement(QVector<Configuration> &currentEvals, float maxRadius, float suffleRadius, int retries);
-	Evaluation *evaluateSolution(const QVector<ConditionPosition *>& positions);
-	Evaluation *reevalMaxQuality();
+	bool findFirstImprovement(float maxRadius, float suffleRadius, int retries);
+	bool recalcISOC(QVector<ConditionPosition *> positions, const QVector<int>& mappedPosition, SurfaceRadiosityEvaluation *evaluation, bool evaluationCached);
+	QVector<int> getMappedPosition(const QVector<ConditionPosition *>& positions);
+	void setEvaluation(const QVector<int>& mappedPositions, SurfaceRadiosityEvaluation *evaluation);
+	bool evaluateSolution(const QVector<ConditionPosition *>& positions, QVector<int>& mappedPositions, SurfaceRadiosityEvaluation *&evaluation);
+	SurfaceRadiosityEvaluation *reevalMaxQuality();
 	QVector<ConditionPosition *> findAllNeighbours(QVector<ConditionPosition *> &currentPositions, int retries, float maxRadius);
-	void logBestConfigurations(QVector<Configuration> &bestConfigurations);
+	void logBestConfigurations();
 	
 
 	bool inited;
 	Scene *scene;
 	QVector<Condition *> conditions;
 	int meshSize;
-	QHash<QVector<int>, Evaluation *> evaluations;
-	OptimizationFunction *optimizationFunction;
+	QHash<QVector<int>, SurfaceRadiosityEvaluation *> evaluations;
+	
+	QList<Configuration> isoc;
+	Interval siIsoc;
+
+	SurfaceRadiosity *optimizationFunction;
 	PMOptixRenderer *renderer;
 	int currentIteration;
 	int maxIterations;

@@ -1,28 +1,18 @@
 #include "SurfaceRadiosityEvaluation.h"
 #include <QLocale>
 
-SurfaceRadiosityEvaluation::SurfaceRadiosityEvaluation(float val, float radius, int photons):
+SurfaceRadiosityEvaluation::SurfaceRadiosityEvaluation(float val, float radius, int photons, bool isMaxQuality):
  m_val(val),
  m_radius(radius),
- m_photons(photons)
+ m_photons(photons),
+ m_interval(val, radius),
+ m_isMaxQuality(isMaxQuality)
 {
 }
 
-EvaluationResult::CompareResult SurfaceRadiosityEvaluation::compare(const Evaluation* eval) const
+Interval SurfaceRadiosityEvaluation::interval() const
 {
-	auto other = dynamic_cast<const SurfaceRadiosityEvaluation *>(eval);
-	if(other == NULL){
-		throw std::invalid_argument("other");
-	}
-
-	if((m_val - m_radius) > (other->m_val + other->m_radius))
-		return EvaluationResult::BETTER;
-	else if((m_val + m_radius) < (other->m_val - other->m_radius))
-		return EvaluationResult::WORSE;
-	else if(m_radius == other->m_radius && m_val == other->m_val)
-		return EvaluationResult::EQUAL;
-	else
-		return EvaluationResult::SIMILAR;
+	return m_interval;
 }
 
 float SurfaceRadiosityEvaluation::val() const
@@ -34,6 +24,17 @@ float SurfaceRadiosityEvaluation::radius() const
 {
 	return m_radius;
 }
+
+int SurfaceRadiosityEvaluation::photons() const
+{
+	return m_photons;
+}
+
+bool SurfaceRadiosityEvaluation::isMaxQuality() const
+{
+	return m_isMaxQuality;
+}
+
 
 QString SurfaceRadiosityEvaluation:: info() const
 {

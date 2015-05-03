@@ -8,6 +8,7 @@
     <DllFiles Include="$(QTDIR)\bin\Qt5Widgetsd.dll"/>
     <DllFiles Include="$(QTDIR)\bin\Qt5Xmld.dll"/>
     <DllFiles Include="$(QTDIR)\bin\Qt5XmlPatternsd.dll"/>
+    <DllFiles Include="$(QTDIR)\bin\Qt5Concurrentd.dll"/>
  </ItemGroup>
  <ItemGroup Condition="'$(Configuration)'=='Release'">
     <DllFiles Include="$(QTDIR)\bin\Qt5Core.dll"/>
@@ -17,6 +18,7 @@
     <DllFiles Include="$(QTDIR)\bin\Qt5Widgets.dll"/>
     <DllFiles Include="$(QTDIR)\bin\Qt5Xml.dll"/>
     <DllFiles Include="$(QTDIR)\bin\Qt5XmlPatterns.dll"/>
+   <DllFiles Include="$(QTDIR)\bin\Qt5Concurrent.dll"/>
  </ItemGroup>
  <ItemGroup>
    <DllFiles Include="$(QTDIR)\bin\icudt51.dll"/>

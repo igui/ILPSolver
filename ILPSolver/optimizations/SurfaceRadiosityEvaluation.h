@@ -1,20 +1,25 @@
 #pragma once
 
-#include "Evaluation.h"
+#include <QString>
+#include "Interval.h"
 
-class SurfaceRadiosityEvaluation: public Evaluation
+
+class SurfaceRadiosityEvaluation
 {
 private:
 	float m_val;
 	float m_radius;
 	int m_photons;
+	Interval m_interval;
+	bool m_isMaxQuality;
 public:
-	SurfaceRadiosityEvaluation(float val, float radius, int photons);
+	SurfaceRadiosityEvaluation(float val, float radius, int photons, bool isMaxQuality);
 
 	float val() const;
 	float radius() const;
-
-	virtual EvaluationResult::CompareResult compare(const Evaluation* other) const;
+	int photons() const;
+	Interval interval () const;
+	bool isMaxQuality() const;
 	virtual QString info() const;
 	virtual QString infoShort() const;
 };

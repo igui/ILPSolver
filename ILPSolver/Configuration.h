@@ -2,7 +2,7 @@
 
 #include <QVector>
 
-class Evaluation;
+class SurfaceRadiosityEvaluation;
 class ConditionPosition;
 
 
@@ -10,13 +10,13 @@ class Configuration
 {
 public:
 	Configuration();
-	Configuration(Evaluation *evaluation, const QVector<ConditionPosition *> &positions);
-	Evaluation *evaluation() const;
-	Evaluation *setEvaluation(Evaluation *evaluation);
+	Configuration(SurfaceRadiosityEvaluation *evaluation, const QVector<ConditionPosition *> &positions);
+	SurfaceRadiosityEvaluation *evaluation() const;
+	SurfaceRadiosityEvaluation *setEvaluation(SurfaceRadiosityEvaluation *evaluation);
 	QVector<ConditionPosition *> positions() const;
 	~Configuration();
 private:
-	Evaluation *m_evaluation;
+	SurfaceRadiosityEvaluation *m_evaluation;
 	QVector<ConditionPosition *> m_positions;
 
 };

@@ -34,7 +34,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>cudart.lib;Qt5OpenGLd.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Xmld.lib;Qt5XmlPatternsd.lib;Qt5Widgetsd.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;optix.1.lib;cuda.lib;optixu.1.lib;glu32.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>cudart.lib;Qt5OpenGLd.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Xmld.lib;Qt5XmlPatternsd.lib;Qt5Widgetsd.lib;Qt5Concurrentd.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;optix.1.lib;cuda.lib;optixu.1.lib;glu32.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>NotSet</SubSystem>
     </Link>
     <ClCompile>
@@ -64,12 +64,10 @@
     <ClCompile Include="conditions\HoleInSurfacePosition.cpp" />
     <ClCompile Include="ILPLog.cpp" />
     <ClCompile Include="ILPRead.cpp" />
-    <ClCompile Include="optimizations\Evaluation.cpp" />
     <ClCompile Include="ILPOptimize.cpp" />
     <ClCompile Include="Interval.cpp" />
     <ClCompile Include="conditions\LightInSurface.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="optimizations\OptimizationFunction.cpp" />
     <ClCompile Include="optimizations\SurfaceRadiosity.cpp" />
     <ClCompile Include="optimizations\SurfaceRadiosityEvaluation.cpp" />
   </ItemGroup>
@@ -88,17 +86,15 @@
     <ClInclude Include="FileLogger.h" />
     <ClInclude Include="conditions\HoleInSurface.h" />
     <ClInclude Include="conditions\HoleInSurfacePosition.h" />
-    <ClInclude Include="optimizations\Evaluation.h" />
     <ClInclude Include="ILP.h" />
     <ClInclude Include="Interval.h" />
     <ClInclude Include="conditions\LightInSurface.h" />
     <ClInclude Include="Main.hxx" />
-    <ClInclude Include="optimizations\OptimizationFunction.h" />
     <ClInclude Include="optimizations\SurfaceRadiosity.h" />
     <ClInclude Include="optimizations\SurfaceRadiosityEvaluation.h" />
   </ItemGroup>
   <ItemGroup>
-    <CudaCompile Include="optimizations\OptimizationFunction.cu">
+    <CudaCompile Include="optimizations\SurfaceRadiosity.cu">
       <NvccCompilation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">compile</NvccCompilation>
     </CudaCompile>
   </ItemGroup>

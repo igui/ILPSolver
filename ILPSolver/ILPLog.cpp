@@ -2,8 +2,8 @@
 
 #include <QTextStream>
 #include "conditions/Condition.h"
-#include "optimizations/OptimizationFunction.h"
-#include "optimizations/Evaluation.h"
+#include "optimizations/SurfaceRadiosity.h"
+#include "optimizations/SurfaceRadiosityEvaluation.h"
 #include "conditions/ConditionPosition.h"
 #include "conditions/HoleInSurfacePosition.h"
 #include <qDebug>
@@ -40,10 +40,9 @@ void ILP::logIterationHeader()
 	
 	out << "Iteration" << ';';
 
-	for(auto conditionsIt = conditions.cbegin(); conditionsIt != conditions.cend(); ++conditionsIt){
-		auto header =  (*conditionsIt)->header();
-		for(auto headerIt = header.begin(); headerIt != header.end(); ++headerIt){
-			out << *headerIt << ";";
+	for(auto condition: conditions){
+		for(auto h: condition->header()){
+			out << h << ";";
 		}
 	}
 
@@ -56,7 +55,7 @@ void ILP::logIterationHeader()
 }
 
 
-void ILP::logIterationResults(QVector<ConditionPosition *> positions, Evaluation *evaluation)
+void ILP::logIterationResults(QVector<ConditionPosition *> positions, SurfaceRadiosityEvaluation *evaluation, const QString& iterationComment)
 {
 	QFile file(outputDir.filePath(logFileName));
 	bool success = file.open(QIODevice::Append | QIODevice::Text);
@@ -67,33 +66,36 @@ void ILP::logIterationResults(QVector<ConditionPosition *> positions, Evaluation
 	
 	out << currentIteration << ';';
 
-	for(auto positionsIt = positions.cbegin(); positionsIt != positions.cend(); ++positionsIt){
-		auto info = (*positionsIt)->info();
-		for(auto infoIt = info.begin(); infoIt != info.end(); ++infoIt){
-			out << *infoIt  << ';';
+	for(auto position: positions){
+		for(auto i: position->info()){
+			out << i << ';';
 		}
 	}
-	out << evaluation->info() << '\n';
+	out << evaluation->info() << ';';
+	out << iterationComment << '\n';
+
 	file.close(); 
 }
 
 
-void ILP::logBestConfigurations(QVector<Configuration> &bestConfigurations)
+void ILP::logBestConfigurations()
 {
-	logger->log("Best values(%d)\n", bestConfigurations.length());
-	for(auto it = bestConfigurations.begin(); it != bestConfigurations.end(); ++it){
-		auto positions = it->positions();
-		for(auto positionsIt = positions.begin(); positionsIt != positions.end(); ++positionsIt){
-			(*positionsIt)->apply(renderer);
+	logger->log("Best values(%d)\n", isoc.length());
+	int i = 1;
+	for(auto configuration: isoc){
+		for(auto position: configuration.positions()){
+			position->apply(renderer);
 		}
 		auto evalSolutionNow = optimizationFunction->evaluateRadiosity();
-		optimizationFunction->saveImage(getImageFileNameSolution(1 + it - bestConfigurations.begin()));
-		QString evalInfo = it->evaluation()->info();
+		optimizationFunction->saveImage(getImageFileNameSolution(i));
+		QString evalInfo = configuration.evaluation()->info();
 		QString evalInfoNow = evalSolutionNow->infoShort();
 		logger->log(
-			"\tEval: %s (now evals as %s)\n",
+			"\tEval %d: %s (now evals as %s)\n",
+			i,
 			evalInfo.toStdString().c_str(),
 			evalInfoNow.toStdString().c_str()
 		);
+		++i;
 	}
 }

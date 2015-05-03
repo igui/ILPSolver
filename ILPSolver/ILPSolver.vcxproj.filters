@@ -12,12 +12,6 @@
     <ClCompile Include="conditions\LightInSurface.cpp">
       <Filter>conditions</Filter>
     </ClCompile>
-    <ClCompile Include="optimizations\OptimizationFunction.cpp">
-      <Filter>optimizations</Filter>
-    </ClCompile>
-    <ClCompile Include="optimizations\Evaluation.cpp">
-      <Filter>optimizations</Filter>
-    </ClCompile>
     <ClCompile Include="conditions\LightInSurfacePosition.cpp">
       <Filter>conditions</Filter>
     </ClCompile>
@@ -54,12 +48,6 @@
     </ClInclude>
     <ClInclude Include="conditions\Condition.h">
       <Filter>conditions</Filter>
-    </ClInclude>
-    <ClInclude Include="optimizations\Evaluation.h">
-      <Filter>optimizations</Filter>
-    </ClInclude>
-    <ClInclude Include="optimizations\OptimizationFunction.h">
-      <Filter>optimizations</Filter>
     </ClInclude>
     <ClInclude Include="conditions\ConditionPosition.h">
       <Filter>conditions</Filter>
@@ -134,13 +122,13 @@
     </Xml>
   </ItemGroup>
   <ItemGroup>
-    <CudaCompile Include="optimizations\OptimizationFunction.cu">
-      <Filter>optimizations</Filter>
-    </CudaCompile>
-  </ItemGroup>
-  <ItemGroup>
     <Image Include="examples\suzanne.png">
       <Filter>examples</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="optimizations\SurfaceRadiosity.cu">
+      <Filter>optimizations</Filter>
+    </CudaCompile>
   </ItemGroup>
 </Project>
