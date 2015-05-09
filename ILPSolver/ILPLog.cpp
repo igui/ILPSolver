@@ -38,7 +38,7 @@ void ILP::logIterationHeader()
 	}
 	QTextStream out(&file);
 	
-	out << "Iteration" << ';';
+	out << "Iteration" << ";";
 
 	for(auto condition: conditions){
 		for(auto h: condition->header()){
@@ -46,17 +46,26 @@ void ILP::logIterationHeader()
 		}
 	}
 
-	auto header = optimizationFunction->header();
-	for(auto headerIt = header.begin(); headerIt != header.end(); ++headerIt){
-		out << *headerIt;
-		out << ((headerIt != header.end()-1) ? ';': '\n');
+	for(auto h: optimizationFunction->header())
+	{
+		out << h << ";";
 	}
+
+	out << "Comment" << ";" 
+		<< "Duration" << "\n";
+
 	file.close(); 
 }
 
 
-void ILP::logIterationResults(QVector<ConditionPosition *> positions, SurfaceRadiosityEvaluation *evaluation, const QString& iterationComment)
+void ILP::logIterationResults(
+	QVector<ConditionPosition *> positions,
+	SurfaceRadiosityEvaluation *evaluation,
+	const QString& iterationComment,
+	float evaluationDuration)
 {
+	QLocale locale;
+
 	QFile file(outputDir.filePath(logFileName));
 	bool success = file.open(QIODevice::Append | QIODevice::Text);
 	if(!success){
@@ -72,6 +81,7 @@ void ILP::logIterationResults(QVector<ConditionPosition *> positions, SurfaceRad
 		}
 	}
 	out << evaluation->info() << ';';
+	out << locale.toString(evaluationDuration, 'f', 6) << ';';
 	out << iterationComment << '\n';
 
 	file.close(); 

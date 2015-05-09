@@ -29,6 +29,27 @@ class ILP
 private:
 	static const QString logFileName;
 	static const float fastEvaluationQuality;
+
+	struct EvaluateSolutionResult {
+		EvaluateSolutionResult();
+		
+		EvaluateSolutionResult(
+			SurfaceRadiosityEvaluation *eval,
+			float timeEvaluation
+		);
+		
+		EvaluateSolutionResult(
+			bool isCached,
+			QVector<int> mappedPositions,
+			SurfaceRadiosityEvaluation *eval,
+			float timeEvaluation
+		);
+
+		bool isCached;
+		QVector<int> mappedPositions;
+		SurfaceRadiosityEvaluation *evaluation;
+		float timeEvaluation;
+	};
 public:
 	ILP();
 	static ILP fromFile(Logger *logger, const QString& filePath, PMOptixRenderer *renderer);
@@ -47,19 +68,32 @@ private:
 	// logging
 	void cleanOutputDir();
 	void logIterationHeader();
-	void logIterationResults(QVector<ConditionPosition *>positions, SurfaceRadiosityEvaluation *evaluation, const QString& iterationComment);
+	void logIterationResults(
+		QVector<ConditionPosition *>positions,
+		SurfaceRadiosityEvaluation *evaluation,
+		const QString& iterationComment,
+		float evaluationDuration
+		);
 
 	// optimization
 	Configuration processInitialConfiguration();
 	bool findFirstImprovement(float maxRadius, float suffleRadius, int retries);
-	bool recalcISOC(QVector<ConditionPosition *> positions, const QVector<int>& mappedPosition, SurfaceRadiosityEvaluation *evaluation, bool evaluationCached);
+	bool recalcISOC(
+		const QVector<ConditionPosition *>& positions,
+		const EvaluateSolutionResult &evaluation
+		);
 	QVector<int> getMappedPosition(const QVector<ConditionPosition *>& positions);
-	void setEvaluation(const QVector<int>& mappedPositions, SurfaceRadiosityEvaluation *evaluation);
-	bool evaluateSolution(const QVector<ConditionPosition *>& positions, QVector<int>& mappedPositions, SurfaceRadiosityEvaluation *&evaluation);
-	SurfaceRadiosityEvaluation *reevalMaxQuality();
-	QVector<ConditionPosition *> findAllNeighbours(QVector<ConditionPosition *> &currentPositions, int retries, float maxRadius);
+	void setEvaluation(
+		const QVector<int>& mappedPositions,
+		SurfaceRadiosityEvaluation *evaluation
+		);
+	EvaluateSolutionResult evaluateSolution(const QVector<ConditionPosition *>& positions);
+	EvaluateSolutionResult reevalMaxQuality();
+	QVector<ConditionPosition *> findAllNeighbours(
+		QVector<ConditionPosition *> &currentPositions,
+		int retries, float maxRadius
+	);
 	void logBestConfigurations();
-	
 
 	bool inited;
 	Scene *scene;

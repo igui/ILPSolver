@@ -17,6 +17,7 @@
 #include <ctime>
 #include <qDebug>
 #include <QtConcurrent/QtConcurrentFilter>
+#include <QtConcurrent/QtConcurrentMap>
 
 const float ILP::fastEvaluationQuality = 0.25f;
 
@@ -69,8 +70,14 @@ void ILP::optimize()
 	{
 		float radius = 0.05f;
 		while(radius < 1.0f){
-			float suffleRadius = getShuffleRadius((float) currentIteration / maxIterations);
-			bool improvementFound = findFirstImprovement(radius,  suffleRadius, getRetriesForRadius(radius));
+			float suffleRadius = getShuffleRadius(
+				(float) currentIteration / maxIterations
+			);
+			bool improvementFound = findFirstImprovement(
+				radius,
+				suffleRadius,
+				getRetriesForRadius(radius)
+				);
 			if(improvementFound){
 				radius = 0.05f;
 			} else {
@@ -90,33 +97,51 @@ void ILP::optimize()
 Configuration ILP::processInitialConfiguration()
 {
 	logIterationHeader();
-	auto initialEval = optimizationFunction->evaluateFast(1.0f);
-	auto initialPositions = QVector<ConditionPosition *>();
-	for(auto conditionIt = conditions.begin(); conditionIt != conditions.end(); ++conditionIt){
-		initialPositions.append((*conditionIt)->initial());
-	}
-	auto initialConfig = Configuration(initialEval, initialPositions);
+	auto initialEval = reevalMaxQuality();
+	auto initialPositions = QtConcurrent::blockingMapped(
+		conditions,
+		(ConditionPosition *(*)(Condition *)) [] (Condition * condition) { return condition->initial(); }
+	);
+		
+	auto initialConfig = Configuration(initialEval.evaluation, initialPositions);
 	isoc.clear();
 	isoc.append(initialConfig);
-	siIsoc = initialEval->interval();
+	siIsoc = initialEval.evaluation->interval();
 
-	logger->log("Initial solution: %s\n", initialEval->infoShort().toStdString().c_str() );
-	logIterationResults(initialConfig.positions(), initialEval, "INITIAL");
+	logger->log("Initial solution: %s\n", qPrintable(initialEval.evaluation->infoShort()));
+	logIterationResults(
+		initialConfig.positions(),
+		initialEval.evaluation,
+		"INITIAL",
+		initialEval.timeEvaluation
+	);
 	++currentIteration;
 	return initialConfig;
 }
 
-bool ILP::recalcISOC(QVector<ConditionPosition *> positions, const QVector<int>& mappedPosition, SurfaceRadiosityEvaluation *evaluation, bool evaluationCached)
+bool ILP::recalcISOC(
+	const QVector<ConditionPosition *> &positions,
+	const ILP::EvaluateSolutionResult &evaluationResult)
 {
-	if(evaluationCached) {
-		logIterationResults(positions, evaluation, "CACHED");
+	if(evaluationResult.isCached) {
+		logIterationResults(
+			positions,
+			evaluationResult.evaluation,
+			"CACHED",
+			evaluationResult.timeEvaluation
+		);
 		++currentIteration;
 		return false;
 	}
 
-	if(evaluation->interval() < siIsoc) {
+	if(evaluationResult.evaluation->interval() < siIsoc) {
 		++currentIteration;
-		logIterationResults(positions, evaluation, "BAD");
+		logIterationResults(
+			positions,
+			evaluationResult.evaluation,
+			"BAD",
+			evaluationResult.timeEvaluation
+		);
 
 		// removes positions from memory
 		for(auto p: positions){
@@ -126,14 +151,29 @@ bool ILP::recalcISOC(QVector<ConditionPosition *> positions, const QVector<int>&
 	} 
 
 	// evaluation is may belong to isoc it's reevaluated with max quality
-	if(!evaluation->isMaxQuality()) {
-		delete evaluation;
-		evaluation = reevalMaxQuality();
-		setEvaluation(mappedPosition, evaluation);
-	}	
+	EvaluateSolutionResult reevaluatedSolution;
+	if(!evaluationResult.evaluation->isMaxQuality()) {
+		delete evaluationResult.evaluation;
+		reevaluatedSolution = reevalMaxQuality();
+		setEvaluation(
+			evaluationResult.mappedPositions,
+			reevaluatedSolution.evaluation
+			);
 
-	if(evaluation->interval() < siIsoc) {
-		logIterationResults(positions, evaluation, "BAD-AFTER-REEVAL");
+		reevaluatedSolution.mappedPositions = evaluationResult.mappedPositions;
+	}
+	else
+	{
+		reevaluatedSolution = evaluationResult;
+	}
+
+	if(reevaluatedSolution.evaluation->interval() < siIsoc) {
+		logIterationResults(
+			positions,
+			reevaluatedSolution.evaluation,
+			"BAD-AFTER-REEVAL",
+			reevaluatedSolution.timeEvaluation
+		);
 		// removes evaluation from memory
 		for(auto p: positions){
 			delete p;
@@ -141,30 +181,34 @@ bool ILP::recalcISOC(QVector<ConditionPosition *> positions, const QVector<int>&
 		return false;
 	} 
 	
-	if(evaluation->interval() > siIsoc) {
+	if(reevaluatedSolution.evaluation->interval() > siIsoc) {
 		isoc.clear();
-		isoc.append(Configuration(evaluation, positions));
-		logger->log("Better solution: %s\n", qPrintable(evaluation->infoShort()));
-		siIsoc = evaluation->interval();
-		logIterationResults(positions, evaluation, "BETTER");
+		isoc.append(Configuration(reevaluatedSolution.evaluation, positions));
+		logger->log("Better solution: %s\n", qPrintable(reevaluatedSolution.evaluation->infoShort()));
+		siIsoc = reevaluatedSolution.evaluation->interval();
+		logIterationResults(
+			positions,
+			reevaluatedSolution.evaluation,
+			"BETTER",
+			reevaluatedSolution.timeEvaluation);
 		return true;
 	}
 	else {
-		logger->log("Probable solution: %s\n", evaluation->infoShort().toStdString().c_str());
-		logIterationResults(positions, evaluation, "PROBABLE");
+		logger->log("Probable solution: %s\n", qPrintable(reevaluatedSolution.evaluation->infoShort()));
+		logIterationResults(positions, reevaluatedSolution.evaluation, "PROBABLE", reevaluatedSolution.timeEvaluation);
 
 
 		// recalculate ISOC and SIISOC
-		QtConcurrent::blockingFilter(isoc, [evaluation](Configuration config){
-			return config.evaluation()->interval() < evaluation->interval();
+		QtConcurrent::blockingFilter(isoc, [reevaluatedSolution](Configuration config){
+			return config.evaluation()->interval() < reevaluatedSolution.evaluation->interval();
 		});
 
-		auto newSiIsoc = evaluation->interval();
+		auto newSiIsoc = reevaluatedSolution.evaluation->interval();
 		for(auto configuration: isoc){
 			newSiIsoc = newSiIsoc.intersection(configuration.evaluation()->interval());
 		}
 		siIsoc = newSiIsoc;
-		isoc.append(Configuration(evaluation, positions));
+		isoc.append(Configuration(reevaluatedSolution.evaluation, positions));
 	}
 	return false;
 }
@@ -198,10 +242,8 @@ bool ILP::findFirstImprovement(float maxRadius, float shuffleRadius, int retries
 			continue; // no neighbours
 		}
 
-		QVector<int> mappedPositions;
-		SurfaceRadiosityEvaluation *candidate;
-		bool isCached = evaluateSolution(neighbourPosition, mappedPositions, candidate);
-		bool isImprovement = recalcISOC(neighbourPosition, mappedPositions, candidate, isCached);
+		auto evaluationResult = evaluateSolution(neighbourPosition);
+		bool isImprovement = recalcISOC(neighbourPosition, evaluationResult);
 		if(isImprovement)
 		{
 			return true;
@@ -237,15 +279,15 @@ QVector<int> ILP::getMappedPosition(const QVector<ConditionPosition *>& position
 }
 
 
-bool ILP::evaluateSolution(const QVector<ConditionPosition *>& positions, QVector<int>& mappedPositions, SurfaceRadiosityEvaluation *&evaluation)
+ILP::EvaluateSolutionResult ILP::evaluateSolution(const QVector<ConditionPosition *>& positions)
 {
-	mappedPositions = getMappedPosition(positions);
-
-	evaluation = evaluations[mappedPositions];
+	double startTime = sutilCurrentTime();
+	auto mappedPositions = getMappedPosition(positions);
+	auto evaluation = evaluations[mappedPositions];
 	if(evaluation)
 	{
 		//qDebug() << "Returning saved evaluation for " << mappedPositionsStr.join(", ") << ": " << evaluation->infoShort() << "\n";
-		return true;
+		return EvaluateSolutionResult(true, mappedPositions, evaluation, sutilCurrentTime() - startTime);
 	}
 	else
 	{
@@ -266,7 +308,7 @@ bool ILP::evaluateSolution(const QVector<ConditionPosition *>& positions, QVecto
 		evaluations[mappedPositions] = candidate;
 
 		evaluation = candidate;
-		return false;
+		return EvaluateSolutionResult(false, mappedPositions, evaluation, sutilCurrentTime() - startTime);
 	}
 }
 
@@ -275,12 +317,18 @@ void ILP::setEvaluation(const QVector<int>& mappedPositions, SurfaceRadiosityEva
 	evaluations[mappedPositions] = evaluation;
 }
 
-SurfaceRadiosityEvaluation *ILP::reevalMaxQuality()
+ILP::EvaluateSolutionResult ILP::reevalMaxQuality()
 {
-	return optimizationFunction->evaluateFast(1.0f);
+	double startTime = sutilCurrentTime();
+	auto evaluation = optimizationFunction->evaluateFast(1.0f);
+	return EvaluateSolutionResult(evaluation, sutilCurrentTime() - startTime);
 }
 
-QVector<ConditionPosition *> ILP::findAllNeighbours(QVector<ConditionPosition *> &currentPositions, int optimizationsRetries,  float maxRadius)
+QVector<ConditionPosition *> ILP::findAllNeighbours(
+	QVector<ConditionPosition *> &currentPositions,
+	int optimizationsRetries, 
+	float maxRadius
+)
 {
 	QVector<ConditionPosition *> res;
 
@@ -296,10 +344,14 @@ QVector<ConditionPosition *> ILP::findAllNeighbours(QVector<ConditionPosition *>
 
 	for(int i = 0; i < conditions.size(); ++i){
 		auto neighbourRadius = corradius.at(i+1) - corradius.at(i);
-		auto neighbour = conditions.at(i)->findNeighbour(currentPositions.at(i), neighbourRadius, optimizationsRetries);
+		auto neighbour = conditions.at(i)->findNeighbour(
+			currentPositions.at(i),
+			neighbourRadius,
+			optimizationsRetries
+		);
 		if(neighbour == NULL){
-			for(auto it = res.begin(); it != res.end(); ++it){
-				delete *it;
+			for(auto r: res){
+				delete r;
 			}
 			res.clear();
 			return res; // empty array: no neighbours
@@ -322,4 +374,34 @@ QString ILP::getImageFileNameSolution(int solutionNum)
 	return  outputDir.filePath(
 		QString("evaluation-solution-%1.png").arg(solutionNum, 4, 10, QLatin1Char('0'))
 	);
+}
+
+ILP::EvaluateSolutionResult::EvaluateSolutionResult(
+	bool isCached,
+	QVector<int> mappedPositions,
+	SurfaceRadiosityEvaluation *eval,
+	float timeEvaluation
+):
+	isCached(isCached),
+	mappedPositions(mappedPositions),
+	evaluation(eval),
+	timeEvaluation(timeEvaluation)
+{
+}
+
+ILP::EvaluateSolutionResult::EvaluateSolutionResult(
+	SurfaceRadiosityEvaluation *eval,
+	float timeEvaluation
+):
+	isCached(false),
+	evaluation(eval),
+	timeEvaluation(timeEvaluation)
+{
+}
+
+ILP::EvaluateSolutionResult::EvaluateSolutionResult():
+	isCached(false),
+	evaluation(NULL),
+	timeEvaluation(0)
+{
 }
