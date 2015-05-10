@@ -103,6 +103,8 @@ static void logHitCount(Logger *logger, OptixRenderer *renderer)
 	}
 
 	logger->log("Hit ratio: %0.2f\n", (float)sumHits / pmOptixRenderer->totalPhotons());
+	logger->log("Emitted power: %0.2f\n", pmOptixRenderer->getEmittedPower());
+
 }
 
 void StandaloneRenderManager::renderNextIteration()
