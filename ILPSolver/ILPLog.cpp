@@ -51,8 +51,8 @@ void ILP::logIterationHeader()
 		out << h << ";";
 	}
 
-	out << "Comment" << ";" 
-		<< "Duration" << "\n";
+	out << "Duration" << ";" 
+		<< "Comment" << "\n";
 
 	file.close(); 
 }

@@ -31,6 +31,8 @@ rtDeclareVariable(uint2, launchIndex, rtLaunchIndex, );
 rtDeclareVariable(uint2, launchDim, rtLaunchDim, );
 rtDeclareVariable(Sphere, sceneBoundingSphere, , );
 rtBuffer<float> powerEmitted;
+rtBuffer<float, 1> lightRussianRulette;
+rtDeclareVariable(float, photonPowerScale, , );
 
 // From https://devtalk.nvidia.com/default/topic/458062/atomicadd-float-float-atomicmul-float-float-/
 __device__ inline void floatAtomicAdd(float* address, float value)
@@ -117,16 +119,22 @@ RT_PROGRAM void generator()
 	photonPrd.inHole = false;
 
     int lightIndex = 0;
+	int n_lights = lights.size();
     if(lights.size() > 1)
     {
         float sample = getRandomUniformFloat(&photonPrd.randomState);
-        lightIndex = intmin((int)(sample*lights.size()), lights.size()-1);
+		for(; lightIndex < n_lights; ++lightIndex)
+		{
+			if(sample <= lightRussianRulette[lightIndex])
+			{
+				break;
+			}
+		}
     }
 
     Light light = lights[lightIndex];
-    float powerScale = lights.size();
 
-    photonPrd.power = light.power*powerScale;
+    photonPrd.power = light.power * photonPowerScale;
 
 	floatAtomicAdd(&powerEmitted[0], photonPrd.power.x + photonPrd.power.y + photonPrd.power.y);
 

@@ -90,6 +90,8 @@ void PMOptixRenderer::initialize(const ComputeDevice & device, Logger *logger)
     m_context["emittedPhotonsPerIterationFloat"]->setFloat(0.f);
     m_context["photonLaunchWidth"]->setUint(0);
 	m_context["storefirstHitPhotons"]->setUint(0);
+	m_context["photonPowerScale"]->setFloat(0.f);
+	
 
     // An empty scene root node
     optix::Group group = m_context->createGroup();
@@ -160,10 +162,17 @@ void PMOptixRenderer::initialize(const ComputeDevice & device, Logger *logger)
 	m_hitCountBuffer->setSize(10);
     m_context["hitCount"]->set( m_hitCountBuffer );
 
+	m_lightRussianRuletteBuffer = m_context->createBuffer(RT_BUFFER_INPUT);
+	m_lightRussianRuletteBuffer->setFormat(RT_FORMAT_FLOAT);
+	m_lightRussianRuletteBuffer->setSize(10);
+    m_context["lightRussianRulette"]->set( m_lightRussianRuletteBuffer );
+
 	m_rawRadianceBuffer = m_context->createBuffer(RT_BUFFER_INPUT_OUTPUT);
 	m_rawRadianceBuffer->setFormat(RT_FORMAT_FLOAT);
 	m_rawRadianceBuffer->setSize(10);
     m_context["rawRadiance"]->set( m_rawRadianceBuffer );
+
+	
 
 
     //
@@ -300,19 +309,23 @@ void PMOptixRenderer::initScene( Scene & scene )
 		auto objectIdToName = scene.getObjectIdToNameMap();
 		m_sceneObjects = objectIdToName.size();
 		m_objectIdToName.resize(m_sceneObjects, "");
-		for(unsigned int i = 0; i < m_sceneObjects; ++i)
+		for(int i = 0; i < m_sceneObjects; ++i)
 		{
-			m_objectIdToName.at(i) = objectIdToName.at(i).toLocal8Bit().constData();
+			m_objectIdToName.at(i) = qPrintable(objectIdToName.at(i));
 		}
 		m_hitCountBuffer->setSize(m_sceneObjects);
 		m_rawRadianceBuffer->setSize(m_sceneObjects);
 
 		// Add the lights from the scene to the light buffer
         m_lightBuffer->setSize(lights.size());
-        Light* lights_host = (Light*)m_lightBuffer->map();
-        memcpy(lights_host, scene.getSceneLights().constData(), sizeof(Light)*lights.size());
-        m_lightBuffer->unmap();
+		{
+			Light* lights_host = (Light*)m_lightBuffer->map();
+			memcpy(lights_host, scene.getSceneLights().constData(), sizeof(Light)*lights.size());
+			m_lightBuffer->unmap();
+		}
 
+		
+		// store light name mapping
 		m_lights->clear();
 		for(int lightIdx = 0; lightIdx < lights.size(); ++lightIdx)
 		{
@@ -323,6 +336,31 @@ void PMOptixRenderer::initScene( Scene & scene )
 			}
 			
 			(*m_lights)[lightName].append(lightIdx);
+		}
+
+		// store light total power
+		m_totalLightPower = 0.f;
+		for(auto light: lights)
+		{
+			m_totalLightPower += light.power.x + light.power.y + light.power.z;
+		}
+
+		// set russian roulette power
+		m_lightRussianRuletteBuffer->setSize(lights.size());
+		{
+			float *lights_host = (float *)m_lightRussianRuletteBuffer->map();
+
+			float power = 0;
+			for(int lightIdx = 0; lightIdx < lights.size(); ++lightIdx)
+			{
+				float lightPower = lights[lightIdx].power.x 
+					+ lights[lightIdx].power.y 
+					+lights[lightIdx].power.z;
+				
+				lights_host[lightIdx] = (power + lightPower) / m_totalLightPower;
+				power += lightPower;
+			}
+			m_lightRussianRuletteBuffer->unmap();
 		}
 
         compile();
@@ -505,6 +543,8 @@ void PMOptixRenderer::resizeBuffers(unsigned int width, unsigned int height, uns
 	m_photons->setSize(getNumPhotons());
 	m_context["photonsSize"]->setUint(getNumPhotons());
 	m_photonsHashCells->setSize( getNumPhotons() );
+	m_context["photonPowerScale"]->setFloat(1.0f / (photonWidth * photonWidth * m_totalLightPower) );
+
 
     m_outputBuffer->setSize( width, height );
     m_raytracePassOutputBuffer->setSize( width, height );

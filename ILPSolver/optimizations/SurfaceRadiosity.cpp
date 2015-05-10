@@ -40,8 +40,8 @@ SurfaceRadiosityEvaluation *SurfaceRadiosity::genEvaluation(int nPhotons)
 	// p is the probability estimate n / (total hits on surfaces)
 	float p = (float) n / m_renderer->totalPhotons();
 	// r is the surface radiosity estimate
-	float r = m_renderer->getRadiance().at(objectId) / (surfaceArea * nPhotons);
-	float R = m_renderer->getEmittedPower() / (surfaceArea * nPhotons);
+	float r = m_renderer->getRadiance().at(objectId) / (surfaceArea);
+	float R = m_renderer->getEmittedPower() / (surfaceArea);
 
 	// radius is the confidence radius given by equations 
 	float radius = z * R * sqrtf( p*(1-p) /   m_renderer->totalPhotons()  );

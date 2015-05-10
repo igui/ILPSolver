@@ -92,6 +92,7 @@ private:
 	optix::Buffer m_hitCountBuffer;
 	optix::Buffer m_rawRadianceBuffer;
 	optix::Buffer m_powerEmittedBuffer;
+	optix::Buffer m_lightRussianRuletteBuffer;
 	optix::uint3 m_gridSize;
     float m_spatialHashMapCellSize;
     AAB m_sceneAABB;
@@ -101,6 +102,7 @@ private:
     unsigned int m_height;
 	unsigned int m_photonWidth;
 	unsigned int m_sceneObjects;
+	float m_totalLightPower;
     bool m_initialized;
     int m_optixDeviceOrdinal;
 	std::vector<std::string> m_objectIdToName;
