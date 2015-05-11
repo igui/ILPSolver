@@ -72,7 +72,7 @@ SurfaceRadiosityEvaluation *SurfaceRadiosity::evaluateFast(float quality)
 	int photonWidth = std::max(
 				std::min(
 					// is good that the photon width is a multiple of 16
-					(unsigned int)(maxPhotonWidth * quality) & ~0xF, 
+					(unsigned int)(maxPhotonWidth * sqrtf(quality)) & ~0xF, 
 					maxPhotonWidth
 				),
 				minPhotonWidth
