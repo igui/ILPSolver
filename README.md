@@ -22,10 +22,9 @@ If this is your first time hearing about *Opposite Renderer*, we recommend you s
 ### Dependencies
 
 - [Visual Studio 2012](http://www.visualstudio.com/)
-- [CUDA](https://developer.nvidia.com/cuda-downloads) v5.5 
-- [OptiX SDK](https://developer.nvidia.com/optix-download) v3.5
+- [CUDA](https://developer.nvidia.com/cuda-downloads) v7.0 
+- [OptiX SDK](https://developer.nvidia.com/optix-download) v3.8
    - **Note:** You must register to [Nvidia Developer Zone](https://developer.nvidia.com/user/register) First
-   - Take note that OptiX 3.0.1 [is not compatible](http://developer.download.nvidia.com/assets/tools/files/optix/3.0.1/NVIDIA-OptiX-SDK-3.0.1-OptiX_Release_Notes.pdf) with CUDA 5.5 
 - [Qt SDK](http://qt-project.org/downloads) 5.x for Windows (VS 201X)
 - [FreeGlut](http://www.transmissionzero.co.uk/software/freeglut-devel/) MSVC Package
 - [GLEW](http://sourceforge.net/projects/glew/files/) - OpenGL Extension Wrangler Library  
