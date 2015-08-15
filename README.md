@@ -23,8 +23,8 @@ If this is your first time hearing about *Opposite Renderer*, we recommend you s
 
 - [Visual Studio 2012](http://www.visualstudio.com/)
 - [CUDA](https://developer.nvidia.com/cuda-downloads) v7.0 
-- [OptiX SDK](https://developer.nvidia.com/optix-download) v3.8
-   - **Note:** You must register to [Nvidia Developer Zone](https://developer.nvidia.com/user/register) First
+- [OptiX SDK](https://developer.nvidia.com/download) v3.8
+   - **Note:** You must register first by completing a form. Then download information is emailed to you. It takes a couple of days, though.
 - [Qt SDK](http://qt-project.org/downloads) 5.x for Windows (VS 201X)
 - [FreeGlut](http://www.transmissionzero.co.uk/software/freeglut-devel/) MSVC Package
 - [GLEW](http://sourceforge.net/projects/glew/files/) - OpenGL Extension Wrangler Library  
