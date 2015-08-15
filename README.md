@@ -21,18 +21,25 @@ If this is your first time hearing about *Opposite Renderer*, we recommend you s
 
 ### Dependencies
 
-- [Visual Studio 2012](http://www.visualstudio.com/)
+- [Visual Studio 2013](http://www.visualstudio.com/)
 - [CUDA](https://developer.nvidia.com/cuda-downloads) v7.0 
-- [OptiX SDK](https://developer.nvidia.com/download) v3.8
-   - **Note:** You must register first by completing a form. Then download information is emailed to you. It takes a couple of days, though.
-- [Qt SDK](http://qt-project.org/downloads) 5.x for Windows (VS 201X)
+- [OptiX](https://developer.nvidia.com/download) v3.8
+   - **Note:** You must register first by completing a form. Then download information is emailed to you. 
+- [Qt Open Source](http://www.qt.io/download-open-source/) 5.5 for Windows 
+  - Specifically the version `msvc2013_64` for 5.5
 - [FreeGlut](http://www.transmissionzero.co.uk/software/freeglut-devel/) MSVC Package
 - [GLEW](http://sourceforge.net/projects/glew/files/) - OpenGL Extension Wrangler Library  
 - [Open Asset Import Library](http://sourceforge.net/projects/assimp/files/)
-- A [CUDA compatible GPU](https://developer.nvidia.com/cuda-gpus) 2.0 or greater. Almost all recent GeForce GPUs support CUDA.
-- Windows 7 or newer, running on x64.
+- A [CUDA compatible GPU](https://developer.nvidia.com/cuda-gpus) 2.0 or greater. 
+  - Almost all recent GeForce GPUs support CUDA.
+  - This is a run only dependency, as the project can be built if the system doesn't
+    have a CUDA compatible card.
+- Windows 8.1 or newer, running on 64 bits.
 
+Notes:
 
+- This project may work with with Qt 5.2, CUDA 5.5, Visual Studio 2012 and OptiX 3.5.
+But require slight dependency changes. 
 
 ### Building
 
@@ -48,7 +55,7 @@ The project needs some [environment variables](http://environmentvariables.org/M
 	
 	For example
 	
-	    QTDIR=C:\Qt\Qt5.2.1\5.2.1\msvc2012_64_opengl
+	    QTDIR=C:\Qt\5.5\msvc2013_64
 	    GLEW_PATH=C:\Program Files\Common Files\glew
 	    ASSIMP_PATH=C:\Program Files\Assimp
 	    FREEGLUT_PATH=C:\Program Files\Common Files\freeglut
@@ -56,7 +63,9 @@ The project needs some [environment variables](http://environmentvariables.org/M
 
 * Open the Visual Studio Solution `OppositeRenderer.sln` and build.
 
-### Running the Renderer on a example scene
+### Running 
+
+## Running a Renderer on a example scene
 
 This can be done inside Visual Studio. There are tested `*.dae` scenes on the `OppositeRenderer\ILPSolver\examples` folder
 
@@ -65,3 +74,21 @@ This can be done inside Visual Studio. There are tested `*.dae` scenes on the `O
 3. Wait for the GUI program to open, and go to File, Open
 4. Select any of the example files
 5. Enjoy!
+
+## Running the ILPSolver on a example scene
+
+If you really want, you can try to solve a sample ILP, using the `ILPSolver` library.
+
+1. Select `ILPSolver` as the primary project. 
+2. Hit on Debug. Compilation can take several minutes.
+3. Wait for the command line program to finish. It may take a minute or two
+   depending on the CUDA core count of the running GPU
+4. Go to the folder `OppositeRenderer\ILPSolver\examples\output` and there
+   you will see the output of the run
+   - `solutions.csv` with the optimal configurations
+   - A collection of images for the optimal results
+
+### Known issues
+
+- Changing the rRendering Method (Photon Mapping, Progressive Photon Mapping, etc.) makes the program to crash due to OptiX Context reallocation errors.
+- Sometimes the program crash while exiting due to OptiX Context destruction errors.
