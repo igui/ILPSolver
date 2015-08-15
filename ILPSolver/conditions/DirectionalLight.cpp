@@ -55,7 +55,6 @@ ConditionPosition *DirectionalLight::findNeighbour(ConditionPosition *from, floa
 	auto sphericalDirection = toSphericalCoord(directionalLightPosition->direction());
 
 	auto sample = qrand() / (float) RAND_MAX;
-	// Test using M_PI instead of 2.0f * M_PI
 	auto rotation = 2.0f * M_PI * radius * (optix::make_float2(sample, 1.0f - sample) - 0.5f);
 	
 	return new DirectionalLightPosition(
