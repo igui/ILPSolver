@@ -424,7 +424,7 @@ void PMOptixRenderer::render(unsigned int photonLaunchWidth, unsigned int height
         double traceStartTime = sutilCurrentTime();
         m_context["camera"]->setUserData( sizeof(Camera), &camera );
 
-		int numSteps = generateOutput ? 6 : 2;
+		//int numSteps = generateOutput ? 6 : 2;
 
 		auto powerEmittedPtr = (float *) m_powerEmittedBuffer->map();
 		*powerEmittedPtr = 0;
@@ -440,7 +440,7 @@ void PMOptixRenderer::render(unsigned int photonLaunchWidth, unsigned int height
                 static_cast<unsigned int>(m_photonWidth),
                 static_cast<unsigned int>(m_photonWidth) );
 			double time = sutilCurrentTime() - start;
-			m_logger->log("1/%d PHOTON_PASS time: %1.3fs\n", numSteps, time);
+			//m_logger->log("1/%d PHOTON_PASS time: %1.3fs\n", numSteps, time);
         }
 
 		if (generateOutput)
@@ -465,7 +465,7 @@ void PMOptixRenderer::render(unsigned int photonLaunchWidth, unsigned int height
             nvtx::ScopedRange r( "Counting hit count" );
 			countHitCountPerObject();
 			double time = sutilCurrentTime() - start;
-			m_logger->log("2/%d Creating photon map time: %1.3fs\n", numSteps, time);
+			//m_logger->log("2/%d Getting photons statistical data: %1.3fs\n", numSteps, time);
         }
 
 
