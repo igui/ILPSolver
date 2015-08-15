@@ -52,12 +52,16 @@ The project needs some [environment variables](http://environmentvariables.org/M
 	    GLEW_PATH=C:\Program Files\Common Files\glew
 	    ASSIMP_PATH=C:\Program Files\Assimp
 	    FREEGLUT_PATH=C:\Program Files\Common Files\freeglut
-	    OPTIX_PATH=C:\ProgramData\NVIDIA Corporation\OptiX SDK 3.5.1
+	    OPTIX_PATH=C:\ProgramData\NVIDIA Corporation\OptiX SDK 3.8.0
 
 * Open the Visual Studio Solution `OppositeRenderer.sln` and build.
 
-### Running
+### Running the Renderer on a example scene
 
-1. Go to the folder `%USER_ROOT%\VisualStudioBuilds\OppositeRenderer\Debug`
-2. Open `Standalone.exe`
-3. Enjoy!
+This can be done inside Visual Studio. There are tested `*.dae` scenes on the `OppositeRenderer\ILPSolver\examples` folder
+
+1. Select `Standalone` as the primary project. This is the renderer.
+2. Hit on Debug. Compilation can take several minutes.
+3. Wait for the GUI program to open, and go to File, Open
+4. Select any of the example files
+5. Enjoy!
