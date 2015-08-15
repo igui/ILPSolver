@@ -175,6 +175,9 @@
     <CudaCompile Include="material\Glass.cu" />
     <CudaCompile Include="material\Mirror.cu" />
     <CudaCompile Include="material\Texture.cu" />
+    <CudaCompile Include="renderer\PMOptixRenderer_PhotonBuffer.cu">
+      <NvccCompilation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">compile</NvccCompilation>
+    </CudaCompile>
     <CudaCompile Include="renderer\pm\PMDirectRadianceEstimation.cu" />
     <CudaCompile Include="renderer\pm\PMIndirectRadianceEstimation.cu" />
     <CudaCompile Include="renderer\pm\PMOutput.cu" />

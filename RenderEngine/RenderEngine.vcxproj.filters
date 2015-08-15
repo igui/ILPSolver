@@ -375,5 +375,8 @@
     <CudaCompile Include="material\Glass.cu">
       <Filter>material</Filter>
     </CudaCompile>
+    <CudaCompile Include="renderer\PMOptixRenderer_PhotonBuffer.cu">
+      <Filter>renderer</Filter>
+    </CudaCompile>
   </ItemGroup>
 </Project>
