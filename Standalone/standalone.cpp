@@ -31,9 +31,6 @@ int main( int argc, char** argv )
     qApplication.setOrganizationName("Opposite Renderer");
     qApplication.setApplicationName("Opposite Renderer");
 
-    QTextStream out(stdout);
-    QTextStream in(stdin);
-
     try
     {
         ComputeDeviceRepository repository;

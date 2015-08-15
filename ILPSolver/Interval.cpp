@@ -1,6 +1,7 @@
 #include "Interval.h"
 #include <cmath>
 #include <stdexcept>
+#include <algorithm>
 
 Interval::Interval(float center, float radius):
 	m_center(center),
