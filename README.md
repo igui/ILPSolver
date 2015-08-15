@@ -41,7 +41,7 @@ Notes:
 - This project may work with with Qt 5.2, CUDA 5.5, Visual Studio 2012 and OptiX 3.5.
 But require slight dependency changes. 
 
-### Building
+## Building
 
 The project needs some [environment variables](http://environmentvariables.org/Main_Page#Environment_variables) to be set so it can build. If you don't define them you will get missing files errors while compiling.
  
@@ -63,9 +63,9 @@ The project needs some [environment variables](http://environmentvariables.org/M
 
 * Open the Visual Studio Solution `OppositeRenderer.sln` and build.
 
-### Running 
+## Running 
 
-## Running a Renderer on a example scene
+### Running OppositeRenderer on a example scene
 
 This can be done inside Visual Studio. There are tested `*.dae` scenes on the `OppositeRenderer\ILPSolver\examples` folder
 
@@ -75,7 +75,7 @@ This can be done inside Visual Studio. There are tested `*.dae` scenes on the `O
 4. Select any of the example files
 5. Enjoy!
 
-## Running the ILPSolver on a example scene
+### Running the ILPSolver on a example scene
 
 If you really want, you can try to solve a sample ILP, using the `ILPSolver` library.
 
@@ -88,7 +88,7 @@ If you really want, you can try to solve a sample ILP, using the `ILPSolver` lib
    - `solutions.csv` with the optimal configurations
    - A collection of images for the optimal results
 
-### Known issues
+## Known issues
 
-- Changing the rRendering Method (Photon Mapping, Progressive Photon Mapping, etc.) makes the program to crash due to OptiX Context reallocation errors.
+- Changing the Rendering Method (Photon Mapping, Progressive Photon Mapping, etc.) makes the program to crash due to OptiX Context reallocation errors.
 - Sometimes the program crash while exiting due to OptiX Context destruction errors.
