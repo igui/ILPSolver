@@ -98,7 +98,6 @@
     <ClCompile Include="gui\main.cpp" />
     <ClCompile Include="gui\MainWindowBase.cpp" />
     <ClCompile Include="gui\RenderWidget.cpp" />
-    <ClCompile Include="main.cpp" />
     <ClCompile Include="models\OutputSettingsModel.cpp" />
     <ClCompile Include="models\PPMSettingsModel.cpp" />
     <ClCompile Include="models\RenderStatisticsModel.cpp" />
