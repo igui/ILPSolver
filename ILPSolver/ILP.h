@@ -80,7 +80,7 @@ private:
 	bool findFirstImprovement(float maxRadius, float suffleRadius, int retries);
 	bool recalcISOC(
 		const QVector<ConditionPosition *>& positions,
-		const EvaluateSolutionResult &evaluation
+		EvaluateSolutionResult evaluation
 		);
 	QVector<int> getMappedPosition(const QVector<ConditionPosition *>& positions);
 	void setEvaluation(

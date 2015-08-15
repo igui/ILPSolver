@@ -108,7 +108,7 @@ Configuration ILP::processInitialConfiguration()
 	isoc.append(initialConfig);
 	siIsoc = initialEval.evaluation->interval();
 
-	logger->log("Initial solution: %s\n", qPrintable(initialEval.evaluation->infoShort()));
+	logger->log("Initial  solution: %s\n", qPrintable(initialEval.evaluation->infoShort()));
 	logIterationResults(
 		initialConfig.positions(),
 		initialEval.evaluation,
@@ -121,27 +121,17 @@ Configuration ILP::processInitialConfiguration()
 
 bool ILP::recalcISOC(
 	const QVector<ConditionPosition *> &positions,
-	const ILP::EvaluateSolutionResult &evaluationResult)
+	ILP::EvaluateSolutionResult eval)
 {
-	if(evaluationResult.isCached) {
-		logIterationResults(
-			positions,
-			evaluationResult.evaluation,
-			"CACHED",
-			evaluationResult.timeEvaluation
-		);
+	if(eval.isCached) {
+		logIterationResults(positions, eval.evaluation, "CACHED", eval.timeEvaluation);
 		++currentIteration;
 		return false;
 	}
 
-	if(evaluationResult.evaluation->interval() < siIsoc) {
+	if(eval.evaluation->interval() < siIsoc) {
 		++currentIteration;
-		logIterationResults(
-			positions,
-			evaluationResult.evaluation,
-			"BAD",
-			evaluationResult.timeEvaluation
-		);
+		logIterationResults(positions, eval.evaluation, "BAD", eval.timeEvaluation);
 
 		// removes positions from memory
 		for(auto p: positions){
@@ -151,29 +141,17 @@ bool ILP::recalcISOC(
 	} 
 
 	// evaluation is may belong to isoc it's reevaluated with max quality
-	EvaluateSolutionResult reevaluatedSolution;
-	if(!evaluationResult.evaluation->isMaxQuality()) {
-		delete evaluationResult.evaluation;
-		reevaluatedSolution = reevalMaxQuality();
-		setEvaluation(
-			evaluationResult.mappedPositions,
-			reevaluatedSolution.evaluation
-			);
+	
+	if(!eval.evaluation->isMaxQuality()) {
+		delete eval.evaluation;
+		auto reevaluatedSolution = reevalMaxQuality();
+		setEvaluation(eval.mappedPositions, reevaluatedSolution.evaluation);
 
-		reevaluatedSolution.mappedPositions = evaluationResult.mappedPositions;
-	}
-	else
-	{
-		reevaluatedSolution = evaluationResult;
+		eval = reevaluatedSolution;
 	}
 
-	if(reevaluatedSolution.evaluation->interval() < siIsoc) {
-		logIterationResults(
-			positions,
-			reevaluatedSolution.evaluation,
-			"BAD-AFTER-REEVAL",
-			reevaluatedSolution.timeEvaluation
-		);
+	if(eval.evaluation->interval() < siIsoc) {
+		logIterationResults(positions, eval.evaluation, "BAD-AFTER-REEVAL", eval.timeEvaluation);
 		// removes evaluation from memory
 		for(auto p: positions){
 			delete p;
@@ -181,34 +159,35 @@ bool ILP::recalcISOC(
 		return false;
 	} 
 	
-	if(reevaluatedSolution.evaluation->interval() > siIsoc) {
-		isoc.clear();
-		isoc.append(Configuration(reevaluatedSolution.evaluation, positions));
-		logger->log("Better solution: %s\n", qPrintable(reevaluatedSolution.evaluation->infoShort()));
-		siIsoc = reevaluatedSolution.evaluation->interval();
-		logIterationResults(
-			positions,
-			reevaluatedSolution.evaluation,
-			"BETTER",
-			reevaluatedSolution.timeEvaluation);
-		return true;
-	}
-	else {
-		logger->log("Probable solution: %s\n", qPrintable(reevaluatedSolution.evaluation->infoShort()));
-		logIterationResults(positions, reevaluatedSolution.evaluation, "PROBABLE", reevaluatedSolution.timeEvaluation);
+	if(eval.evaluation->interval() > siIsoc) {
+		logger->log("Better   solution: %s\n", qPrintable(eval.evaluation->infoShort()));
+		logIterationResults(positions, eval.evaluation, "BETTER", eval.timeEvaluation);
 
-
-		// recalculate ISOC and SIISOC
-		QtConcurrent::blockingFilter(isoc, [reevaluatedSolution](Configuration config){
-			return config.evaluation()->interval() < reevaluatedSolution.evaluation->interval();
+		QtConcurrent::blockingFilter(isoc, [eval](Configuration config){
+			return config.evaluation()->interval().intersects(eval.evaluation->interval());
 		});
 
-		auto newSiIsoc = reevaluatedSolution.evaluation->interval();
+		auto newSiIsoc = eval.evaluation->interval();
 		for(auto configuration: isoc){
 			newSiIsoc = newSiIsoc.intersection(configuration.evaluation()->interval());
 		}
 		siIsoc = newSiIsoc;
-		isoc.append(Configuration(reevaluatedSolution.evaluation, positions));
+
+		isoc.append(Configuration(eval.evaluation, positions));
+
+		return true;
+	}
+	else {
+		logger->log("Probable solution: %s\n", qPrintable(eval.evaluation->infoShort()));
+		logIterationResults(positions, eval.evaluation, "PROBABLE", eval.timeEvaluation);
+
+		// recalculate ISOC and SIISOC
+		auto newSiIsoc = eval.evaluation->interval();
+		for(auto configuration: isoc){
+			newSiIsoc = newSiIsoc.intersection(configuration.evaluation()->interval());
+		}
+		siIsoc = newSiIsoc;
+		isoc.append(Configuration(eval.evaluation, positions));
 	}
 	return false;
 }
@@ -226,7 +205,9 @@ bool ILP::findFirstImprovement(float maxRadius, float shuffleRadius, int retries
 		int shuffled;
 		for(shuffled = 0; shuffled < positions.size(); ++shuffled){
 			auto currentShuffleRadius = shuffleRadius * qrand() / RAND_MAX;
-			auto neighbour = conditions.at(shuffled)->findNeighbour(positions.at(shuffled), currentShuffleRadius, retries);
+			auto neighbour = conditions.at(shuffled)->findNeighbour(
+				positions.at(shuffled), currentShuffleRadius, neighbourhoodRetries
+			);
 			if(!neighbour){
 				break; // can't shuffle
 			}
@@ -242,8 +223,8 @@ bool ILP::findFirstImprovement(float maxRadius, float shuffleRadius, int retries
 			continue; // no neighbours
 		}
 
-		auto evaluationResult = evaluateSolution(neighbourPosition);
-		bool isImprovement = recalcISOC(neighbourPosition, evaluationResult);
+		auto eval = evaluateSolution(neighbourPosition);
+		bool isImprovement = recalcISOC(neighbourPosition, eval);
 		if(isImprovement)
 		{
 			return true;
