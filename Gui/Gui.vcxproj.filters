@@ -47,9 +47,6 @@
     <ClCompile Include="gui\RenderWidget.cpp">
       <Filter>gui</Filter>
     </ClCompile>
-    <ClCompile Include="gui\main.cpp">
-      <Filter>gui</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gui_export_api.h" />

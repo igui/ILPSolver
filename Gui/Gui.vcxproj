@@ -95,7 +95,6 @@
     <ClCompile Include="gui\docks\PPMDock.cpp" />
     <ClCompile Include="gui\docks\RenderInformationDock.cpp" />
     <ClCompile Include="gui\docks\SceneDock.cpp" />
-    <ClCompile Include="gui\main.cpp" />
     <ClCompile Include="gui\MainWindowBase.cpp" />
     <ClCompile Include="gui\RenderWidget.cpp" />
     <ClCompile Include="models\OutputSettingsModel.cpp" />
