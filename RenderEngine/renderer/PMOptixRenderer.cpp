@@ -392,7 +392,7 @@ void PMOptixRenderer::renderNextIteration(unsigned long long iterationNumber, un
 	render(512, details.getHeight(), details.getWidth(), details.getCamera(), true, false);
 }
 
-void PMOptixRenderer::genPhotonMap(unsigned int photonLaunchWidth)
+void PMOptixRenderer::buildPhotonBuffer(unsigned int photonLaunchWidth)
 {
 	render(photonLaunchWidth, 10, 10, Camera(), false, true);
 }

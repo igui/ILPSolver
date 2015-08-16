@@ -78,7 +78,7 @@ SurfaceRadiosityEvaluation *SurfaceRadiosity::evaluateFast(float quality)
 				minPhotonWidth
 			);
 
-	m_renderer->genPhotonMap(photonWidth);
+	m_renderer->buildPhotonBuffer(photonWidth);
 	return genEvaluation(photonWidth * photonWidth);
 }
 

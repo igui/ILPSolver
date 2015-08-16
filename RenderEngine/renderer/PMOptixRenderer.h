@@ -40,7 +40,7 @@ public:
     RENDER_ENGINE_EXPORT_API void renderNextIteration(unsigned long long iterationNumber, unsigned long long localIterationNumber, 
         float PPMRadius, const RenderServerRenderRequestDetails & details);
 	RENDER_ENGINE_EXPORT_API void render(unsigned int photonLaunchWidth, unsigned int height, unsigned int width, const Camera camera, bool generateOutput, bool storefirstHitPhotons);
-	RENDER_ENGINE_EXPORT_API void genPhotonMap(unsigned int photonLaunchWidth);
+	RENDER_ENGINE_EXPORT_API void buildPhotonBuffer(unsigned int photonLaunchWidth);
     RENDER_ENGINE_EXPORT_API void getOutputBuffer(void* data);
 	RENDER_ENGINE_EXPORT_API std::vector<unsigned int> getHitCount();
     RENDER_ENGINE_EXPORT_API unsigned int getWidth() const;
