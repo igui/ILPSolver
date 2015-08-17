@@ -84,12 +84,15 @@ void PMOptixRenderer::initialize(const ComputeDevice & device, Logger *logger)
     m_context->setStackSize(4096);
 	m_context->setPrintEnabled(true);
 
+	m_photonWidth = getMaxPhotonWidth();
+
     m_context["maxPhotonDepositsPerEmitted"]->setUint(MAX_PHOTON_COUNT);
     m_context["ppmRadius"]->setFloat(0.f);
     m_context["ppmRadiusSquared"]->setFloat(0.f);
     m_context["emittedPhotonsPerIterationFloat"]->setFloat(0.f);
     m_context["photonLaunchWidth"]->setUint(0);
 	m_context["storefirstHitPhotons"]->setUint(0);
+	m_context["photonBufferOffset"]->setUint(0);
 	m_context["photonPowerScale"]->setFloat(0.f);
 	
 
@@ -137,7 +140,7 @@ void PMOptixRenderer::initialize(const ComputeDevice & device, Logger *logger)
     m_photons = m_context->createBuffer(RT_BUFFER_OUTPUT);
     m_photons->setFormat( RT_FORMAT_USER );
     m_photons->setElementSize( sizeof( Photon ) );
-	m_photons->setSize(getNumPhotons());
+	m_photons->setSize(getMaxTotalPhotons());
     m_context["photons"]->set( m_photons );
 	m_context["photonsSize"]->setUint(getNumPhotons());
 
@@ -309,7 +312,7 @@ void PMOptixRenderer::initScene( Scene & scene )
 		auto objectIdToName = scene.getObjectIdToNameMap();
 		m_sceneObjects = objectIdToName.size();
 		m_objectIdToName.resize(m_sceneObjects, "");
-		for(int i = 0; i < m_sceneObjects; ++i)
+		for(unsigned int i = 0; i < m_sceneObjects; ++i)
 		{
 			m_objectIdToName.at(i) = qPrintable(objectIdToName.at(i));
 		}
@@ -389,15 +392,16 @@ void PMOptixRenderer::compile()
 void PMOptixRenderer::renderNextIteration(unsigned long long iterationNumber, unsigned long long localIterationNumber, float PPMRadius, 
                                         const RenderServerRenderRequestDetails & details)
 {
-	render(512, details.getHeight(), details.getWidth(), details.getCamera(), true, false);
+	render(getMaxPhotonWidth(), details.getHeight(), details.getWidth(), details.getCamera(), true, false, false);
 }
 
-void PMOptixRenderer::buildPhotonBuffer(unsigned int photonLaunchWidth)
+void PMOptixRenderer::buildPhotonBuffer(unsigned int photonLaunchWidth, bool reusePreviousBuffer)
 {
-	render(photonLaunchWidth, 10, 10, Camera(), false, true);
+	render(photonLaunchWidth, 10, 10, Camera(), false, true, reusePreviousBuffer);
 }
 
-void PMOptixRenderer::render(unsigned int photonLaunchWidth, unsigned int height, unsigned int width, const Camera camera, bool generateOutput, bool storefirstHitPhotons)
+void PMOptixRenderer::render(unsigned int photonLaunchWidth, unsigned int height, unsigned int width,
+	const Camera camera, bool generateOutput, bool storefirstHitPhotons, bool reusePreviousBuffer)
 {
 	//storefirstHitPhotons = true;
 
@@ -407,6 +411,11 @@ void PMOptixRenderer::render(unsigned int photonLaunchWidth, unsigned int height
         throw std::exception("Traced before PMOptixRenderer was initialized.");
     }
 
+	if (reusePreviousBuffer && generateOutput)
+	{
+		throw std::exception("reusePreviousBuffer must be used only when generating photon buffers");
+	}
+
 	nvtx::ScopedRange r("PMOptixRenderer::Trace");
 
 	//m_logger->log("Used host memory: %1.1fMib\n", m_context->getUsedHostMemory() / (1024.0f * 1024.0f) );
@@ -414,6 +423,31 @@ void PMOptixRenderer::render(unsigned int photonLaunchWidth, unsigned int height
     try
     {
 		m_context["storefirstHitPhotons"]->setUint(storefirstHitPhotons);
+
+		unsigned int actualPhotonLaunchWidth = photonLaunchWidth;
+
+		if (reusePreviousBuffer)
+		{
+			unsigned int nDiff = photonLaunchWidth * photonLaunchWidth - m_photonWidth * m_photonWidth;
+			unsigned int sqrtNDiff = ceilf(sqrtf(nDiff));
+			
+			actualPhotonLaunchWidth = (sqrtNDiff + 0x10) & ~0xF;
+
+			assert(actualPhotonLaunchWidth * actualPhotonLaunchWidth >= nDiff);
+			assert(actualPhotonLaunchWidth * actualPhotonLaunchWidth % 0x10 == 0);
+		}
+
+		// Set the offset
+		unsigned int photonBufferOffset = 0;
+		if (reusePreviousBuffer)
+		{
+			photonBufferOffset = (photonLaunchWidth * photonLaunchWidth - actualPhotonLaunchWidth * actualPhotonLaunchWidth) * MAX_PHOTON_COUNT;
+		}
+		m_context["photonBufferOffset"]->setUint(photonBufferOffset);
+
+		m_context["photonLaunchWidth"]->setUint(actualPhotonLaunchWidth);
+
+		assert(photonBufferOffset + MAX_PHOTON_COUNT * (actualPhotonLaunchWidth * actualPhotonLaunchWidth) == MAX_PHOTON_COUNT * photonLaunchWidth * photonLaunchWidth);
 
         // If the width and height of the current render request has changed, we must resize buffers
 		if(width != m_width || height != m_height || photonLaunchWidth != m_photonWidth)
@@ -424,7 +458,7 @@ void PMOptixRenderer::render(unsigned int photonLaunchWidth, unsigned int height
         double traceStartTime = sutilCurrentTime();
         m_context["camera"]->setUserData( sizeof(Camera), &camera );
 
-		//int numSteps = generateOutput ? 6 : 2;
+		//int numSteps = generateOutput ? 7 : 2;
 
 		auto powerEmittedPtr = (float *) m_powerEmittedBuffer->map();
 		*powerEmittedPtr = 0;
@@ -436,12 +470,19 @@ void PMOptixRenderer::render(unsigned int photonLaunchWidth, unsigned int height
         {
 			double start = sutilCurrentTime();
             nvtx::ScopedRange r( "OptixEntryPoint::PHOTON_PASS" );
-            m_context->launch( OptixEntryPoint::PPM_PHOTON_PASS,
-                static_cast<unsigned int>(m_photonWidth),
-                static_cast<unsigned int>(m_photonWidth) );
+			m_context->launch(OptixEntryPoint::PPM_PHOTON_PASS, actualPhotonLaunchWidth, actualPhotonLaunchWidth);
 			double time = sutilCurrentTime() - start;
 			//m_logger->log("1/%d PHOTON_PASS time: %1.3fs\n", numSteps, time);
         }
+
+		//
+		// Get hit count
+		//
+		double start = sutilCurrentTime();
+		nvtx::ScopedRange r("Counting hit count");
+		countHitCountPerObject();
+		double time = sutilCurrentTime() - start;
+		//m_logger->log("2/%d Getting photons statistical data: %1.3fs\n", numSteps, time);
 
 		if (generateOutput)
 		{
@@ -452,21 +493,8 @@ void PMOptixRenderer::render(unsigned int photonLaunchWidth, unsigned int height
 			nvtx::ScopedRange r("Creating photon map");
 			createUniformGridPhotonMap(m_scenePPMRadius);
 			double time = sutilCurrentTime() - start;
-			//m_logger->log("2/%d Creating photon map time: %1.3fs\n", numSteps, time);
+			//m_logger->log("3/%d Creating photon map time: %1.3fs\n", numSteps, time);
 		}
-
-
-        if(!generateOutput)
-		{
-			//
-			// Get hit count
-			//
-			double start = sutilCurrentTime();
-            nvtx::ScopedRange r( "Counting hit count" );
-			countHitCountPerObject();
-			double time = sutilCurrentTime() - start;
-			//m_logger->log("2/%d Getting photons statistical data: %1.3fs\n", numSteps, time);
-        }
 
 
         //
@@ -486,7 +514,7 @@ void PMOptixRenderer::render(unsigned int photonLaunchWidth, unsigned int height
                 static_cast<unsigned int>(m_width),
                 static_cast<unsigned int>(m_height) );
 			double time = sutilCurrentTime() - start;
-			//m_logger->log("3/%d RAYTRACE_PASS time: %1.3fs\n", numSteps, time);
+			//m_logger->log("4/%d RAYTRACE_PASS time: %1.3fs\n", numSteps, time);
         }
     
         //
@@ -498,7 +526,7 @@ void PMOptixRenderer::render(unsigned int photonLaunchWidth, unsigned int height
             m_context->launch(OptixEntryPoint::PPM_INDIRECT_RADIANCE_ESTIMATION_PASS,
                 m_width, m_height);
 			double time = sutilCurrentTime() - start;
-			//m_logger->log("4/%d INDIRECT_RADIANCE_ESTIMATION time: %1.3fs\n", numSteps, time);
+			//m_logger->log("5/%d INDIRECT_RADIANCE_ESTIMATION time: %1.3fs\n", numSteps, time);
         }
 
         //
@@ -510,7 +538,7 @@ void PMOptixRenderer::render(unsigned int photonLaunchWidth, unsigned int height
             m_context->launch(OptixEntryPoint::PPM_DIRECT_RADIANCE_ESTIMATION_PASS,
                 m_width, m_height);
 			double time = sutilCurrentTime() - start;
-			//m_logger->log("5/%d DIRECT_RADIANCE_ESTIMATION_PASS time: %1.3fs\n", numSteps, time);
+			//m_logger->log("6/%d DIRECT_RADIANCE_ESTIMATION_PASS time: %1.3fs\n", numSteps, time);
         }
 
         //
@@ -522,7 +550,7 @@ void PMOptixRenderer::render(unsigned int photonLaunchWidth, unsigned int height
 			m_context->launch(OptixEntryPoint::PPM_OUTPUT_PASS,
 				m_width, m_height);
 			double time = sutilCurrentTime() - start;
-			//m_logger->log("6/%d OUTPUT_PASS time: %1.3fs\n", numSteps, time);
+			//m_logger->log("7/%d OUTPUT_PASS time: %1.3fs\n", numSteps, time);
 		}
 
         double traceTime = sutilCurrentTime() -traceStartTime;
@@ -541,19 +569,16 @@ void PMOptixRenderer::resizeBuffers(unsigned int width, unsigned int height, uns
 {
 	m_photonWidth = photonWidth;
 	m_context["emittedPhotonsPerIterationFloat"]->setFloat(m_photonWidth * m_photonWidth);
-	m_context["photonLaunchWidth"]->setUint(m_photonWidth);
-	m_photons->setSize(getNumPhotons());
 	m_context["photonsSize"]->setUint(getNumPhotons());
 	m_photonsHashCells->setSize( getNumPhotons() );
 	m_context["photonPowerScale"]->setFloat(1.0f / (photonWidth * photonWidth * m_totalLightPower) );
-
 
     m_outputBuffer->setSize( width, height );
     m_raytracePassOutputBuffer->setSize( width, height );
     m_outputBuffer->setSize( width, height );
     m_directRadianceBuffer->setSize( width, height );
     m_indirectRadianceBuffer->setSize( width, height );
-    m_randomStatesBuffer->setSize(max(m_photonWidth, (unsigned int)width), max(m_photonWidth,  (unsigned int)height));
+	m_randomStatesBuffer->setSize(max(getMaxPhotonWidth(), (unsigned int)width), max(getMaxPhotonWidth(), (unsigned int)height));
     initializeRandomStates();
     m_width = width;
     m_height = height;
@@ -620,6 +645,12 @@ unsigned int PMOptixRenderer::getScreenBufferSizeBytes() const
 unsigned int PMOptixRenderer::getNumPhotons() const
 {
 	return m_photonWidth * m_photonWidth * MAX_PHOTON_COUNT;
+}
+
+unsigned int PMOptixRenderer::getMaxTotalPhotons()
+{
+	auto photonWidth = getMaxPhotonWidth();
+	return photonWidth * photonWidth * MAX_PHOTON_COUNT;
 }
 
 static void transformBufferMatrix(Buffer buffer, const Matrix4x4& matrix)
@@ -741,7 +772,7 @@ unsigned int PMOptixRenderer::totalPhotons()
 
 unsigned int PMOptixRenderer::getMaxPhotonWidth()
 {
-	static const double k = 0.075f;
+	static const double k = 0.07f;
 
 	int deviceOrdinal = m_context->getEnabledDevices().front();
 	RTsize totalMemory;

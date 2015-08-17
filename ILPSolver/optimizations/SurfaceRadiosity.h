@@ -17,7 +17,7 @@ class SurfaceRadiosity
 public:
 	SurfaceRadiosity(Logger *logger, PMOptixRenderer *renderer, Scene *scene, const QString &surfaceId);
 	SurfaceRadiosityEvaluation *evaluateRadiosity();
-	SurfaceRadiosityEvaluation *evaluateFast(float quality);
+	SurfaceRadiosityEvaluation *evaluateFast(float quality, bool reusePreviousBuffer);
 	void saveImage(const QString &fileName);	
 	virtual QStringList header();
 	virtual ~SurfaceRadiosity();

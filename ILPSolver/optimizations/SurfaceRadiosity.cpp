@@ -63,11 +63,11 @@ SurfaceRadiosity::~SurfaceRadiosity()
 
 SurfaceRadiosityEvaluation *SurfaceRadiosity::evaluateRadiosity()
 {
-	m_renderer->render(maxPhotonWidth, sampleImageHeight, sampleImageWidth, *sampleCamera, true, true);
+	m_renderer->render(maxPhotonWidth, sampleImageHeight, sampleImageWidth, *sampleCamera, true, true, false);
 	return genEvaluation(maxPhotonWidth * maxPhotonWidth);
 }
 
-SurfaceRadiosityEvaluation *SurfaceRadiosity::evaluateFast(float quality)
+SurfaceRadiosityEvaluation *SurfaceRadiosity::evaluateFast(float quality, bool reusePreviousBuffer)
 {
 	int photonWidth = std::max(
 				std::min(
@@ -78,7 +78,7 @@ SurfaceRadiosityEvaluation *SurfaceRadiosity::evaluateFast(float quality)
 				minPhotonWidth
 			);
 
-	m_renderer->buildPhotonBuffer(photonWidth);
+	m_renderer->buildPhotonBuffer(photonWidth, reusePreviousBuffer);
 	return genEvaluation(photonWidth * photonWidth);
 }
 
