@@ -507,7 +507,20 @@ void Scene::loadDefaultSceneCamera()
 
 optix::Group Scene::getGroupFromNode(optix::Context & context, aiNode* node, QVector<optix::Geometry> & geometries, QVector<Material*> & materials, QMap<QString, optix::Group> *nameMapping)
 {
-    if(node->mNumMeshes > 0)
+	if (QString(node->mName.C_Str()).toLower().endsWith("__geometry") || !node->mNumMeshes && !node->mNumChildren)
+	{
+		optix::Group emptyGroup = context->createGroup();
+		optix::Acceleration acceleration = context->createAcceleration("NoAccel", "NoAccel");
+		emptyGroup->setAcceleration(acceleration);
+
+		if (nameMapping != NULL)
+		{
+			nameMapping->insert(node->mName.C_Str(), emptyGroup);
+		}
+
+		return emptyGroup;
+	} 
+	else if(node->mNumMeshes > 0)
     {
         QVector<optix::GeometryInstance> instances;
         optix::GeometryGroup geometryGroup = context->createGeometryGroup();
@@ -589,16 +602,7 @@ optix::Group Scene::getGroupFromNode(optix::Context & context, aiNode* node, QVe
     }
 	else
 	{
-		optix::Group emptyGroup = context->createGroup();
-		optix::Acceleration acceleration = context->createAcceleration("NoAccel", "NoAccel");
-		emptyGroup->setAcceleration(acceleration);
-
-		if(nameMapping != NULL)
-		{
-			nameMapping->insert(node->mName.C_Str(), emptyGroup);
-		}
-
-		return emptyGroup;
+		throw std::logic_error("Node should have nodes or childen, or be empty");
 	}
 }
 
