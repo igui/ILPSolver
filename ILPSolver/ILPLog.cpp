@@ -5,7 +5,6 @@
 #include "optimizations/SurfaceRadiosity.h"
 #include "optimizations/SurfaceRadiosityEvaluation.h"
 #include "conditions/ConditionPosition.h"
-#include "conditions/HoleInSurfacePosition.h"
 #include <qDebug>
 
 const QString ILP::logFileName("solutions.csv");

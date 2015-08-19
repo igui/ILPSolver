@@ -26,10 +26,10 @@
     <ClCompile Include="conditions\DirectionalLightPosition.cpp">
       <Filter>conditions</Filter>
     </ClCompile>
-    <ClCompile Include="conditions\HoleInSurface.cpp">
+    <ClCompile Include="conditions\ObjectInSurface.cpp">
       <Filter>conditions</Filter>
     </ClCompile>
-    <ClCompile Include="conditions\HoleInSurfacePosition.cpp">
+    <ClCompile Include="conditions\ObjectInSurfacePosition.cpp">
       <Filter>conditions</Filter>
     </ClCompile>
   </ItemGroup>
@@ -63,10 +63,10 @@
     <ClInclude Include="conditions\DirectionalLight.h">
       <Filter>conditions</Filter>
     </ClInclude>
-    <ClInclude Include="conditions\HoleInSurface.h">
+    <ClInclude Include="conditions\ObjectInSurface.h">
       <Filter>conditions</Filter>
     </ClInclude>
-    <ClInclude Include="conditions\HoleInSurfacePosition.h">
+    <ClInclude Include="conditions\ObjectInSurfacePosition.h">
       <Filter>conditions</Filter>
     </ClInclude>
   </ItemGroup>
@@ -98,6 +98,12 @@
     <None Include="examples\hole.dae">
       <Filter>examples</Filter>
     </None>
+    <None Include="examples\move-geometry.blend">
+      <Filter>examples</Filter>
+    </None>
+    <None Include="examples\move-geometry.dae">
+      <Filter>examples</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="examples">
@@ -120,11 +126,17 @@
     <Xml Include="examples\hole.xml">
       <Filter>examples</Filter>
     </Xml>
+    <Xml Include="examples\move-geometry.xml">
+      <Filter>examples</Filter>
+    </Xml>
   </ItemGroup>
   <ItemGroup>
     <Image Include="examples\suzanne.png">
       <Filter>examples</Filter>
     </Image>
+    <Image Include="examples\steel.jpg" />
+    <Image Include="examples\brickwork-texture.jpg" />
+    <Image Include="examples\brickwork_normal-map.jpg" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="optimizations\SurfaceRadiosity.cu">

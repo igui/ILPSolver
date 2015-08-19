@@ -8,7 +8,7 @@
 #include <QAbstractXmlNodeModel>
 #include <QDebug>
 #include "conditions/LightInSurface.h"
-#include "conditions/HoleInSurface.h"
+#include "conditions/ObjectInSurface.h"
 #include "conditions/DirectionalLight.h"
 #include "optimizations/SurfaceRadiosity.h"
 
@@ -54,7 +54,7 @@ static Condition *readLightInSurface(Scene *scene, const QDomElement& element)
 	return new LightInSurface(scene, id, surface);
 }
 
-static Condition *readHoleInSurface(Scene *scene, const QDomElement& element)
+static Condition *readObjectInSurface(Scene *scene, const QDomElement& element)
 {
 	QString id = element.attribute("id");
 	QString surface = element.attribute("surface");
@@ -63,38 +63,38 @@ static Condition *readHoleInSurface(Scene *scene, const QDomElement& element)
 	QString surfaceVertexCIndex = element.attribute("vertexCIndex");
 	QString surfaceVertexDIndex = element.attribute("vertexDIndex");
 
-	if(id.isEmpty())
+	if (id.isEmpty())
 		throw std::logic_error("id can't be empty");
-	if(surface.isEmpty())
+	if (surface.isEmpty())
 		throw std::logic_error("surface can't be empty");
-	
-	if(surfaceVertexAIndex.isEmpty())
+
+	if (surfaceVertexAIndex.isEmpty())
 		throw std::logic_error("surface A vertex index can't be empty");
-	if(surfaceVertexBIndex.isEmpty())
+	if (surfaceVertexBIndex.isEmpty())
 		throw std::logic_error("surface B vertex index can't be empty");
-	if(surfaceVertexCIndex.isEmpty())
+	if (surfaceVertexCIndex.isEmpty())
 		throw std::logic_error("surface C vertex index can't be empty");
-	if(surfaceVertexDIndex.isEmpty())
+	if (surfaceVertexDIndex.isEmpty())
 		throw std::logic_error("surface D vertex index can't be empty");
 
 	bool ok;
 	int vertexAIndex = surfaceVertexAIndex.toInt(&ok);
-	if(!ok || vertexAIndex < 0)
+	if (!ok || vertexAIndex < 0)
 		throw std::logic_error("surface A vertex index can't be empty");
 	int vertexBIndex = surfaceVertexBIndex.toInt(&ok);
-	if(!ok || vertexBIndex < 0)
+	if (!ok || vertexBIndex < 0)
 		throw std::logic_error("surface B vertex index can't be empty");
 	int vertexCIndex = surfaceVertexCIndex.toInt(&ok);
-	if(!ok || vertexCIndex < 0)
+	if (!ok || vertexCIndex < 0)
 		throw std::logic_error("surface C vertex index can't be empty");
 	int vertexDIndex = surfaceVertexDIndex.toInt(&ok);
-	if(!ok || vertexDIndex < 0)
+	if (!ok || vertexDIndex < 0)
 		throw std::logic_error("surface D vertex index can't be empty");
-	
 
-	qDebug("condition: Hole in Surface id: %s, surface: %s", qPrintable(id), qPrintable(surface));
 
-	return new HoleInSurface(scene, id, surface, vertexAIndex, vertexBIndex, vertexCIndex, vertexDIndex);
+	qDebug("condition: Object in Surface id: %s, surface: %s", qPrintable(id), qPrintable(surface));
+
+	return new ObjectInSurface(scene, id, surface, vertexAIndex, vertexBIndex, vertexCIndex, vertexDIndex);
 }
 
 static Condition *readDirectionalLight(Scene *scene, const QDomElement& element)
@@ -120,8 +120,8 @@ static Condition *readConditionElement(Scene *scene, const QDomElement& element)
 
 	if(element.tagName() == "lightInSurface")
 		readFunc = readLightInSurface;
-	else if(element.tagName() == "holeInSurface")
-		readFunc = readHoleInSurface;
+	else if (element.tagName() == "objectInSurface")
+		readFunc = readObjectInSurface;
 	else if(element.tagName() == "directionalLight")
 		readFunc = readDirectionalLight;
 	
