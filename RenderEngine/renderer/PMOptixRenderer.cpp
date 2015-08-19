@@ -740,7 +740,7 @@ unsigned int PMOptixRenderer::totalPhotons()
 
 unsigned int PMOptixRenderer::getMaxPhotonWidth()
 {
-	static const double k = 0.075f;
+	static const double k = 0.07f;
 
 	int deviceOrdinal = m_context->getEnabledDevices().front();
 	RTsize totalMemory;
