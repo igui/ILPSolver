@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<input>
+  <!-- Scene path (relative to this file) -->
+  <scene path="move-geometry.dae"/>
+
+  <!-- print output images and log on "./output" folder -->
+  <output path="output"/>
+
+  <!-- Optimization variables -->
+  <conditions meshSize="100">
+    <objectInSurface id="Suzanne" surface="Suzanne__Geometry" vertexAIndex="3" vertexBIndex="0" vertexCIndex="2" vertexDIndex="1">
+    </objectInSurface>
+  </conditions>
+
+  <!-- Which aspects of the scene must be optimized  -->
+  <objectives maxIterations="100">
+    <maximizeRadiance surface="Suzanne"/>
+  </objectives>
+</input>
