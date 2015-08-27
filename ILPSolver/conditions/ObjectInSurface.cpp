@@ -6,15 +6,53 @@
 
 static void checkVertexIndex(const QString& surfaceId, const QVector<Vector3>& objectPoints, int index, const QString &vertexName)
 {
-	if (index > objectPoints.length() || index < 0)
+	if (index > objectPoints.length() || index < 0){
 		throw std::invalid_argument(
-		qPrintable(
-		QString("%1: invalid vertex %2 index: %3")
-		.arg(surfaceId)
-		.arg(vertexName)
-		.arg(index)
-		)
+			qPrintable(
+				QString("%1: invalid vertex %2 index: %3")
+					.arg(surfaceId)
+					.arg(vertexName)
+					.arg(index)
+			)
 		);
+	}
+}
+
+static float getMaxDistance(optix::float3 base, optix::float3 pointA, optix::float3 pointB, optix::float3 pointC)
+{
+	return std::max(
+			std::max(
+				std::max(
+					length(base - pointA),
+					length(base - pointB)
+				),
+			length(base - pointC)
+		),
+		std::max(
+			std::max(
+				length(pointA - pointB),
+				length(pointA - pointC)
+			),
+			length(pointB - pointC)
+		)
+	);
+}
+
+static QVector<Vector3> getAndCheckNodeInScene(Scene *scene, const QString& objectName)
+{
+	int objectId = scene->getObjectId(objectName);
+	if (objectId < 0)
+		throw std::invalid_argument(("There isn't any object named " + objectName + " in the scene").toStdString());
+
+	auto objectPoints = scene->getObjectPoints(objectId);
+
+	/*qDebug("%s: %d vertices", qPrintable(objectName), objectPoints.length());
+	for (int i = 0; i < objectPoints.length(); ++i){
+		auto point = objectPoints.at(i);
+		qDebug() << "Point " << i << ": " << point.x << point.y << point.z;
+	}*/
+
+	return objectPoints;
 }
 
 ObjectInSurface::ObjectInSurface(Scene *scene,
@@ -24,41 +62,21 @@ ObjectInSurface::ObjectInSurface(Scene *scene,
 	int surfaceVertexBIndex,
 	int surfaceVertexCIndex,
 	int surfaceVertexDIndex
-	):
+	) :
 	m_nodeId(nodeId)
 {
-	int objectObjectId = scene->getObjectId(nodeId);
-	if (objectObjectId < 0)
-		throw std::invalid_argument(("There isn't any object named " + nodeId + " in the scene").toStdString());
+	getAndCheckNodeInScene(scene, nodeId);
+	auto surfacePoints = getAndCheckNodeInScene(scene, surfaceId);
+	
+	checkVertexIndex(surfaceId, surfacePoints, surfaceVertexAIndex, "A");
+	checkVertexIndex(surfaceId, surfacePoints, surfaceVertexBIndex, "B");
+	checkVertexIndex(surfaceId, surfacePoints, surfaceVertexCIndex, "C");
+	checkVertexIndex(surfaceId, surfacePoints, surfaceVertexDIndex, "D");
+	
+	base = surfacePoints[surfaceVertexAIndex];
 
-	/*QVector<Vector3> holePoints = scene->getObjectPoints(objectObjectId);
-	qDebug("%s: %d vertices", qPrintable(nodeId), objectPoints.length());
-	for(auto point: objectPoints){
-	qDebug() << "Point: " << point.x << point.y << point.z;
-	}*/
-
-	int objectId = scene->getObjectId(surfaceId);
-
-	if (objectId < 0)
-		throw std::invalid_argument(("There isn't any object named " + surfaceId + " in the scene").toStdString());
-
-	QVector<Vector3> objectPoints = scene->getObjectPoints(objectId);
-
-	checkVertexIndex(surfaceId, objectPoints, surfaceVertexAIndex, "A");
-	checkVertexIndex(surfaceId, objectPoints, surfaceVertexBIndex, "B");
-	checkVertexIndex(surfaceId, objectPoints, surfaceVertexCIndex, "C");
-	checkVertexIndex(surfaceId, objectPoints, surfaceVertexDIndex, "D");
-
-	/*qDebug("%s: %d vertices", qPrintable(surfaceId), objectPoints.length());
-	for(int i = 0; i < objectPoints.length(); ++i){
-	auto point = objectPoints.at(i);
-	qDebug() << "Point " << i << ": " << point.x << point.y << point.z;
-	}*/
-
-	base = objectPoints[surfaceVertexAIndex];
-
-	optix::float3 pointA = (optix::float3) objectPoints[surfaceVertexBIndex] - (optix::float3)objectPoints[surfaceVertexAIndex];
-	optix::float3 pointB = (optix::float3) objectPoints[surfaceVertexCIndex] - (optix::float3)objectPoints[surfaceVertexAIndex];
+	optix::float3 pointA = (optix::float3) surfacePoints[surfaceVertexBIndex] - (optix::float3)surfacePoints[surfaceVertexAIndex];
+	optix::float3 pointB = (optix::float3) surfacePoints[surfaceVertexCIndex] - (optix::float3)surfacePoints[surfaceVertexAIndex];
 
 	u = normalize(pointA);
 	v = normalize(cross(cross(pointA, pointB), pointA));
@@ -66,28 +84,13 @@ ObjectInSurface::ObjectInSurface(Scene *scene,
 	a = optix::make_float2(dot(u, pointA), dot(v, pointA));
 	b = optix::make_float2(dot(u, pointB), dot(v, pointB));
 
-	optix::float3 pointC = (optix::float3) objectPoints[surfaceVertexDIndex] - (optix::float3) objectPoints[surfaceVertexAIndex];
+	optix::float3 pointC = (optix::float3) surfacePoints[surfaceVertexDIndex] - (optix::float3) surfacePoints[surfaceVertexAIndex];
 
 	c = optix::make_float2(dot(u, pointC), dot(v, pointC));
 
-	maxDistance =
-		std::max(
-		std::max(
-		std::max(
-		length(base - pointA),
-		length(base - pointB)
-		),
-		length(base - pointC)
-		),
-		std::max(
-		std::max(
-		length(pointA - pointB),
-		length(pointA - pointC)
-		),
-		length(pointB - pointC)
-		)
-		);
+	maxDistance = getMaxDistance(base, pointA, pointB, pointC);
 }
+
 
 QVector<float> ObjectInSurface::dimensions() const
 {
@@ -116,16 +119,20 @@ ConditionPosition *ObjectInSurface::findNeighbour(ConditionPosition *from, float
 	return new ObjectInSurfacePosition(m_nodeId, base, currentTransformation, normalizedPosition);
 }
 
+static float getRandomAngle()
+{
+	return 2.0f * M_PI * qrand() / RAND_MAX;
+}
+
 optix::float3 ObjectInSurface::generatePointNeighbourhood(optix::float3 centerWorldCoordinates, float radius, unsigned int& retries) const
 {
 	auto relativeCenter = centerWorldCoordinates - base;
 	auto center = optix::make_float2(dot(u, relativeCenter), dot(v, relativeCenter));
 	auto relativeRadius = radius * maxDistance;
 
-	optix::float2 res;
 	while (retries > 0) {
-		float angle = 2.0f * M_PI * qrand() / RAND_MAX; // random angle
-		res = center + relativeRadius * optix::make_float2(cosf(angle), sinf(angle)); // res in uv coordinates
+		float angle = getRandomAngle();
+		optix::float2 res = center + relativeRadius * optix::make_float2(cosf(angle), sinf(angle)); // res in uv coordinates
 		if (pointInSurface(res)){
 			return res.x * u + res.y * v + base; // res in world coordinates
 		}

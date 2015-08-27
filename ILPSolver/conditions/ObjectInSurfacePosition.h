@@ -13,6 +13,7 @@ public:
 	virtual void apply(PMOptixRenderer *) const;
 	optix::Matrix4x4 transformation() const;
 	virtual QStringList info() const;
+	optix::float3 position() const;
 private:
 	QString nodeName;
 	optix::float3 initialPosition;
