@@ -309,7 +309,7 @@ void PMOptixRenderer::initScene( Scene & scene )
 		auto objectIdToName = scene.getObjectIdToNameMap();
 		m_sceneObjects = objectIdToName.size();
 		m_objectIdToName.resize(m_sceneObjects, "");
-		for(int i = 0; i < m_sceneObjects; ++i)
+		for(unsigned int i = 0; i < m_sceneObjects; ++i)
 		{
 			m_objectIdToName.at(i) = qPrintable(objectIdToName.at(i));
 		}
@@ -663,21 +663,8 @@ void PMOptixRenderer::setLightDirection(const QString &lightName, const Vector3 
 
 void PMOptixRenderer::transformNodeImpl(const QString &nodeName, const optix::Matrix4x4 &transformation, bool preMultiply)
 {
-	if(nodeName == NULL || nodeName.isEmpty())
-	{
-		throw std::invalid_argument("nodeName can't be NULL or empty");
-	}
-
-	auto group = (*m_groups)[nodeName];
-	if(group == NULL)
-	{
-		throw std::invalid_argument((nodeName + " doesn't exists").toStdString());
-	}
+	auto group = getGroup(nodeName);
 	unsigned int childCount = group->getChildCount();
-	if(childCount == 0)
-	{
-		throw std::invalid_argument((nodeName + " has no geometries").toStdString());
-	}
 	
 	// apply transform to every thing in on group
 	for(unsigned int childIdx = 0; childIdx < childCount; ++childIdx)
@@ -720,6 +707,45 @@ void PMOptixRenderer::transformNodeImpl(const QString &nodeName, const optix::Ma
 			}
 		}
         m_lightBuffer->unmap();
+	}
+}
+
+Group PMOptixRenderer::getGroup(const QString &nodeName)
+{
+	if (nodeName == NULL || nodeName.isEmpty())
+	{
+		throw std::invalid_argument("nodeName can't be NULL or empty");
+	}
+
+	auto group = (*m_groups)[nodeName];
+	if (group == NULL)
+	{
+		throw std::invalid_argument((nodeName + " doesn't exists").toStdString());
+	}
+	unsigned int childCount = group->getChildCount();
+	if (childCount == 0)
+	{
+		throw std::invalid_argument((nodeName + " has no geometries").toStdString());
+	}
+	return group;
+}
+
+void PMOptixRenderer::setNodeDiffuseMaterialKd(const QString &nodeName, optix::float3 kd)
+{
+	auto group = getGroup(nodeName);
+	
+	// apply transform to every thing in on group
+	for (unsigned int childIdx = 0; childIdx < group->getChildCount(); ++childIdx)
+	{
+		auto transform = group->getChild<Transform>(childIdx);
+		auto geometryGroup = transform->getChild<GeometryGroup>();
+		for (unsigned int geometryGroupChildIdx = 0;
+			geometryGroupChildIdx < geometryGroup->getChildCount();
+			++geometryGroupChildIdx)
+		{
+			auto geometryInstance = geometryGroup->getChild(geometryGroupChildIdx);
+			geometryInstance["Kd"]->setFloat(kd);
+		}
 	}
 }
 

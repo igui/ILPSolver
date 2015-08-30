@@ -32,6 +32,12 @@
     <ClCompile Include="conditions\ObjectInSurfacePosition.cpp">
       <Filter>conditions</Filter>
     </ClCompile>
+    <ClCompile Include="conditions\ColorCondition.cpp">
+      <Filter>conditions</Filter>
+    </ClCompile>
+    <ClCompile Include="conditions\ColorConditionPosition.cpp">
+      <Filter>conditions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ILP.h" />
@@ -69,6 +75,12 @@
     <ClInclude Include="conditions\ObjectInSurfacePosition.h">
       <Filter>conditions</Filter>
     </ClInclude>
+    <ClInclude Include="conditions\ColorCondition.h">
+      <Filter>conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="conditions\ColorConditionPosition.h">
+      <Filter>conditions</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="examples\cube.blend">
@@ -104,6 +116,12 @@
     <None Include="examples\move-geometry.dae">
       <Filter>examples</Filter>
     </None>
+    <None Include="examples\color.blend">
+      <Filter>examples</Filter>
+    </None>
+    <None Include="examples\color.dae">
+      <Filter>examples</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="examples">
@@ -127,6 +145,9 @@
       <Filter>examples</Filter>
     </Xml>
     <Xml Include="examples\move-geometry.xml">
+      <Filter>examples</Filter>
+    </Xml>
+    <Xml Include="examples\color.xml">
       <Filter>examples</Filter>
     </Xml>
   </ItemGroup>

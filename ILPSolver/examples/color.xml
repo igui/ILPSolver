@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<input>
+  <!-- Scene path (relative to this file) -->
+  <scene path="color.dae"/>
+
+  <!-- print output images and log on "./output" folder -->
+  <output path="output"/>
+
+  <!-- Optimization variables -->
+  <conditions meshSize="20">
+    <color id="Walls" saturation="0.9" value="1.0"/>
+  </conditions>
+
+  <!-- Which aspects of the scene must be optimized  -->
+  <objectives maxIterations="100">
+    <maximizeRadiance surface="Torus"/>
+  </objectives>
+</input>

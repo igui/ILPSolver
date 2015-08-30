@@ -55,7 +55,9 @@
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="conditions\ColorCondition.cpp" />
     <ClCompile Include="conditions\LightInSurfacePosition.cpp" />
+    <ClCompile Include="conditions\ColorConditionPosition.cpp" />
     <ClCompile Include="Configuration.cpp" />
     <ClCompile Include="conditions\DirectionalLight.cpp" />
     <ClCompile Include="conditions\DirectionalLightPosition.cpp" />
@@ -77,6 +79,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="conditions\ColorCondition.h" />
+    <ClInclude Include="conditions\ColorConditionPosition.h" />
     <ClInclude Include="conditions\ConditionPosition.h" />
     <ClInclude Include="conditions\Condition.h" />
     <ClInclude Include="conditions\LightInSurfacePosition.h" />
@@ -99,6 +103,8 @@
     </CudaCompile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="examples\color.blend" />
+    <None Include="examples\color.dae" />
     <None Include="examples\conference.blend" />
     <None Include="examples\conference.dae" />
     <None Include="examples\cube.blend" />
@@ -120,6 +126,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Xml Include="examples\color.xml" />
     <Xml Include="examples\conference.xml">
       <SubType>Designer</SubType>
     </Xml>

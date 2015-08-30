@@ -10,6 +10,7 @@
 #include "conditions/LightInSurface.h"
 #include "conditions/ObjectInSurface.h"
 #include "conditions/DirectionalLight.h"
+#include "conditions/ColorCondition.h"
 #include "optimizations/SurfaceRadiosity.h"
 
 
@@ -109,6 +110,34 @@ static Condition *readDirectionalLight(Scene *scene, const QDomElement& element)
 	return new DirectionalLight(scene, id);
 }
 
+static Condition *readColorCondition(Scene *scene, const QDomElement& element)
+{
+	QString id = element.attribute("id");
+
+	if (id.isEmpty())
+		throw std::logic_error("id can't be empty");
+
+	QString saturationStr = element.attribute("saturation");
+	QString valueStr = element.attribute("value");
+
+	if (saturationStr.isEmpty())
+		throw std::logic_error("saturation can't be empty");
+	if (valueStr.isEmpty())
+		throw std::logic_error("value can't be empty");
+
+	bool ok;
+	float saturation = saturationStr.toFloat(&ok);
+	if (!ok || saturation < 0 || saturation > 1)
+		throw std::logic_error("color saturation value is invalid");
+	float value = valueStr.toFloat(&ok);
+	if (!ok || value < 0 || value > 1)
+		throw std::logic_error("color value is invalid");
+	
+	qDebug("condition: Color Node id: %s", qPrintable(id));
+
+	return new ColorCondition(id, saturation, value);
+}
+
 static Condition *readUnknownCondition(Scene *, const QDomElement&)
 {
 	return NULL;
@@ -124,6 +153,8 @@ static Condition *readConditionElement(Scene *scene, const QDomElement& element)
 		readFunc = readObjectInSurface;
 	else if(element.tagName() == "directionalLight")
 		readFunc = readDirectionalLight;
+	else if (element.tagName() == "color")
+		readFunc = readColorCondition;
 	
 	return readFunc(scene, element);
 }
