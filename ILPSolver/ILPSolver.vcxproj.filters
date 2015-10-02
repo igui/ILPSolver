@@ -83,43 +83,28 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="examples\cube.blend">
-      <Filter>examples</Filter>
-    </None>
-    <None Include="examples\cube.dae">
-      <Filter>examples</Filter>
-    </None>
-    <None Include="examples\cube.xml">
-      <Filter>examples</Filter>
-    </None>
     <None Include="examples\conference.blend">
       <Filter>examples</Filter>
     </None>
     <None Include="examples\conference.dae">
       <Filter>examples</Filter>
     </None>
-    <None Include="examples\directional.blend">
-      <Filter>examples</Filter>
-    </None>
-    <None Include="examples\directional.dae">
-      <Filter>examples</Filter>
-    </None>
-    <None Include="examples\hole.blend">
-      <Filter>examples</Filter>
-    </None>
-    <None Include="examples\hole.dae">
-      <Filter>examples</Filter>
-    </None>
-    <None Include="examples\move-geometry.blend">
-      <Filter>examples</Filter>
-    </None>
-    <None Include="examples\move-geometry.dae">
-      <Filter>examples</Filter>
-    </None>
     <None Include="examples\color.blend">
       <Filter>examples</Filter>
     </None>
     <None Include="examples\color.dae">
+      <Filter>examples</Filter>
+    </None>
+    <None Include="examples\cornell.blend">
+      <Filter>examples</Filter>
+    </None>
+    <None Include="examples\cornell.dae">
+      <Filter>examples</Filter>
+    </None>
+    <None Include="examples\sponza.blend">
+      <Filter>examples</Filter>
+    </None>
+    <None Include="examples\sponza.dae">
       <Filter>examples</Filter>
     </None>
   </ItemGroup>
@@ -138,16 +123,16 @@
     <Xml Include="examples\conference.xml">
       <Filter>examples</Filter>
     </Xml>
-    <Xml Include="examples\directional.xml">
-      <Filter>examples</Filter>
-    </Xml>
-    <Xml Include="examples\hole.xml">
-      <Filter>examples</Filter>
-    </Xml>
-    <Xml Include="examples\move-geometry.xml">
-      <Filter>examples</Filter>
-    </Xml>
     <Xml Include="examples\color.xml">
+      <Filter>examples</Filter>
+    </Xml>
+    <Xml Include="examples\cornell-move-cone.xml">
+      <Filter>examples</Filter>
+    </Xml>
+    <Xml Include="examples\cornell-move-light.xml">
+      <Filter>examples</Filter>
+    </Xml>
+    <Xml Include="examples\sponza.xml">
       <Filter>examples</Filter>
     </Xml>
   </ItemGroup>

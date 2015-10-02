@@ -107,34 +107,19 @@
     <None Include="examples\color.dae" />
     <None Include="examples\conference.blend" />
     <None Include="examples\conference.dae" />
-    <None Include="examples\cube.blend" />
-    <None Include="examples\cube.dae">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="examples\directional.blend" />
-    <None Include="examples\directional.dae" />
-    <None Include="examples\hole.blend" />
-    <None Include="examples\hole.dae">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="examples\move-geometry.blend" />
-    <None Include="examples\move-geometry.dae" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="examples\cube.xml">
-      <SubType>Designer</SubType>
-    </None>
+    <None Include="examples\cornell.blend" />
+    <None Include="examples\cornell.dae" />
+    <None Include="examples\sponza.blend" />
+    <None Include="examples\sponza.dae" />
   </ItemGroup>
   <ItemGroup>
     <Xml Include="examples\color.xml" />
     <Xml Include="examples\conference.xml">
       <SubType>Designer</SubType>
     </Xml>
-    <Xml Include="examples\directional.xml" />
-    <Xml Include="examples\hole.xml">
-      <SubType>Designer</SubType>
-    </Xml>
-    <Xml Include="examples\move-geometry.xml" />
+    <Xml Include="examples\cornell-move-cone.xml" />
+    <Xml Include="examples\cornell-move-light.xml" />
+    <Xml Include="examples\sponza.xml" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="examples\brickwork-texture.jpg" />

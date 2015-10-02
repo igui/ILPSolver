@@ -286,14 +286,14 @@
     <Filter Include="math">
       <UniqueIdentifier>{9d0e4f50-99f8-4214-bdd1-cb25bd345916}</UniqueIdentifier>
     </Filter>
-    <Filter Include="renderer\pt">
-      <UniqueIdentifier>{ec99dcf1-86b9-44d2-b9f0-eafb7c99a4e3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="renderer\pm">
       <UniqueIdentifier>{838de7de-4aa0-42fa-9fbd-7b62dd02a8db}</UniqueIdentifier>
     </Filter>
     <Filter Include="renderer\ppm">
       <UniqueIdentifier>{1e3d0fdb-dbaa-426b-aabe-d0449c8c323b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="renderer\ppm\pt">
+      <UniqueIdentifier>{ec99dcf1-86b9-44d2-b9f0-eafb7c99a4e3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -322,7 +322,7 @@
       <Filter>material</Filter>
     </CudaCompile>
     <CudaCompile Include="renderer\pt\RayGeneratorPT.cu">
-      <Filter>renderer\pt</Filter>
+      <Filter>renderer\ppm\pt</Filter>
     </CudaCompile>
     <CudaCompile Include="renderer\pm\PMDirectRadianceEstimation.cu">
       <Filter>renderer\pm</Filter>

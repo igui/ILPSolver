@@ -7,20 +7,12 @@
   <output path="output"/>
 
   <!-- Optimization variables -->
-  <conditions>
-    <lightInSurface id="LightPlane_001" surface="Ceiling"></lightInSurface>
-    <lightInSurface id="LightPlane_002" surface="Ceiling"></lightInSurface>
-    <lightInSurface id="LightPlane_003" surface="Ceiling"></lightInSurface>
-    <lightInSurface id="LightPlane_004" surface="Ceiling"></lightInSurface>
-    <lightInSurface id="LightPlane_005" surface="Ceiling"></lightInSurface>
-    <lightInSurface id="LightPlane_006" surface="Ceiling"></lightInSurface>
-    <lightInSurface id="LightPlane_007" surface="Ceiling"></lightInSurface>
-    <lightInSurface id="LightPlane_008" surface="Ceiling"></lightInSurface>
+  <conditions meshSize="10">
+    <directionalLight id="Sun"/>
   </conditions>
 
   <!-- Which aspects of the scene must be optimized  -->
-  <objectives maxIterations="50000">
-    <!-- Maximize radiance on floor surface with 95% and radius of 5 W -->
-    <maximizeRadiance surface="Table"/>
+  <objectives maxIterations="200">
+    <maximizeRadiance surface="Blackboard"/>
   </objectives>
 </input>
