@@ -36,8 +36,8 @@ const unsigned int PPMOptixRenderer::PHOTON_GRID_MAX_SIZE = 0;
 #endif
 
 const unsigned int PPMOptixRenderer::MAX_PHOTON_COUNT = MAX_PHOTONS_DEPOSITS_PER_EMITTED;
-const unsigned int PPMOptixRenderer::PHOTON_LAUNCH_WIDTH = 1024;
-const unsigned int PPMOptixRenderer::PHOTON_LAUNCH_HEIGHT = 1024;
+const unsigned int PPMOptixRenderer::PHOTON_LAUNCH_WIDTH = 512;
+const unsigned int PPMOptixRenderer::PHOTON_LAUNCH_HEIGHT = 512;
 // Ensure that NUM PHOTONS are a power of 2 for stochastic hash
 
 const unsigned int PPMOptixRenderer::EMITTED_PHOTONS_PER_ITERATION = PPMOptixRenderer::PHOTON_LAUNCH_WIDTH*PPMOptixRenderer::PHOTON_LAUNCH_HEIGHT;
