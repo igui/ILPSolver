@@ -242,7 +242,7 @@ QVector<int> ILP::getMappedPosition(const QVector<ConditionPosition *>& position
 		for(int dimensionIdx = 0; dimensionIdx < dimensions.length(); ++dimensionIdx) {
 			auto normalizedPosition = positions[conditionIdx]->normalizedPosition();
 			mappedPositions.append(
-				floorf(meshSize * normalizedPosition[dimensionIdx] / dimensions[dimensionIdx])
+				floorf(meshSize * normalizedPosition[dimensionIdx])
 			);
 		}
 	}

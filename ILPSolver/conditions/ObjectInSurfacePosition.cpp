@@ -21,8 +21,6 @@ QVector<float> ObjectInSurfacePosition::normalizedPosition() const
 	return m_normalizedPosition;
 }
 
-#include <iostream>
-
 void ObjectInSurfacePosition::apply(PMOptixRenderer *renderer) const
 {
 	auto position = this->position() - initialPosition;
