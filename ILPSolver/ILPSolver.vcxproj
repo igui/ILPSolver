@@ -114,7 +114,8 @@
   </ItemGroup>
   <ItemGroup>
     <Xml Include="examples\color.xml" />
-    <Xml Include="examples\conference.xml">
+    <Xml Include="examples\conference-color.xml" />
+    <Xml Include="examples\conference-directional.xml">
       <SubType>Designer</SubType>
     </Xml>
     <Xml Include="examples\cornell-move-cone.xml" />

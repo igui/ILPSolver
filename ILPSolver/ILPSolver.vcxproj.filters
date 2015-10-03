@@ -120,9 +120,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <Xml Include="examples\conference.xml">
-      <Filter>examples</Filter>
-    </Xml>
     <Xml Include="examples\color.xml">
       <Filter>examples</Filter>
     </Xml>
@@ -133,6 +130,12 @@
       <Filter>examples</Filter>
     </Xml>
     <Xml Include="examples\sponza.xml">
+      <Filter>examples</Filter>
+    </Xml>
+    <Xml Include="examples\conference-directional.xml">
+      <Filter>examples</Filter>
+    </Xml>
+    <Xml Include="examples\conference-color.xml">
       <Filter>examples</Filter>
     </Xml>
   </ItemGroup>
