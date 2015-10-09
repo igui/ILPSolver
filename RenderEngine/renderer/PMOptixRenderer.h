@@ -15,6 +15,7 @@
 #include <vector>
 #include <string>
 #include <functional>
+#include "RendererStatistics.h"
 
 
 class ComputeDevice;
@@ -58,6 +59,7 @@ public:
 	RENDER_ENGINE_EXPORT_API optix::Buffer outputBuffer();
 	RENDER_ENGINE_EXPORT_API unsigned int totalPhotons();
 	RENDER_ENGINE_EXPORT_API unsigned int getMaxPhotonWidth();
+	RENDER_ENGINE_EXPORT_API RendererStatistics getStatistics();
 
     const static unsigned int PHOTON_GRID_MAX_SIZE;
 private:
@@ -112,5 +114,5 @@ private:
 	QMap<QString, optix::Group>* m_groups;
 	QMap<QString, QList<int>> *m_lights; // a mapping to Light name to light position into m_lightBuffer
 	Logger *m_logger;
-
+	RendererStatistics m_statistics;
 };

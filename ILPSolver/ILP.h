@@ -50,6 +50,12 @@ private:
 		SurfaceRadiosityEvaluation *evaluation;
 		float timeEvaluation;
 	};
+
+	struct Statistics {
+		double evaluationTime;
+		int evaluations;
+		double totalTime;
+	};
 public:
 	ILP();
 	static ILP fromFile(Logger *logger, const QString& filePath, PMOptixRenderer *renderer);
@@ -110,4 +116,5 @@ private:
 	int maxIterations;
 	Logger *logger;
 	QDir outputDir;
+	Statistics statistics;
 };

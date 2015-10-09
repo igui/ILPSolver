@@ -30,6 +30,7 @@ ILP::ILP():
 	inited(false),
 	siIsoc(0, 0)
 {
+	statistics = { 0 };
 }
 
 uint qHash(const QVector<int> &key, uint seed)
@@ -87,6 +88,7 @@ void ILP::optimize()
 		logger->log("Done navigating whole neighbourhood: %d\n", currentIteration);
 	}
 	double totalTime = sutilCurrentTime() - start;
+	statistics.totalTime = totalTime;
 	
 	logger->log("%d iterations on %0.2fs. %0.2fs per iteration\n", 
 		(currentIteration+1), totalTime, totalTime/(currentIteration+1));
@@ -289,7 +291,11 @@ ILP::EvaluateSolutionResult ILP::evaluateSolution(const QVector<ConditionPositio
 		evaluations[mappedPositions] = candidate;
 
 		evaluation = candidate;
-		return EvaluateSolutionResult(false, mappedPositions, evaluation, sutilCurrentTime() - startTime);
+
+		auto totalTime = sutilCurrentTime() - startTime;
+		statistics.evaluationTime += totalTime;
+		statistics.evaluations++;
+		return EvaluateSolutionResult(false, mappedPositions, evaluation, totalTime);
 	}
 }
 
@@ -302,7 +308,10 @@ ILP::EvaluateSolutionResult ILP::reevalMaxQuality()
 {
 	double startTime = sutilCurrentTime();
 	auto evaluation = optimizationFunction->evaluateFast(1.0f);
-	return EvaluateSolutionResult(evaluation, sutilCurrentTime() - startTime);
+	auto totalTime = sutilCurrentTime() - startTime;
+	statistics.evaluationTime += totalTime;
+	statistics.evaluations++;
+	return EvaluateSolutionResult(evaluation, totalTime);
 }
 
 QVector<ConditionPosition *> ILP::findAllNeighbours(

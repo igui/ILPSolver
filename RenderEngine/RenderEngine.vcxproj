@@ -74,6 +74,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="material\Glass.h" />
+    <ClInclude Include="renderer\RendererStatistics.h" />
     <ClInclude Include="util\RelPath.h" />
     <ClInclude Include="logging\DummyLogger.h" />
     <ClInclude Include="logging\SignalLogger.hxx" />

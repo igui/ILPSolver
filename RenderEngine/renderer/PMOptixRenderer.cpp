@@ -397,6 +397,13 @@ void PMOptixRenderer::buildPhotonBuffer(unsigned int photonLaunchWidth)
 	render(photonLaunchWidth, 10, 10, Camera(), false, true);
 }
 
+double calcEllapsedTime(std::function<void(void)> process)
+{
+	double start = sutilCurrentTime();
+	process();
+	return sutilCurrentTime() - start;
+}
+
 void PMOptixRenderer::render(unsigned int photonLaunchWidth, unsigned int height, unsigned int width, const Camera camera, bool generateOutput, bool storefirstHitPhotons)
 {
 	//storefirstHitPhotons = true;
@@ -418,10 +425,12 @@ void PMOptixRenderer::render(unsigned int photonLaunchWidth, unsigned int height
         // If the width and height of the current render request has changed, we must resize buffers
 		if(width != m_width || height != m_height || photonLaunchWidth != m_photonWidth)
         {
-			this->resizeBuffers(width, height, photonLaunchWidth);
+			m_statistics.resizeBufferTime +=  calcEllapsedTime([&]()
+			{
+				this->resizeBuffers(width, height, photonLaunchWidth);
+			});
         }
 
-        double traceStartTime = sutilCurrentTime();
         m_context["camera"]->setUserData( sizeof(Camera), &camera );
 
 		//int numSteps = generateOutput ? 7 : 2;
@@ -433,100 +442,84 @@ void PMOptixRenderer::render(unsigned int photonLaunchWidth, unsigned int height
         //
         // Photon Tracing
         //
-        {
-			double start = sutilCurrentTime();
-            nvtx::ScopedRange r( "OptixEntryPoint::PHOTON_PASS" );
-            m_context->launch( OptixEntryPoint::PPM_PHOTON_PASS,
-                static_cast<unsigned int>(m_photonWidth),
-                static_cast<unsigned int>(m_photonWidth) );
-			double time = sutilCurrentTime() - start;
-			//m_logger->log("1/%d PHOTON_PASS time: %1.3fs\n", numSteps, time);
-        }
+		m_statistics.photonTracingTime += calcEllapsedTime([&](){
+			nvtx::ScopedRange r("OptixEntryPoint::PHOTON_PASS");
+			m_context->launch(OptixEntryPoint::PPM_PHOTON_PASS,
+				static_cast<unsigned int>(m_photonWidth),
+				static_cast<unsigned int>(m_photonWidth));
+		});
 
 		if (generateOutput)
 		{
 			//
 			// Create Photon Map
 			//
-			double start = sutilCurrentTime();
-			nvtx::ScopedRange r("Creating photon map");
-			createUniformGridPhotonMap(m_scenePPMRadius);
-			double time = sutilCurrentTime() - start;
-			//m_logger->log("2/%d Creating photon map time: %1.3fs\n", numSteps, time);
+			m_statistics.buildPhotonMapTime += calcEllapsedTime([&](){
+				nvtx::ScopedRange r("Creating photon map");
+				createUniformGridPhotonMap(m_scenePPMRadius);
+			});
 		}
 
-
-		{
-			//
-			// Get hit count
-			//
-			double start = sutilCurrentTime();
-            nvtx::ScopedRange r( "Counting hit count" );
+		//
+		// Get hit count
+		//
+		m_statistics.hitCountCalculationTime += calcEllapsedTime([&](){
+			nvtx::ScopedRange r("Counting hit count");
 			countHitCountPerObject();
-			double time = sutilCurrentTime() - start;
-			//m_logger->log("3/%d Getting photons statistical data: %1.3fs\n", numSteps, time);
-        }
+		});
 
 
         //
         // Transfer any data from the photon acceleration structure build to the GPU (trigger an empty launch)
         //
-        {
+		m_statistics.transferDataTime += calcEllapsedTime([&](){
             nvtx::ScopedRange r("Transfer photon map to GPU");
             m_context->launch(OptixEntryPoint::PPM_INDIRECT_RADIANCE_ESTIMATION_PASS,
                 0, 0);
-        }
+		});
 
         // Trace viewing rays
 		if(generateOutput){
-			double start = sutilCurrentTime();
-            nvtx::ScopedRange r("OptixEntryPoint::RAYTRACE_PASS");
-            m_context->launch( OptixEntryPoint::PPM_RAYTRACE_PASS,
-                static_cast<unsigned int>(m_width),
-                static_cast<unsigned int>(m_height) );
-			double time = sutilCurrentTime() - start;
-			//m_logger->log("4/%d RAYTRACE_PASS time: %1.3fs\n", numSteps, time);
+			m_statistics.raytracePassTime += calcEllapsedTime([&](){
+				nvtx::ScopedRange r("OptixEntryPoint::RAYTRACE_PASS");
+				m_context->launch(OptixEntryPoint::PPM_RAYTRACE_PASS,
+					static_cast<unsigned int>(m_width),
+					static_cast<unsigned int>(m_height));
+			});
         }
     
         //
         // PPM Indirect Estimation (using the photon map)
         //
 		if(generateOutput){
-			double start = sutilCurrentTime();
-            nvtx::ScopedRange r("OptixEntryPoint::INDIRECT_RADIANCE_ESTIMATION");
-            m_context->launch(OptixEntryPoint::PPM_INDIRECT_RADIANCE_ESTIMATION_PASS,
-                m_width, m_height);
-			double time = sutilCurrentTime() - start;
-			//m_logger->log("5/%d INDIRECT_RADIANCE_ESTIMATION time: %1.3fs\n", numSteps, time);
+			m_statistics.indirectRadiancePassTime += calcEllapsedTime([&](){
+				nvtx::ScopedRange r("OptixEntryPoint::INDIRECT_RADIANCE_ESTIMATION");
+				m_context->launch(OptixEntryPoint::PPM_INDIRECT_RADIANCE_ESTIMATION_PASS,
+					m_width, m_height);
+			});
         }
 
         //
         // Direct Radiance Estimation
         //
         if(generateOutput){
-			double start = sutilCurrentTime();
-            nvtx::ScopedRange r("OptixEntryPoint::PPM_DIRECT_RADIANCE_ESTIMATION_PASS");
-            m_context->launch(OptixEntryPoint::PPM_DIRECT_RADIANCE_ESTIMATION_PASS,
-                m_width, m_height);
-			double time = sutilCurrentTime() - start;
-			//m_logger->log("6/%d DIRECT_RADIANCE_ESTIMATION_PASS time: %1.3fs\n", numSteps, time);
+			m_statistics.directRadiancePassTime += calcEllapsedTime([&](){
+				nvtx::ScopedRange r("OptixEntryPoint::PPM_DIRECT_RADIANCE_ESTIMATION_PASS");
+				m_context->launch(OptixEntryPoint::PPM_DIRECT_RADIANCE_ESTIMATION_PASS,
+					m_width, m_height);
+			});
         }
 
         //
         // Combine indirect and direct buffers in the output buffer
         //
 		if(generateOutput){
-			double start = sutilCurrentTime();
-			nvtx::ScopedRange r("OptixEntryPoint::PPM_OUTPUT_PASS");
-			m_context->launch(OptixEntryPoint::PPM_OUTPUT_PASS,
-				m_width, m_height);
-			double time = sutilCurrentTime() - start;
-			//m_logger->log("7/%d OUTPUT_PASS time: %1.3fs\n", numSteps, time);
+			m_statistics.outputPassTime += calcEllapsedTime([&](){
+				nvtx::ScopedRange r("OptixEntryPoint::PPM_OUTPUT_PASS");
+				m_context->launch(OptixEntryPoint::PPM_OUTPUT_PASS,
+					m_width, m_height);
+			});
 		}
-
-        double traceTime = sutilCurrentTime() -traceStartTime;
-
-		//m_logger->log("---- END Trace time: %1.3fs -----\n", traceTime);
     }
     catch(const optix::Exception & e)
     {

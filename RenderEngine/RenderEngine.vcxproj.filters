@@ -257,6 +257,9 @@
     <ClInclude Include="material\Glass.h">
       <Filter>material</Filter>
     </ClInclude>
+    <ClInclude Include="renderer\RendererStatistics.h">
+      <Filter>renderer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="material">
