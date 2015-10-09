@@ -13,6 +13,6 @@
 
   <!-- Which aspects of the scene must be optimized  -->
   <objectives maxIterations="100">
-    <maximizeRadiance surface="Table"/>
+    <maximizeRadiance surface="Torus"/>
   </objectives>
 </input>
