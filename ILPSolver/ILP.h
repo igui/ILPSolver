@@ -44,6 +44,7 @@ private:
 			SurfaceRadiosityEvaluation *eval,
 			float timeEvaluation
 		);
+	void logStatistics();
 
 		bool isCached;
 		QVector<int> mappedPositions;
@@ -80,6 +81,7 @@ private:
 		const QString& iterationComment,
 		float evaluationDuration
 		);
+	void logStatistics();
 
 	// optimization
 	Configuration processInitialConfiguration();

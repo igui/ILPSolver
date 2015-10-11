@@ -93,6 +93,8 @@ void ILP::optimize()
 	logger->log("%d iterations on %0.2fs. %0.2fs per iteration\n", 
 		(currentIteration+1), totalTime, totalTime/(currentIteration+1));
 
+	logStatistics();
+
 	logBestConfigurations();
 }
 

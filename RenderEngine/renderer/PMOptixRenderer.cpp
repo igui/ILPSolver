@@ -775,6 +775,11 @@ const std::vector<std::string>& PMOptixRenderer::objectToNameMapping() const
 	return m_objectIdToName;
 }
 
+RendererStatistics PMOptixRenderer::getStatistics()
+{
+	return m_statistics;
+}
+
 Program PMOptixRenderer::createProgram(const std::string& filename, const std::string programName)
 {
 	try {
