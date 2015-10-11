@@ -15,7 +15,7 @@ class SurfaceRadiosityEvaluation;
 class SurfaceRadiosity
 {
 public:
-	SurfaceRadiosity(Logger *logger, PMOptixRenderer *renderer, Scene *scene, const QString &surfaceId);
+	SurfaceRadiosity(Logger *logger, PMOptixRenderer *renderer, Scene *scene, const QString &surfaceId, float maxRadiosity);
 	SurfaceRadiosityEvaluation *evaluateRadiosity();
 	SurfaceRadiosityEvaluation *evaluateFast(float quality, bool reusePreviousBuffer);
 	void saveImage(const QString &fileName);	
@@ -34,6 +34,7 @@ private:
 	unsigned int maxPhotonWidth;
 	static const float gammaCorrection;
 
+	float maxRadiosity;
 	PMOptixRenderer *m_renderer;
 	Scene *scene;
 	Logger *logger;

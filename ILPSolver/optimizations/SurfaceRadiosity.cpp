@@ -16,14 +16,16 @@ const unsigned int SurfaceRadiosity::sampleImageWidth = 1024;
 const unsigned int SurfaceRadiosity::minPhotonWidth = 16;
 const float SurfaceRadiosity::gammaCorrection = 2.8f;
 
-SurfaceRadiosity::SurfaceRadiosity(Logger *logger, PMOptixRenderer *renderer, Scene *scene, const QString &surfaceId):
+SurfaceRadiosity::SurfaceRadiosity(Logger *logger, PMOptixRenderer *renderer,
+		Scene *scene, const QString &surfaceId, float maxRadiosity):
 	m_renderer(renderer),
 	scene(scene),
 	logger(logger),
 	sampleCamera(new Camera(scene->getDefaultCamera())),
 	maxPhotonWidth(renderer->getMaxPhotonWidth()),
 	surfaceId(surfaceId),
-	objectId(scene->getObjectId(surfaceId))
+	objectId(scene->getObjectId(surfaceId)),
+	maxRadiosity(maxRadiosity)
 {
 	if(objectId < 0)
 		throw std::invalid_argument(("There isn't any object named " + surfaceId + " in the scene").toStdString());
@@ -46,7 +48,9 @@ SurfaceRadiosityEvaluation *SurfaceRadiosity::genEvaluation(int nPhotons)
 	// radius is the confidence radius given by equations 
 	float radius = z * R * sqrtf( p*(1-p) /   m_renderer->totalPhotons()  );
 
-	return new SurfaceRadiosityEvaluation(r, radius, nPhotons, nPhotons >= maxPhotonWidth * maxPhotonWidth);
+	bool valid = r - radius <= maxRadiosity;
+
+	return new SurfaceRadiosityEvaluation(r, radius, nPhotons, nPhotons >= maxPhotonWidth * maxPhotonWidth, valid);
 }
 
 

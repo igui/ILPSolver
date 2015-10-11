@@ -247,9 +247,21 @@ void ILP::readOptimizationFunction(QDomDocument& xml)
 			if(surface.isEmpty())
 				throw std::logic_error("surface can't be empty");
 
-			optimizationFunction = new SurfaceRadiosity(logger, renderer, scene, surface);
+			QString maxRadiosity = maximizeRadianceNode.attribute("maxRadiosity");
+			float maxRadiosityVal;
+			if (maxRadiosity.isEmpty())
+				maxRadiosityVal = std::numeric_limits<float>::infinity();
+			else
+			{
+				bool ok;
+				maxRadiosityVal = maxRadiosity.toFloat(&ok);
+				if (!ok)
+					throw std::logic_error("Invalid value for maxRadiosity");
+			}
 
-			qDebug("objective: maximize Surface Radiosity on %s", qPrintable(surface));
+			optimizationFunction = new SurfaceRadiosity(logger, renderer, scene, surface, maxRadiosityVal);
+
+			qDebug("objective: maximize Surface Radiosity on %s. Max value %f", qPrintable(surface), maxRadiosityVal);
 		}
 	}
 

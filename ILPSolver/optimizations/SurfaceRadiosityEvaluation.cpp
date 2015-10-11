@@ -1,18 +1,25 @@
 #include "SurfaceRadiosityEvaluation.h"
 #include <QLocale>
 
-SurfaceRadiosityEvaluation::SurfaceRadiosityEvaluation(float val, float radius, int photons, bool isMaxQuality):
+SurfaceRadiosityEvaluation::SurfaceRadiosityEvaluation(float val, float radius,
+		int photons, bool isMaxQuality, bool isValid):
  m_val(val),
  m_radius(radius),
  m_photons(photons),
  m_interval(val, radius),
- m_isMaxQuality(isMaxQuality)
+ m_isMaxQuality(isMaxQuality),
+ m_isValid(isValid)
 {
 }
 
 Interval SurfaceRadiosityEvaluation::interval() const
 {
 	return m_interval;
+}
+
+bool SurfaceRadiosityEvaluation::valid() const
+{
+	return m_isValid;
 }
 
 float SurfaceRadiosityEvaluation::val() const

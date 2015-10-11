@@ -12,9 +12,11 @@ private:
 	int m_photons;
 	Interval m_interval;
 	bool m_isMaxQuality;
+	bool m_isValid;
 public:
-	SurfaceRadiosityEvaluation(float val, float radius, int photons, bool isMaxQuality);
+	SurfaceRadiosityEvaluation(float val, float radius, int photons, bool isMaxQuality, bool isValid);
 
+	bool valid() const;
 	float val() const;
 	float radius() const;
 	int photons() const;

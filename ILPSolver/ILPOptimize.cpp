@@ -136,6 +136,13 @@ bool ILP::recalcISOC(
 		return false;
 	}
 
+	if (!eval.evaluation->valid())
+	{
+		logIterationResults(positions, eval.evaluation, "INVALID", eval.timeEvaluation);
+		++currentIteration;
+		return false;
+	}
+
 	if(eval.evaluation->interval() < siIsoc) {
 		++currentIteration;
 		logIterationResults(positions, eval.evaluation, "BAD", eval.timeEvaluation);
