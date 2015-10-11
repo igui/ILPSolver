@@ -80,7 +80,6 @@ private:
 		const QString& iterationComment,
 		float evaluationDuration
 		);
-	void logStatistics();
 
 	// optimization
 	Configuration processInitialConfiguration();

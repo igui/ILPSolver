@@ -93,18 +93,13 @@ void ILP::optimize()
 	logger->log("%d iterations on %0.2fs. %0.2fs per iteration\n", 
 		(currentIteration+1), totalTime, totalTime/(currentIteration+1));
 
-	logStatistics();
-
 	logBestConfigurations();
 }
 
 Configuration ILP::processInitialConfiguration()
 {
 	logIterationHeader();
-	auto startTime = sutilCurrentTime();
-	auto evaluation = optimizationFunction->evaluateFast(1.0f, false);
-	auto initialEval = EvaluateSolutionResult(evaluation, sutilCurrentTime() - startTime);
-
+	auto initialEval = reevalMaxQuality();
 	auto initialPositions = QtConcurrent::blockingMapped(
 		conditions,
 		(ConditionPosition *(*)(Condition *)) [] (Condition * condition) { return condition->initial(); }
@@ -293,7 +288,7 @@ ILP::EvaluateSolutionResult ILP::evaluateSolution(const QVector<ConditionPositio
 		}
 
 		// TODO use evaluate fast
-		auto candidate = optimizationFunction->evaluateFast(fastEvaluationQuality, false);
+		auto candidate = optimizationFunction->evaluateFast(fastEvaluationQuality);
 		/*auto candidate = optimizationFunction->evaluateRadiosity();
 		auto imagePath = outputDir.filePath(
 			QString("solution-%1.png").arg(currentIteration, 4, 10, QLatin1Char('0'))
@@ -319,7 +314,7 @@ void ILP::setEvaluation(const QVector<int>& mappedPositions, SurfaceRadiosityEva
 ILP::EvaluateSolutionResult ILP::reevalMaxQuality()
 {
 	double startTime = sutilCurrentTime();
-	auto evaluation = optimizationFunction->evaluateFast(1.0f, true);
+	auto evaluation = optimizationFunction->evaluateFast(1.0f);
 	auto totalTime = sutilCurrentTime() - startTime;
 	statistics.evaluationTime += totalTime;
 	statistics.evaluations++;

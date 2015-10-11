@@ -84,15 +84,12 @@ void PMOptixRenderer::initialize(const ComputeDevice & device, Logger *logger)
     m_context->setStackSize(4096);
 	m_context->setPrintEnabled(true);
 
-	m_photonWidth = getMaxPhotonWidth();
-
     m_context["maxPhotonDepositsPerEmitted"]->setUint(MAX_PHOTON_COUNT);
     m_context["ppmRadius"]->setFloat(0.f);
     m_context["ppmRadiusSquared"]->setFloat(0.f);
     m_context["emittedPhotonsPerIterationFloat"]->setFloat(0.f);
     m_context["photonLaunchWidth"]->setUint(0);
 	m_context["storefirstHitPhotons"]->setUint(0);
-	m_context["photonBufferOffset"]->setUint(0);
 	m_context["photonPowerScale"]->setFloat(0.f);
 	
 
@@ -140,7 +137,7 @@ void PMOptixRenderer::initialize(const ComputeDevice & device, Logger *logger)
     m_photons = m_context->createBuffer(RT_BUFFER_OUTPUT);
     m_photons->setFormat( RT_FORMAT_USER );
     m_photons->setElementSize( sizeof( Photon ) );
-	m_photons->setSize(getMaxTotalPhotons());
+	m_photons->setSize(getNumPhotons());
     m_context["photons"]->set( m_photons );
 	m_context["photonsSize"]->setUint(getNumPhotons());
 
@@ -392,12 +389,12 @@ void PMOptixRenderer::compile()
 void PMOptixRenderer::renderNextIteration(unsigned long long iterationNumber, unsigned long long localIterationNumber, float PPMRadius, 
                                         const RenderServerRenderRequestDetails & details)
 {
-	render(getMaxPhotonWidth(), details.getHeight(), details.getWidth(), details.getCamera(), true, false, false);
+	render(512, details.getHeight(), details.getWidth(), details.getCamera(), true, false);
 }
 
-void PMOptixRenderer::buildPhotonBuffer(unsigned int photonLaunchWidth, bool reusePreviousBuffer)
+void PMOptixRenderer::buildPhotonBuffer(unsigned int photonLaunchWidth)
 {
-	render(photonLaunchWidth, 10, 10, Camera(), false, true, reusePreviousBuffer);
+	render(photonLaunchWidth, 10, 10, Camera(), false, true);
 }
 
 double calcEllapsedTime(std::function<void(void)> process)
@@ -407,8 +404,7 @@ double calcEllapsedTime(std::function<void(void)> process)
 	return sutilCurrentTime() - start;
 }
 
-void PMOptixRenderer::render(unsigned int photonLaunchWidth, unsigned int height, unsigned int width,
-	const Camera camera, bool generateOutput, bool storefirstHitPhotons, bool reusePreviousBuffer)
+void PMOptixRenderer::render(unsigned int photonLaunchWidth, unsigned int height, unsigned int width, const Camera camera, bool generateOutput, bool storefirstHitPhotons)
 {
 	//storefirstHitPhotons = true;
 
@@ -418,11 +414,6 @@ void PMOptixRenderer::render(unsigned int photonLaunchWidth, unsigned int height
         throw std::exception("Traced before PMOptixRenderer was initialized.");
     }
 
-	if (reusePreviousBuffer && generateOutput)
-	{
-		throw std::exception("reusePreviousBuffer must be used only when generating photon buffers");
-	}
-
 	nvtx::ScopedRange r("PMOptixRenderer::Trace");
 
 	//m_logger->log("Used host memory: %1.1fMib\n", m_context->getUsedHostMemory() / (1024.0f * 1024.0f) );
@@ -430,31 +421,6 @@ void PMOptixRenderer::render(unsigned int photonLaunchWidth, unsigned int height
     try
     {
 		m_context["storefirstHitPhotons"]->setUint(storefirstHitPhotons);
-
-		unsigned int actualPhotonLaunchWidth = photonLaunchWidth;
-
-		if (reusePreviousBuffer)
-		{
-			unsigned int nDiff = photonLaunchWidth * photonLaunchWidth - m_photonWidth * m_photonWidth;
-			unsigned int sqrtNDiff = ceilf(sqrtf(nDiff));
-			
-			actualPhotonLaunchWidth = (sqrtNDiff + 0x10) & ~0xF;
-
-			assert(actualPhotonLaunchWidth * actualPhotonLaunchWidth >= nDiff);
-			assert(actualPhotonLaunchWidth * actualPhotonLaunchWidth % 0x10 == 0);
-		}
-
-		// Set the offset
-		unsigned int photonBufferOffset = 0;
-		if (reusePreviousBuffer)
-		{
-			photonBufferOffset = (photonLaunchWidth * photonLaunchWidth - actualPhotonLaunchWidth * actualPhotonLaunchWidth) * MAX_PHOTON_COUNT;
-		}
-		m_context["photonBufferOffset"]->setUint(photonBufferOffset);
-
-		m_context["photonLaunchWidth"]->setUint(actualPhotonLaunchWidth);
-
-		assert(photonBufferOffset + MAX_PHOTON_COUNT * (actualPhotonLaunchWidth * actualPhotonLaunchWidth) == MAX_PHOTON_COUNT * photonLaunchWidth * photonLaunchWidth);
 
         // If the width and height of the current render request has changed, we must resize buffers
 		if(width != m_width || height != m_height || photonLaunchWidth != m_photonWidth)
@@ -464,7 +430,7 @@ void PMOptixRenderer::render(unsigned int photonLaunchWidth, unsigned int height
 				this->resizeBuffers(width, height, photonLaunchWidth);
 			});
         }
-        
+
         m_context["camera"]->setUserData( sizeof(Camera), &camera );
 
 		//int numSteps = generateOutput ? 7 : 2;
@@ -479,20 +445,20 @@ void PMOptixRenderer::render(unsigned int photonLaunchWidth, unsigned int height
 		m_statistics.photonTracingTime += calcEllapsedTime([&](){
 			nvtx::ScopedRange r("OptixEntryPoint::PHOTON_PASS");
 			m_context->launch(OptixEntryPoint::PPM_PHOTON_PASS,
-				actualPhotonLaunchWidth, actualPhotonLaunchWidth);
+				static_cast<unsigned int>(m_photonWidth),
+				static_cast<unsigned int>(m_photonWidth));
 		});
 
-		//
-		// Create Photon Map
-		//
 		if (generateOutput)
 		{
+			//
+			// Create Photon Map
+			//
 			m_statistics.buildPhotonMapTime += calcEllapsedTime([&](){
 				nvtx::ScopedRange r("Creating photon map");
 				createUniformGridPhotonMap(m_scenePPMRadius);
 			});
 		}
-		
 
 		//
 		// Get hit count
@@ -567,16 +533,19 @@ void PMOptixRenderer::resizeBuffers(unsigned int width, unsigned int height, uns
 {
 	m_photonWidth = photonWidth;
 	m_context["emittedPhotonsPerIterationFloat"]->setFloat(m_photonWidth * m_photonWidth);
+	m_context["photonLaunchWidth"]->setUint(m_photonWidth);
+	m_photons->setSize(getNumPhotons());
 	m_context["photonsSize"]->setUint(getNumPhotons());
 	m_photonsHashCells->setSize( getNumPhotons() );
 	m_context["photonPowerScale"]->setFloat(1.0f / (photonWidth * photonWidth * m_totalLightPower) );
+
 
     m_outputBuffer->setSize( width, height );
     m_raytracePassOutputBuffer->setSize( width, height );
     m_outputBuffer->setSize( width, height );
     m_directRadianceBuffer->setSize( width, height );
     m_indirectRadianceBuffer->setSize( width, height );
-	m_randomStatesBuffer->setSize(max(getMaxPhotonWidth(), (unsigned int)width), max(getMaxPhotonWidth(), (unsigned int)height));
+    m_randomStatesBuffer->setSize(max(m_photonWidth, (unsigned int)width), max(m_photonWidth,  (unsigned int)height));
     initializeRandomStates();
     m_width = width;
     m_height = height;
@@ -643,12 +612,6 @@ unsigned int PMOptixRenderer::getScreenBufferSizeBytes() const
 unsigned int PMOptixRenderer::getNumPhotons() const
 {
 	return m_photonWidth * m_photonWidth * MAX_PHOTON_COUNT;
-}
-
-unsigned int PMOptixRenderer::getMaxTotalPhotons()
-{
-	auto photonWidth = getMaxPhotonWidth();
-	return photonWidth * photonWidth * MAX_PHOTON_COUNT;
 }
 
 static void transformBufferMatrix(Buffer buffer, const Matrix4x4& matrix)
@@ -810,11 +773,6 @@ unsigned int PMOptixRenderer::getMaxPhotonWidth()
 const std::vector<std::string>& PMOptixRenderer::objectToNameMapping() const
 {
 	return m_objectIdToName;
-}
-
-RendererStatistics PMOptixRenderer::getStatistics() const
-{
-	return m_statistics;
 }
 
 Program PMOptixRenderer::createProgram(const std::string& filename, const std::string programName)

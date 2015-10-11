@@ -108,36 +108,3 @@ void ILP::logBestConfigurations()
 		++i;
 	}
 }
-
-static std::string toString(double d)
-{
-	QLocale locale;
-	return locale.toString(d, 'f', 10).toStdString();
-}
-
-
-void ILP::logStatistics()
-{
-	logger->log("Statistics:\n");
-	logger->log("Evaluations\t%d\n", statistics.evaluations);
-	logger->log("Total time\t%s\n", toString(statistics.totalTime).c_str());
-
-	auto timePerIteration = statistics.totalTime / statistics.evaluations;
-	logger->log("Time per iteration\t%s\n", toString(timePerIteration).c_str());
-
-	logger->log("Evaluation time\t%s\n", toString(statistics.evaluationTime).c_str());
-	
-	auto rendererStatistics = renderer->getStatistics();
-	logger->log("Photon Tracing\t%s\n", toString(rendererStatistics.photonTracingTime).c_str());
-	logger->log("Build Photon Map\t%s\n", toString(rendererStatistics.buildPhotonMapTime).c_str());
-	logger->log("Resize Buffers\t%s\n", toString(rendererStatistics.resizeBufferTime).c_str());
-	logger->log("Calculate Hit Count\t%s\n", toString(rendererStatistics.hitCountCalculationTime).c_str());
-
-	auto otherTime = statistics.totalTime - (
-		  rendererStatistics.photonTracingTime
-		+ rendererStatistics.buildPhotonMapTime
-		+ rendererStatistics.resizeBufferTime
-		+ rendererStatistics.hitCountCalculationTime);
-
-	logger->log("Other\t%s\n", toString(otherTime).c_str());
-}
