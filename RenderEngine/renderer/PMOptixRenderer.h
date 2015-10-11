@@ -41,8 +41,9 @@ public:
 
     RENDER_ENGINE_EXPORT_API void renderNextIteration(unsigned long long iterationNumber, unsigned long long localIterationNumber, 
         float PPMRadius, const RenderServerRenderRequestDetails & details);
-	RENDER_ENGINE_EXPORT_API void render(unsigned int photonLaunchWidth, unsigned int height, unsigned int width, const Camera camera, bool generateOutput, bool storefirstHitPhotons);
-	RENDER_ENGINE_EXPORT_API void buildPhotonBuffer(unsigned int photonLaunchWidth);
+	RENDER_ENGINE_EXPORT_API void render(unsigned int photonLaunchWidth, unsigned int height, unsigned int width,
+		const Camera camera, bool generateOutput, bool storefirstHitPhotons, bool reusePreviousBuffer);
+	RENDER_ENGINE_EXPORT_API void buildPhotonBuffer(unsigned int photonLaunchWidth, bool reusePreviousBuffer);
     RENDER_ENGINE_EXPORT_API void getOutputBuffer(void* data);
 	RENDER_ENGINE_EXPORT_API std::vector<unsigned int> getHitCount();
     RENDER_ENGINE_EXPORT_API unsigned int getWidth() const;
@@ -59,7 +60,8 @@ public:
 	RENDER_ENGINE_EXPORT_API optix::Buffer outputBuffer();
 	RENDER_ENGINE_EXPORT_API unsigned int totalPhotons();
 	RENDER_ENGINE_EXPORT_API unsigned int getMaxPhotonWidth();
-	RENDER_ENGINE_EXPORT_API RendererStatistics getStatistics();
+	RENDER_ENGINE_EXPORT_API unsigned int getMaxTotalPhotons();
+	RENDER_ENGINE_EXPORT_API RendererStatistics getStatistics() const;
 
     const static unsigned int PHOTON_GRID_MAX_SIZE;
 private:

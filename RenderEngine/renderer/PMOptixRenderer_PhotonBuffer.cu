@@ -63,6 +63,8 @@ void PMOptixRenderer::countHitCountPerObject()
 	int deviceNumber = 0;
 	cudaSetDevice(m_optixDeviceOrdinal);
 
+	cudaDeviceSynchronize();
+
 	thrust::device_ptr<unsigned int> hitCount = getThrustDevicePtr<unsigned int>(m_hitCountBuffer, deviceNumber);
 	thrust::fill(hitCount, hitCount + m_sceneObjects, 0);
 

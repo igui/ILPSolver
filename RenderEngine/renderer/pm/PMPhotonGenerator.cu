@@ -26,6 +26,7 @@ rtBuffer<Photon, 1> photons;
 rtBuffer<RandomState, 2> randomStates;
 rtDeclareVariable(uint, maxPhotonDepositsPerEmitted, , );
 rtDeclareVariable(uint, photonLaunchWidth, , );
+rtDeclareVariable(uint, photonBufferOffset, , );
 rtBuffer<Light, 1> lights;
 rtDeclareVariable(uint2, launchIndex, rtLaunchIndex, );
 rtDeclareVariable(uint2, launchDim, rtLaunchDim, );
@@ -111,7 +112,7 @@ static __device__ void generatePhotonOriginAndDirection(const Light& light, Rand
 RT_PROGRAM void generator()
 {
     PhotonPRD photonPrd;
-    photonPrd.pm_index = (launchIndex.y * photonLaunchWidth + launchIndex.x)*maxPhotonDepositsPerEmitted;
+    photonPrd.pm_index = (launchIndex.y * photonLaunchWidth + launchIndex.x)*maxPhotonDepositsPerEmitted + photonBufferOffset;
     photonPrd.numStoredPhotons = 0;
     photonPrd.depth = 0;
     photonPrd.weight = 1.0f;
