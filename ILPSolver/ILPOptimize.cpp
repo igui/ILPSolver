@@ -109,14 +109,28 @@ Configuration ILP::processInitialConfiguration()
 		
 	auto initialConfig = Configuration(initialEval.evaluation, initialPositions);
 	isoc.clear();
-	isoc.append(initialConfig);
-	siIsoc = initialEval.evaluation->interval();
+
+	QString initialIterationComment;
+	
+	if (initialEval.evaluation->valid())
+	{
+		isoc.append(initialConfig);
+		siIsoc = initialEval.evaluation->interval();
+		initialIterationComment = "INITIAL";
+	}
+	else
+	{
+		isoc.append(initialConfig);
+		siIsoc = Interval(0, 0);
+		initialIterationComment = "INITIAL INVALID";
+	}
+
 
 	logger->log("Initial  solution: %s\n", qPrintable(initialEval.evaluation->infoShort()));
 	logIterationResults(
 		initialConfig.positions(),
 		initialEval.evaluation,
-		"INITIAL",
+		initialIterationComment,
 		initialEval.timeEvaluation
 	);
 	++currentIteration;
@@ -128,7 +142,6 @@ bool ILP::recalcISOC(
 	ILP::EvaluateSolutionResult eval)
 {
 	if(eval.isCached) {
-		logIterationResults(positions, eval.evaluation, "CACHED", eval.timeEvaluation);
 		++currentIteration;
 		return false;
 	}
