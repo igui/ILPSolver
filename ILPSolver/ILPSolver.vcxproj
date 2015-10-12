@@ -103,8 +103,6 @@
     </CudaCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="examples\color.blend" />
-    <None Include="examples\color.dae" />
     <None Include="examples\conference.blend" />
     <None Include="examples\conference.dae" />
     <None Include="examples\cornell.blend" />
@@ -113,20 +111,13 @@
     <None Include="examples\sponza.dae" />
   </ItemGroup>
   <ItemGroup>
-    <Xml Include="examples\color.xml" />
-    <Xml Include="examples\conference-color.xml" />
-    <Xml Include="examples\conference-directional.xml">
+    <Xml Include="examples\sponza-color.xml" />
+    <Xml Include="examples\conference.xml">
       <SubType>Designer</SubType>
     </Xml>
     <Xml Include="examples\cornell-move-cone.xml" />
     <Xml Include="examples\cornell-move-light.xml" />
-    <Xml Include="examples\sponza.xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="examples\brickwork-texture.jpg" />
-    <Image Include="examples\brickwork_normal-map.jpg" />
-    <Image Include="examples\steel.jpg" />
-    <Image Include="examples\suzanne.png" />
+    <Xml Include="examples\sponza-hole.xml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

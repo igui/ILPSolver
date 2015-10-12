@@ -89,12 +89,6 @@
     <None Include="examples\conference.dae">
       <Filter>examples</Filter>
     </None>
-    <None Include="examples\color.blend">
-      <Filter>examples</Filter>
-    </None>
-    <None Include="examples\color.dae">
-      <Filter>examples</Filter>
-    </None>
     <None Include="examples\cornell.blend">
       <Filter>examples</Filter>
     </None>
@@ -120,32 +114,21 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <Xml Include="examples\color.xml">
-      <Filter>examples</Filter>
-    </Xml>
     <Xml Include="examples\cornell-move-cone.xml">
       <Filter>examples</Filter>
     </Xml>
     <Xml Include="examples\cornell-move-light.xml">
       <Filter>examples</Filter>
     </Xml>
-    <Xml Include="examples\sponza.xml">
+    <Xml Include="examples\conference.xml">
       <Filter>examples</Filter>
     </Xml>
-    <Xml Include="examples\conference-directional.xml">
+    <Xml Include="examples\sponza-hole.xml">
       <Filter>examples</Filter>
     </Xml>
-    <Xml Include="examples\conference-color.xml">
+    <Xml Include="examples\sponza-color.xml">
       <Filter>examples</Filter>
     </Xml>
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="examples\suzanne.png">
-      <Filter>examples</Filter>
-    </Image>
-    <Image Include="examples\steel.jpg" />
-    <Image Include="examples\brickwork-texture.jpg" />
-    <Image Include="examples\brickwork_normal-map.jpg" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="optimizations\SurfaceRadiosity.cu">
