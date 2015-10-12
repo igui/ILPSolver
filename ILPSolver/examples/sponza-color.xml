@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<input>
+  <!-- Scene path (relative to this file) -->
+  <scene path="sponza-color.dae"/>
+
+  <!-- print output images and log on "./output" folder -->
+  <output path="output"/>
+
+  <!-- Optimization variables -->
+  <conditions meshSize="50">
+    <color id="InnerWalls" saturation="1.0" value="0.9"/>
+  </conditions>
+
+  <!-- Which aspects of the scene must be optimized  -->
+  <objectives maxIterations="100">
+    <maximizeRadiance surface="Floor" maxRadiosity="0.000646"/>
+  </objectives>
+</input>
