@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <input>
   <!-- Scene path (relative to this file) -->
-  <scene path="sponza.dae"/>
+  <scene path="sponza-hole.dae"/>
 
   <!-- print output images and log on "./output" folder -->
   <output path="output"/>
 
   <!-- Optimization variables -->
-  <conditions meshSize="10">
+  <conditions meshSize="30">
     <objectInSurface id="Hole-1" surface="Ceiling-Top" vertexAIndex="1" vertexBIndex="0" vertexCIndex="2" vertexDIndex="3"/>
   </conditions>
 
   <!-- Which aspects of the scene must be optimized  -->
-  <objectives maxIterations="100">
+  <objectives maxIterations="1000">
     <maximizeRadiance surface="Vase"/>
   </objectives>
 </input>
