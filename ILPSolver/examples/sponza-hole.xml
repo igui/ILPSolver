@@ -7,9 +7,8 @@
   <output path="output"/>
 
   <!-- Optimization variables -->
-  <conditions meshSize="10">
-    <objectInSurface id="Hole-1" surface="Ceiling-Top" vertexAIndex="1" vertexBIndex="0" vertexCIndex="2" vertexDIndex="3"/>
-    <objectInSurface id="Hole-2" surface="Ceiling-Top" vertexAIndex="1" vertexBIndex="0" vertexCIndex="2" vertexDIndex="3"/>
+  <conditions meshSize="20">
+    <objectInSurface id="Hole" surface="Ceiling-Top__Geometry" vertexAIndex="1" vertexBIndex="0" vertexCIndex="2" vertexDIndex="3"/>
   </conditions>
 
   <!-- Which aspects of the scene must be optimized  -->
