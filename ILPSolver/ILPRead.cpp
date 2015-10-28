@@ -118,24 +118,24 @@ static Condition *readColorCondition(Scene *scene, const QDomElement& element)
 		throw std::logic_error("id can't be empty");
 
 	QString saturationStr = element.attribute("saturation");
-	QString valueStr = element.attribute("value");
+	QString hueStr = element.attribute("hue");
 
 	if (saturationStr.isEmpty())
 		throw std::logic_error("saturation can't be empty");
-	if (valueStr.isEmpty())
-		throw std::logic_error("value can't be empty");
+	if (hueStr.isEmpty())
+		throw std::logic_error("hue can't be empty");
 
 	bool ok;
 	float saturation = saturationStr.toFloat(&ok);
 	if (!ok || saturation < 0 || saturation > 1)
 		throw std::logic_error("color saturation value is invalid");
-	float value = valueStr.toFloat(&ok);
-	if (!ok || value < 0 || value > 1)
-		throw std::logic_error("color value is invalid");
+	float hue = hueStr.toFloat(&ok);
+	if (!ok || hue < 0 || hue > 360)
+		throw std::logic_error("color hue is invalid");
 	
 	qDebug("condition: Color Node id: %s", qPrintable(id));
 
-	return new ColorCondition(id, saturation, value);
+	return new ColorCondition(id, saturation, hue);
 }
 
 static Condition *readUnknownCondition(Scene *, const QDomElement&)

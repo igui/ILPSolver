@@ -14,7 +14,7 @@ public:
 	virtual void apply(PMOptixRenderer *) const;
 	virtual QStringList info() const;
 private:
-	float hue() const;	
+	float value() const;	
 
 	QString m_node;
 	optix::float3 m_hsvColor;

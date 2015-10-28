@@ -107,11 +107,15 @@
     <None Include="examples\conference.dae" />
     <None Include="examples\cornell.blend" />
     <None Include="examples\cornell.dae" />
-    <None Include="examples\sponza.blend" />
-    <None Include="examples\sponza.dae" />
+    <None Include="examples\sponza-color.blend" />
+    <None Include="examples\sponza-color.dae" />
+    <None Include="examples\sponza-hole.blend" />
+    <None Include="examples\sponza-hole.dae" />
   </ItemGroup>
   <ItemGroup>
-    <Xml Include="examples\sponza-color.xml" />
+    <Xml Include="examples\sponza-color.xml">
+      <SubType>Designer</SubType>
+    </Xml>
     <Xml Include="examples\conference.xml">
       <SubType>Designer</SubType>
     </Xml>

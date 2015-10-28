@@ -95,10 +95,16 @@
     <None Include="examples\cornell.dae">
       <Filter>examples</Filter>
     </None>
-    <None Include="examples\sponza.blend">
+    <None Include="examples\sponza-color.dae">
       <Filter>examples</Filter>
     </None>
-    <None Include="examples\sponza.dae">
+    <None Include="examples\sponza-color.blend">
+      <Filter>examples</Filter>
+    </None>
+    <None Include="examples\sponza-hole.blend">
+      <Filter>examples</Filter>
+    </None>
+    <None Include="examples\sponza-hole.dae">
       <Filter>examples</Filter>
     </None>
   </ItemGroup>

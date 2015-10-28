@@ -80,9 +80,9 @@ optix::float3 ColorConditionPosition::hsvColor() const
 	return m_hsvColor;
 }
 
-float ColorConditionPosition::hue() const
+float ColorConditionPosition::value() const
 {
-	return m_hsvColor.x;
+	return m_hsvColor.z;
 }
 
 QString ColorConditionPosition::node() const
@@ -92,7 +92,7 @@ QString ColorConditionPosition::node() const
 
 QVector<float> ColorConditionPosition::normalizedPosition() const
 {
-	return QVector<float>() << (hue() / 360.0f);
+	return QVector<float>() << value();
 }
 
 QStringList ColorConditionPosition::info() const

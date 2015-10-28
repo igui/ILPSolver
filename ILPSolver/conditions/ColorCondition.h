@@ -7,7 +7,7 @@
 class ColorCondition : public Condition
 {
 public:
-	ColorCondition(const QString& node, const float saturation, const float value);
+	ColorCondition(const QString& node, const float saturation, const float hue);
 	virtual ConditionPosition *findNeighbour(ConditionPosition *from, float radius, unsigned int retries) const;
 	virtual ConditionPosition *initial() const;
 	virtual QVector<float> dimensions() const;
