@@ -8,11 +8,11 @@
 
   <!-- Optimization variables -->
   <conditions meshSize="50">
-    <color id="InnerWalls" saturation="1.0" value="0.9"/>
+    <color id="InnerWalls" saturation="0.23" hue="39"/>
   </conditions>
 
   <!-- Which aspects of the scene must be optimized  -->
   <objectives maxIterations="100">
-    <maximizeRadiance surface="Floor" maxRadiosity="0.000646"/>
+    <maximizeRadiance surface="Floor" maxRadiosity="0.0003"/>
   </objectives>
 </input>
