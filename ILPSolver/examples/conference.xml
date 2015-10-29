@@ -7,12 +7,12 @@
   <output path="output"/>
 
   <!-- Optimization variables -->
-  <conditions meshSize="10">
+  <conditions meshSize="20">
     <directionalLight id="Sun"/>
   </conditions>
 
   <!-- Which aspects of the scene must be optimized  -->
-  <objectives maxIterations="200">
+  <objectives maxIterations="1000">
     <maximizeRadiance surface="Blackboard"/>
   </objectives>
 </input>
