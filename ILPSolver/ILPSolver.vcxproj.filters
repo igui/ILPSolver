@@ -107,6 +107,7 @@
     <None Include="examples\sponza-hole.dae">
       <Filter>examples</Filter>
     </None>
+    <None Include="make_statistics.ps1" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="examples">
