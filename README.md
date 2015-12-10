@@ -1,12 +1,14 @@
 
-# Opposite Renderer
+# Opposite Renderer + ILPSolver
 Forked from [apartridge/OppositeRenderer](https://github.com/apartridge/OppositeRenderer)
 
 In short *Opposite Renderer* is a GPU Photon Mapping Rendering Tool implemented in [CUDA](https://wikipedia.org/wiki/CUDA) using [OptiX](https://en.wikipedia.org/wiki/OptiX) library. It allows importing [Collada](https://en.wikipedia.org/wiki/Collada) scenes files and then render them to an image using [Progressive Photon Mapping](http://www.cgg.unibe.ch/publications/2011/progressive-photon-mapping-a-probabilistic-approach).
 
-#####Why this fork?
+This fork is intended to extend the original project to help implementing ILP problems. See this [paper](http://ima.udg.es/~dagush/papers/surveyInvLighting.pdf) for more info on the topic. 
 
-This fork is intended to extend the original project to help implementing ILP problems. See this [paper](http://ima.udg.es/~dagush/papers/surveyInvLighting.pdf) for more info on the topic.
+## ILPSolver
+
+This program was done in the context of my final [thesis](https://www.dropbox.com/s/zbl0hg7hg1la2o6/documentacion.pdf?dl=1) (in spanish). ILPSolver solves Inverse Lighting Problems, defined in an XML file, finding the best configuration that meets certain Lighting Intentions.
 
 ## Where To Start?
 If this is your first time hearing about *Opposite Renderer*, we recommend you start with the original website: [http://apartridge.github.io/OppositeRenderer/](http://apartridge.github.io/OppositeRenderer/).
