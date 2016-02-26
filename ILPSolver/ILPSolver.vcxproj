@@ -103,6 +103,8 @@
     </CudaCompile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="examples\conference-simple.blend" />
+    <None Include="examples\conference-simple.dae" />
     <None Include="examples\conference.blend" />
     <None Include="examples\conference.dae" />
     <None Include="examples\cornell.blend" />
@@ -114,6 +116,7 @@
     <None Include="make_statistics.ps1" />
   </ItemGroup>
   <ItemGroup>
+    <Xml Include="examples\conference-simple.xml" />
     <Xml Include="examples\sponza-color.xml">
       <SubType>Designer</SubType>
     </Xml>
