@@ -534,19 +534,48 @@ void PMOptixRenderer::resizeBuffers(unsigned int width, unsigned int height, uns
 	m_photonWidth = photonWidth;
 	m_context["emittedPhotonsPerIterationFloat"]->setFloat(m_photonWidth * m_photonWidth);
 	m_context["photonLaunchWidth"]->setUint(m_photonWidth);
-	m_photons->setSize(getNumPhotons());
 	m_context["photonsSize"]->setUint(getNumPhotons());
-	m_photonsHashCells->setSize( getNumPhotons() );
 	m_context["photonPowerScale"]->setFloat(1.0f / (photonWidth * photonWidth * m_totalLightPower) );
 
 
-    m_outputBuffer->setSize( width, height );
-    m_raytracePassOutputBuffer->setSize( width, height );
-    m_outputBuffer->setSize( width, height );
-    m_directRadianceBuffer->setSize( width, height );
-    m_indirectRadianceBuffer->setSize( width, height );
-    m_randomStatesBuffer->setSize(max(m_photonWidth, (unsigned int)width), max(m_photonWidth,  (unsigned int)height));
-    initializeRandomStates();
+	RTsize hashCellsSize;
+	m_photonsHashCells->getSize(hashCellsSize);
+
+	if (getNumPhotons() > hashCellsSize)
+	{
+		m_logger->log("Changing getNumPhotons() buffers -> %d\n", getNumPhotons());
+		m_photonsHashCells->setSize(getNumPhotons());
+		m_photons->setSize(getNumPhotons());
+	}
+
+	RTsize currentWidth, currentHeight;
+	m_outputBuffer->getSize(currentWidth, currentHeight);
+
+	if (currentWidth < width || currentHeight < height)
+	{
+		m_logger->log("Changing w/h buffers -> %d %d\n", width, height);
+		m_outputBuffer->setSize(width, height);
+		m_raytracePassOutputBuffer->setSize(width, height);
+		m_outputBuffer->setSize(width, height);
+		m_directRadianceBuffer->setSize(width, height);
+		m_indirectRadianceBuffer->setSize(width, height);
+	}
+
+	auto candidateRandomStatesWidth = max(m_photonWidth, (unsigned int)width);
+	auto candidateRandomStatesHeight = max(m_photonWidth, (unsigned int)height);
+	RTsize randomStatesWidth, randomStatesHeight;
+
+	m_randomStatesBuffer->getSize(randomStatesWidth, randomStatesHeight);
+
+	if (randomStatesWidth < candidateRandomStatesWidth || randomStatesHeight < candidateRandomStatesHeight)
+	{
+		m_logger->log("Changing random state buffers -> %d %d\n", candidateRandomStatesWidth, candidateRandomStatesWidth);
+		m_randomStatesBuffer->setSize(candidateRandomStatesWidth, candidateRandomStatesWidth);
+		initializeRandomStates();
+	}
+
+
+    
     m_width = width;
     m_height = height;
 }
