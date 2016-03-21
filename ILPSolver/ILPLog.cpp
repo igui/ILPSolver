@@ -128,6 +128,7 @@ void ILP::logStatistics()
 	logger->log("Evaluation time\t%s\n", toString(statistics.evaluationTime).c_str());
 	
 	auto rendererStatistics = renderer->getStatistics();
+	logger->log("Recalculate Acceleration Structures\t%s\n", toString(rendererStatistics.recalcAccelerationStructures).c_str());
 	logger->log("Photon Tracing\t%s\n", toString(rendererStatistics.photonTracingTime).c_str());
 	logger->log("Build Photon Map\t%s\n", toString(rendererStatistics.buildPhotonMapTime).c_str());
 	logger->log("Resize Buffers\t%s\n", toString(rendererStatistics.resizeBufferTime).c_str());

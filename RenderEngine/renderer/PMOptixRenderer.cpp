@@ -439,6 +439,15 @@ void PMOptixRenderer::render(unsigned int photonLaunchWidth, unsigned int height
 		*powerEmittedPtr = 0;
 		m_powerEmittedBuffer->unmap();
 
+		//
+		// Recalculate Acceleration Structures
+		//
+		m_statistics.recalcAccelerationStructures += calcEllapsedTime([&](){
+			nvtx::ScopedRange r("Transfer photon map to GPU");
+			m_context->launch(OptixEntryPoint::PPM_INDIRECT_RADIANCE_ESTIMATION_PASS,
+				0, 0);
+		});
+
         //
         // Photon Tracing
         //

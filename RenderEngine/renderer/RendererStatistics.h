@@ -10,7 +10,8 @@ struct RendererStatistics {
 		raytracePassTime(0),
 		directRadiancePassTime(0),
 		indirectRadiancePassTime(0),
-		outputPassTime(0)
+		outputPassTime(0),
+		recalcAccelerationStructures(0)
 	{
 
 	}
@@ -24,4 +25,5 @@ struct RendererStatistics {
 	double directRadiancePassTime;
 	double indirectRadiancePassTime;
 	double outputPassTime;
+	double recalcAccelerationStructures;
 };
