@@ -371,7 +371,7 @@ optix::Group Scene::getSceneRootGroup( optix::Context & context, QMap<QString, o
     }
 #endif
 
-    optix::Acceleration acceleration = context->createAcceleration("Sbvh", "Bvh");
+    optix::Acceleration acceleration = context->createAcceleration("Trbvh", "Bvh");
     rootNodeGroup->setAcceleration( acceleration );
     acceleration->markDirty();
 
@@ -546,7 +546,7 @@ optix::Group Scene::getGroupFromNode(optix::Context & context, aiNode* node, QVe
         }
 
         {
-            optix::Acceleration acceleration = context->createAcceleration("Sbvh", "Bvh");
+            optix::Acceleration acceleration = context->createAcceleration("Trbvh", "Bvh");
             acceleration->setProperty( "vertex_buffer_name", "vertexBuffer" );
             acceleration->setProperty( "index_buffer_name", "indexBuffer" );
             geometryGroup->setAcceleration( acceleration );
@@ -590,7 +590,7 @@ optix::Group Scene::getGroupFromNode(optix::Context & context, aiNode* node, QVe
         }
 
         optix::Group group = context->createGroup(transforms.begin(), transforms.end());
-        optix::Acceleration acceleration = context->createAcceleration("Sbvh", "Bvh");
+        optix::Acceleration acceleration = context->createAcceleration("Trbvh", "Bvh");
         group->setAcceleration( acceleration );
 
 		if(nameMapping != NULL)
