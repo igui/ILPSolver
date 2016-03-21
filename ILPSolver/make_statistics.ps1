@@ -1,4 +1,4 @@
-$scenes = 'cornell-move-cone', 'sponza-hole', 'conference';
+$scenes = 'cornell-move-cone', 'sponza-hole', 'conference-simple';
 $ilpsolver = '..\x64\Debug\ILPSolver.exe';
 $triesPerScene = 10;
 
