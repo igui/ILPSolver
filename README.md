@@ -1,14 +1,14 @@
 
-# Opposite Renderer + ILPSolver
+# Opposite Renderer + RPSolver
 Forked from [apartridge/OppositeRenderer](https://github.com/apartridge/OppositeRenderer)
 
 In short *Opposite Renderer* is a GPU Photon Mapping Rendering Tool implemented in [CUDA](https://wikipedia.org/wiki/CUDA) using [OptiX](https://en.wikipedia.org/wiki/OptiX) library. It allows importing [Collada](https://en.wikipedia.org/wiki/Collada) scenes files and then render them to an image using [Progressive Photon Mapping](http://www.cgg.unibe.ch/publications/2011/progressive-photon-mapping-a-probabilistic-approach).
 
-This fork is intended to extend the original project to help implementing ILP problems. See this [paper](http://ima.udg.es/~dagush/papers/surveyInvLighting.pdf) for more info on the topic. 
+This fork is intended to extend the original project to help solving Rendering Problem. See this [paper](http://ima.udg.es/~dagush/papers/surveyInvLighting.pdf) for more info on the topic. 
 
-## ILPSolver
+## RPSolver
 
-This program was done in the context of my final [thesis](https://www.dropbox.com/s/zbl0hg7hg1la2o6/documentacion.pdf?dl=1) (in spanish). ILPSolver solves Inverse Lighting Problems, defined in an XML file, finding the best configuration that meets certain Lighting Intentions.
+This program was done in the context of my final [thesis](https://www.dropbox.com/s/zbl0hg7hg1la2o6/documentacion.pdf?dl=1) (in spanish). RPSolver solves Inverse Lighting Problems, defined in an XML file, finding the best configuration that meets certain Lighting Intentions.
 
 ## Where To Start?
 If this is your first time hearing about *Opposite Renderer*, we recommend you start with the original website: [http://apartridge.github.io/OppositeRenderer/](http://apartridge.github.io/OppositeRenderer/).
@@ -69,7 +69,7 @@ The project needs some [environment variables](http://environmentvariables.org/M
 
 ### Running OppositeRenderer on a example scene
 
-This can be done inside Visual Studio. There are tested `*.dae` scenes on the `OppositeRenderer\ILPSolver\examples` folder
+This can be done inside Visual Studio. There are tested `*.dae` scenes on the `OppositeRenderer\RPSolver\examples` folder
 
 1. Select `Standalone` as the primary project. This is the renderer.
 2. Hit on Debug. Compilation can take several minutes.
@@ -79,13 +79,13 @@ This can be done inside Visual Studio. There are tested `*.dae` scenes on the `O
 
 ### Running the ILPSolver on a example scene
 
-If you really want, you can try to solve a sample ILP, using the `ILPSolver` library.
+If you really want, you can try to solve a sample RP, using the `RPSolver` library.
 
-1. Select `ILPSolver` as the primary project. 
+1. Select `RPSolver` as the primary project. 
 2. Hit on Debug. Compilation can take several minutes.
 3. Wait for the command line program to finish. It may take a minute or two
    depending on the CUDA core count of the running GPU
-4. Go to the folder `OppositeRenderer\ILPSolver\examples\output` and there
+4. Go to the folder `OppositeRenderer\RPSolver\examples\output` and there
    you will see the output of the run
    - `solutions.csv` with the optimal configurations
    - A collection of images for the optimal results
