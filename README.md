@@ -8,7 +8,7 @@ This fork is intended to extend the original project to help solving Rendering P
 
 ## RPSolver
 
-This program was done in the context of my final [thesis](https://www.dropbox.com/s/zbl0hg7hg1la2o6/documentacion.pdf?dl=1) (in spanish). RPSolver solves Inverse Lighting Problems, defined in an XML file, finding the best configuration that meets certain Lighting Intentions.
+This program was done in the context of my final [thesis](https://www.dropbox.com/s/zbl0hg7hg1la2o6/documentacion.pdf?dl=1) (in spanish). RPSolver solves Rendering Problems, defined in an XML file, finding the best configuration that meets certain Lighting Intentions.
 
 ## Where To Start?
 If this is your first time hearing about *Opposite Renderer*, we recommend you start with the original website: [http://apartridge.github.io/OppositeRenderer/](http://apartridge.github.io/OppositeRenderer/).
