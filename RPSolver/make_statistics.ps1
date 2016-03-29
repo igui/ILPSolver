@@ -1,5 +1,5 @@
 $scenes = 'cornell-move-cone', 'sponza-hole', 'conference-simple';
-$ilpsolver = '..\x64\Debug\ILPSolver.exe';
+$rpsolver = '..\x64\Debug\RPSolver.exe';
 $triesPerScene = 10;
 
 foreach ($scene in $scenes) {
@@ -12,7 +12,7 @@ foreach ($scene in $scenes) {
 		}
 
 		Write-Host $scene $i;
-		Invoke-Expression "& $ilpsolver .\examples\$scene.xml";
+		Invoke-Expression "& $rpsolver .\examples\$scene.xml";
 		Move-Item ".\examples\log.txt" $outLogFile;
 		Write-Host "Cooling down";
 		Start-Sleep -s 10;

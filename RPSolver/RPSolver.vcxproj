@@ -13,7 +13,8 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{721F177C-D65F-4EA0-A6D4-FD2295252510}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>ILPSolver</RootNamespace>
+    <RootNamespace>RPSolver</RootNamespace>
+    <ProjectName>RPSolver</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -62,9 +63,9 @@
     <ClCompile Include="conditions\DirectionalLight.cpp" />
     <ClCompile Include="conditions\DirectionalLightPosition.cpp" />
     <ClCompile Include="FileLogger.cpp" />
-    <ClCompile Include="ILPLog.cpp" />
-    <ClCompile Include="ILPRead.cpp" />
-    <ClCompile Include="ILPOptimize.cpp" />
+    <ClCompile Include="Log.cpp" />
+    <ClCompile Include="Read.cpp" />
+    <ClCompile Include="Optimize.cpp" />
     <ClCompile Include="Interval.cpp" />
     <ClCompile Include="conditions\LightInSurface.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -88,7 +89,7 @@
     <ClInclude Include="conditions\DirectionalLight.h" />
     <ClInclude Include="conditions\DirectionalLightPosition.h" />
     <ClInclude Include="FileLogger.h" />
-    <ClInclude Include="ILP.h" />
+    <ClInclude Include="Problem.h" />
     <ClInclude Include="Interval.h" />
     <ClInclude Include="conditions\LightInSurface.h" />
     <ClInclude Include="Main.hxx" />

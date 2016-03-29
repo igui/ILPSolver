@@ -16,10 +16,7 @@
       <Filter>conditions</Filter>
     </ClCompile>
     <ClCompile Include="Configuration.cpp" />
-    <ClCompile Include="ILPRead.cpp" />
     <ClCompile Include="FileLogger.cpp" />
-    <ClCompile Include="ILPLog.cpp" />
-    <ClCompile Include="ILPOptimize.cpp" />
     <ClCompile Include="conditions\DirectionalLight.cpp">
       <Filter>conditions</Filter>
     </ClCompile>
@@ -38,9 +35,11 @@
     <ClCompile Include="conditions\ColorConditionPosition.cpp">
       <Filter>conditions</Filter>
     </ClCompile>
+    <ClCompile Include="Log.cpp" />
+    <ClCompile Include="Optimize.cpp" />
+    <ClCompile Include="Read.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ILP.h" />
     <ClInclude Include="Interval.h" />
     <ClInclude Include="Main.hxx" />
     <ClInclude Include="optimizations\SurfaceRadiosity.h">
@@ -81,6 +80,7 @@
     <ClInclude Include="conditions\ColorConditionPosition.h">
       <Filter>conditions</Filter>
     </ClInclude>
+    <ClInclude Include="Problem.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="examples\conference.blend">

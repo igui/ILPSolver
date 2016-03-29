@@ -4,7 +4,7 @@
  * file that was distributed with this source code.
 */
 
-#include "ILP.h"
+#include "Problem.h"
 #include "logging/Logger.h"
 #include "util/sutil.h"
 #include "conditions/Condition.h"
@@ -19,9 +19,9 @@
 #include <QtConcurrent/QtConcurrentFilter>
 #include <QtConcurrent/QtConcurrentMap>
 
-const float ILP::fastEvaluationQuality = 0.25f;
+const float Problem::fastEvaluationQuality = 0.25f;
 
-ILP::ILP():
+Problem::Problem():
 	scene(NULL),
 	optimizationFunction(NULL),
 	currentIteration(0),
@@ -53,10 +53,10 @@ static float getShuffleRadius(float progress)
 	return 0.5f * (0.5f + sinf(2.0f * (float)M_PI * progress - 0.5f * (float)M_PI) / 2.0f);
 }
 
-void ILP::optimize()
+void Problem::optimize()
 {
 	if(!inited){
-		throw std::logic_error("ILP is not inited");
+		throw std::logic_error("Problem is not inited");
 	}
 
 	qsrand(std::time(NULL));
@@ -66,7 +66,7 @@ void ILP::optimize()
 	// first solution
 	processInitialConfiguration();
 
-	// apply ILP
+	// apply Problem
 	while(currentIteration < maxIterations)
 	{
 		float radius = 0.05f;
@@ -98,7 +98,7 @@ void ILP::optimize()
 	logBestConfigurations();
 }
 
-Configuration ILP::processInitialConfiguration()
+Configuration Problem::processInitialConfiguration()
 {
 	logIterationHeader();
 	auto initialEval = reevalMaxQuality();
@@ -137,9 +137,9 @@ Configuration ILP::processInitialConfiguration()
 	return initialConfig;
 }
 
-bool ILP::recalcISOC(
+bool Problem::recalcISOC(
 	const QVector<ConditionPosition *> &positions,
-	ILP::EvaluateSolutionResult eval)
+	Problem::EvaluateSolutionResult eval)
 {
 	if(eval.isCached) {
 		++currentIteration;
@@ -216,7 +216,7 @@ bool ILP::recalcISOC(
 	return false;
 }
 
-bool ILP::findFirstImprovement(float maxRadius, float shuffleRadius, int retries)
+bool Problem::findFirstImprovement(float maxRadius, float shuffleRadius, int retries)
 {
 	static const int neighbourhoodRetries = 20;
 
@@ -257,7 +257,7 @@ bool ILP::findFirstImprovement(float maxRadius, float shuffleRadius, int retries
 	return false;
 }
 
-QVector<int> ILP::getMappedPosition(const QVector<ConditionPosition *>& positions)
+QVector<int> Problem::getMappedPosition(const QVector<ConditionPosition *>& positions)
 {
 	// builds a mapped positions using relative dimension size
 	QVector<int> mappedPositions;
@@ -284,7 +284,7 @@ QVector<int> ILP::getMappedPosition(const QVector<ConditionPosition *>& position
 }
 
 
-ILP::EvaluateSolutionResult ILP::evaluateSolution(const QVector<ConditionPosition *>& positions)
+Problem::EvaluateSolutionResult Problem::evaluateSolution(const QVector<ConditionPosition *>& positions)
 {
 	double startTime = sutilCurrentTime();
 	auto mappedPositions = getMappedPosition(positions);
@@ -321,12 +321,12 @@ ILP::EvaluateSolutionResult ILP::evaluateSolution(const QVector<ConditionPositio
 	}
 }
 
-void ILP::setEvaluation(const QVector<int>& mappedPositions, SurfaceRadiosityEvaluation *evaluation)
+void Problem::setEvaluation(const QVector<int>& mappedPositions, SurfaceRadiosityEvaluation *evaluation)
 {
 	evaluations[mappedPositions] = evaluation;
 }
 
-ILP::EvaluateSolutionResult ILP::reevalMaxQuality()
+Problem::EvaluateSolutionResult Problem::reevalMaxQuality()
 {
 	double startTime = sutilCurrentTime();
 	auto evaluation = optimizationFunction->evaluateFast(1.0f);
@@ -336,7 +336,7 @@ ILP::EvaluateSolutionResult ILP::reevalMaxQuality()
 	return EvaluateSolutionResult(evaluation, totalTime);
 }
 
-QVector<ConditionPosition *> ILP::findAllNeighbours(
+QVector<ConditionPosition *> Problem::findAllNeighbours(
 	QVector<ConditionPosition *> &currentPositions,
 	int optimizationsRetries, 
 	float maxRadius
@@ -374,21 +374,21 @@ QVector<ConditionPosition *> ILP::findAllNeighbours(
 	return res;
 }
 
-QString ILP::getImageFileName()
+QString Problem::getImageFileName()
 {
 	return  outputDir.filePath(
 		QString("evaluation-%1.png").arg(currentIteration, 4, 10, QLatin1Char('0'))
 	);
 }
 
-QString ILP::getImageFileNameSolution(int solutionNum)
+QString Problem::getImageFileNameSolution(int solutionNum)
 {
 	return  outputDir.filePath(
 		QString("evaluation-solution-%1.png").arg(solutionNum, 4, 10, QLatin1Char('0'))
 	);
 }
 
-ILP::EvaluateSolutionResult::EvaluateSolutionResult(
+Problem::EvaluateSolutionResult::EvaluateSolutionResult(
 	bool isCached,
 	QVector<int> mappedPositions,
 	SurfaceRadiosityEvaluation *eval,
@@ -401,7 +401,7 @@ ILP::EvaluateSolutionResult::EvaluateSolutionResult(
 {
 }
 
-ILP::EvaluateSolutionResult::EvaluateSolutionResult(
+Problem::EvaluateSolutionResult::EvaluateSolutionResult(
 	SurfaceRadiosityEvaluation *eval,
 	float timeEvaluation
 ):
@@ -411,7 +411,7 @@ ILP::EvaluateSolutionResult::EvaluateSolutionResult(
 {
 }
 
-ILP::EvaluateSolutionResult::EvaluateSolutionResult():
+Problem::EvaluateSolutionResult::EvaluateSolutionResult():
 	isCached(false),
 	evaluation(NULL),
 	timeEvaluation(0)

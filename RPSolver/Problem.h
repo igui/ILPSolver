@@ -24,7 +24,7 @@ class Configuration;
 
 uint qHash(const QVector<int> &key, uint seed);
 
-class ILP
+class Problem
 {
 private:
 	static const QString logFileName;
@@ -58,8 +58,8 @@ private:
 		double totalTime;
 	};
 public:
-	ILP();
-	static ILP fromFile(Logger *logger, const QString& filePath, PMOptixRenderer *renderer);
+	Problem();
+	static Problem fromFile(Logger *logger, const QString& filePath, PMOptixRenderer *renderer);
 	void optimize();
 private:
 	// scene reading

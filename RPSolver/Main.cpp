@@ -9,7 +9,7 @@
 #include "logging/DummyLogger.h"
 #include "scene/Scene.h"
 #include "FileLogger.h"
-#include "ILP.h"
+#include "Problem.h"
 
 
 Main::Main(QObject *parent, const QString &filePath, const ComputeDevice &device):
@@ -33,10 +33,10 @@ void Main::run()
 	}
 	renderer.initialize(device, &logger);
 	
-	ILP ilp;
+	Problem problem;
 	try {
 		logger.log("Load definition XML & Scene\n");
-		ilp = ILP::fromFile(&logger, filePath, &renderer);
+		problem = Problem::fromFile(&logger, filePath, &renderer);
 	} catch(std::exception& ex){
 		logger.log("Error reading file: %s\n", ex.what());
 		emit finished();
@@ -45,7 +45,7 @@ void Main::run()
 
 	try {
 		logger.log("Optimizing\n");
-		ilp.optimize();
+		problem.optimize();
 	}catch(std::exception& ex){
 		logger.log("Error optimizing: %s\n", ex.what());
 	}
@@ -74,11 +74,11 @@ static void listDevices()
 int main(int argc, char **argv)
 {
 	QCoreApplication app(argc, argv);
-    QCoreApplication::setApplicationName("ilpsolver");
+    QCoreApplication::setApplicationName("Problemsolver");
     QCoreApplication::setApplicationVersion("0.0.1");
 
 	QCommandLineParser parser;
-    parser.setApplicationDescription("ILP Problem solver using OptiX.");
+    parser.setApplicationDescription("Problem Problem solver using OptiX.");
     parser.addHelpOption();
     parser.addVersionOption();
 	parser.addPositionalArgument("source", "Problem definition input file.");

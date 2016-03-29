@@ -1,4 +1,4 @@
-#include "ILP.h"
+#include "Problem.h"
 
 #include <QTextStream>
 #include "conditions/Condition.h"
@@ -7,9 +7,9 @@
 #include "conditions/ConditionPosition.h"
 #include <qDebug>
 
-const QString ILP::logFileName("solutions.csv");
+const QString Problem::logFileName("solutions.csv");
 
-void ILP::cleanOutputDir()
+void Problem::cleanOutputDir()
 {
 	if(!outputDir.exists()){
 		outputDir.mkpath(".");
@@ -26,7 +26,7 @@ void ILP::cleanOutputDir()
 }
 
 
-void ILP::logIterationHeader()
+void Problem::logIterationHeader()
 {
 	cleanOutputDir();
 
@@ -57,7 +57,7 @@ void ILP::logIterationHeader()
 }
 
 
-void ILP::logIterationResults(
+void Problem::logIterationResults(
 	QVector<ConditionPosition *> positions,
 	SurfaceRadiosityEvaluation *evaluation,
 	const QString& iterationComment,
@@ -87,7 +87,7 @@ void ILP::logIterationResults(
 }
 
 
-void ILP::logBestConfigurations()
+void Problem::logBestConfigurations()
 {
 	logger->log("Best values(%d)\n", isoc.length());
 	int i = 1;
@@ -116,7 +116,7 @@ static std::string toString(double d)
 }
 
 
-void ILP::logStatistics()
+void Problem::logStatistics()
 {
 	logger->log("Statistics:\n");
 	logger->log("Evaluations\t%d\n", statistics.evaluations);
@@ -138,7 +138,8 @@ void ILP::logStatistics()
 		  rendererStatistics.photonTracingTime
 		+ rendererStatistics.buildPhotonMapTime
 		+ rendererStatistics.resizeBufferTime
-		+ rendererStatistics.hitCountCalculationTime);
+		+ rendererStatistics.hitCountCalculationTime
+		+ rendererStatistics.recalcAccelerationStructures);
 
 	logger->log("Other\t%s\n", toString(otherTime).c_str());
 }

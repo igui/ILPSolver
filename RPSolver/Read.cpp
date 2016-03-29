@@ -1,4 +1,4 @@
-#include "ILP.h"
+#include "Problem.h"
 #include <QDomDocument>
 #include <QXmlQuery>
 #include <QXmlResultItems>
@@ -14,7 +14,7 @@
 #include "optimizations/SurfaceRadiosity.h"
 
 
-void ILP::readScene(QFile &file, const QString& fileName)
+void Problem::readScene(QFile &file, const QString& fileName)
 {
 	QXmlQuery query(QXmlQuery::XQuery10);
     query.setFocus(&file);
@@ -159,7 +159,7 @@ static Condition *readConditionElement(Scene *scene, const QDomElement& element)
 	return readFunc(scene, element);
 }
 
-void ILP::readConditions(QDomDocument& xml)
+void Problem::readConditions(QDomDocument& xml)
 {
 	auto nodes = xml.documentElement().childNodes();
 	for(int i = 0; i < nodes.length(); ++i)
@@ -192,7 +192,7 @@ void ILP::readConditions(QDomDocument& xml)
 }
 
 
-void ILP::readOutputPath(const QString &fileName, QDomDocument& xml)
+void Problem::readOutputPath(const QString &fileName, QDomDocument& xml)
 {
 	auto nodes = xml.documentElement().childNodes();
 	for(int i = 0; i < nodes.length(); ++i){
@@ -212,7 +212,7 @@ void ILP::readOutputPath(const QString &fileName, QDomDocument& xml)
 	throw std::logic_error("No output path set");
 }
 
-void ILP::readOptimizationFunction(QDomDocument& xml)
+void Problem::readOptimizationFunction(QDomDocument& xml)
 {
 	auto nodes = xml.documentElement().childNodes();
 	for(int i = 0; i < nodes.length(); ++i)
@@ -270,9 +270,9 @@ void ILP::readOptimizationFunction(QDomDocument& xml)
 }
 
 
-ILP ILP::fromFile(Logger *logger, const QString& filePath, PMOptixRenderer *renderer)
+Problem Problem::fromFile(Logger *logger, const QString& filePath, PMOptixRenderer *renderer)
 {
-	ILP res;
+	Problem res;
 
     QFile file(filePath);
 	if(!QFileInfo(file).exists())
