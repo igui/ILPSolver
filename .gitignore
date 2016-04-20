@@ -28,3 +28,4 @@ ILPSolver/examples/output
 /x64
 ILPSolver/examples/log.txt
 *.blend1
+*.vcxproj.user
