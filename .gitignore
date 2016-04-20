@@ -23,9 +23,9 @@ ui_*.h
 *.idb
 *.suo
 *.unsuccessfulbuild
-ILPSolver/examples/output
+RPSolver/examples/output
 /Debug
 /x64
-ILPSolver/examples/log.txt
+RPSolver/examples/log.txt
 *.blend1
 *.vcxproj.user
