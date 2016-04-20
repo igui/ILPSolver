@@ -7,13 +7,13 @@
   <output path="output"/>
 
   <!-- Optimization variables -->
-  <conditions meshSize="20">
+  <conditions meshSize="200">
     <objectInSurface id="Cone" surface="Cone__Geometry" vertexAIndex="3" vertexBIndex="0" vertexCIndex="2" vertexDIndex="1">
     </objectInSurface>
   </conditions>
 
   <!-- Which aspects of the scene must be optimized  -->
-  <objectives maxIterations="1000">
+  <objectives maxIterations="1000" fastEvaluationQuality="0.00390625">
     <maximizeRadiance surface="Cone"/>
   </objectives>
 </input>

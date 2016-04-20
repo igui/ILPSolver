@@ -8,11 +8,12 @@
 
   <!-- Optimization variables -->
   <conditions meshSize="20">
-    <lightInSurface id="LightPlane_003" surface="Ceiling"></lightInSurface>
+    <lightInSurface id="LightPlane_1" surface="Ceiling"></lightInSurface>
+    <lightInSurface id="LightPlane_2" surface="Ceiling"></lightInSurface>
   </conditions>
 
   <!-- Which aspects of the scene must be optimized  -->
-  <objectives maxIterations="400">
+  <objectives maxIterations="2000" fastEvaluationQuality="0.00390625">
     <maximizeRadiance surface="dais"/>
   </objectives>
 </input>
