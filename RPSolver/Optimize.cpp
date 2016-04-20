@@ -19,7 +19,7 @@
 #include <QtConcurrent/QtConcurrentFilter>
 #include <QtConcurrent/QtConcurrentMap>
 
-const float Problem::fastEvaluationQuality = 0.25f;
+const Problem::OptimizationStrategy Problem::strategy = Problem::REFINE_ISOC_ON_END;
 
 Problem::Problem():
 	scene(NULL),
@@ -87,6 +87,9 @@ void Problem::optimize()
 		}
 		logger->log("Done navigating whole neighbourhood: %d\n", currentIteration);
 	}
+
+	finishingISOCRefinement();
+
 	double totalTime = sutilCurrentTime() - start;
 	statistics.totalTime = totalTime;
 	
@@ -98,10 +101,93 @@ void Problem::optimize()
 	logBestConfigurations();
 }
 
+void Problem::finishingISOCRefinement()
+{
+	if (strategy != REFINE_ISOC_ON_END)
+	{
+		return;
+	}
+
+	logger->log("Finishing Refining ISOC\n");
+
+	struct PositionEvalResult {
+		QVector<ConditionPosition *> positions;
+		EvaluateSolutionResult evalResult;
+	};
+
+	QList<PositionEvalResult> maxQualityISOCCandidates;
+	for (auto conf : isoc)
+	{
+		double startTime = sutilCurrentTime();
+		for (auto position : conf.positions()) {
+			position->apply(renderer);
+		}
+
+		auto evaluation = optimizationFunction->evaluateFast(1.0f);
+		auto totalTime = sutilCurrentTime() - startTime;
+		statistics.evaluationTime += totalTime;
+		statistics.evaluations++;
+	
+
+		maxQualityISOCCandidates.append(PositionEvalResult{
+			conf.positions(),
+			EvaluateSolutionResult(evaluation, totalTime)
+		});
+	}
+
+	isoc.clear();
+	siIsoc = Interval(0, 0);
+
+	for (auto candidate : maxQualityISOCCandidates)
+	{
+		recalcISOC(candidate.positions, candidate.evalResult);
+	}
+}
+
+float Problem::initialConfigurationQuality()
+{
+	switch (strategy)
+	{
+	case REFINE_ISOC_ON_INTERSECTION:
+		return 1.0f;
+	case REFINE_ISOC_ON_END:
+		return fastEvaluationQuality;
+	case NO_REFINE_ISOC:
+		return 1.0f;
+	default:
+		throw std::logic_error("No such strategy");
+		break;
+	}
+}
+
+float Problem::evalConfigurationQuality()
+{
+	switch (strategy)
+	{
+	case REFINE_ISOC_ON_INTERSECTION:
+		return fastEvaluationQuality;
+	case REFINE_ISOC_ON_END:
+		return fastEvaluationQuality;
+	case NO_REFINE_ISOC:
+		return 1.0f;
+	default:
+		throw std::logic_error("No such strategy");
+		break;
+	}
+}
+
 Configuration Problem::processInitialConfiguration()
 {
 	logIterationHeader();
-	auto initialEval = reevalMaxQuality();
+	
+	double startTime = sutilCurrentTime();
+	auto evaluation = optimizationFunction->evaluateFast(initialConfigurationQuality());
+	auto totalTime = sutilCurrentTime() - startTime;
+	statistics.evaluationTime += totalTime;
+	statistics.evaluations++;
+	auto initialEval = EvaluateSolutionResult(evaluation, totalTime);
+
+
 	auto initialPositions = QtConcurrent::blockingMapped(
 		conditions,
 		(ConditionPosition *(*)(Condition *)) [] (Condition * condition) { return condition->initial(); }
@@ -141,7 +227,7 @@ bool Problem::recalcISOC(
 	const QVector<ConditionPosition *> &positions,
 	Problem::EvaluateSolutionResult eval)
 {
-	if(eval.isCached) {
+	if (eval.isCached) {
 		++currentIteration;
 		return false;
 	}
@@ -153,35 +239,37 @@ bool Problem::recalcISOC(
 		return false;
 	}
 
-	if(eval.evaluation->interval() < siIsoc) {
+	if (eval.evaluation->interval() < siIsoc) {
 		++currentIteration;
 		logIterationResults(positions, eval.evaluation, "BAD", eval.timeEvaluation);
 
 		// removes positions from memory
-		for(auto p: positions){
+		for (auto p : positions){
 			delete p;
 		}
 		return false;
-	} 
-
-	// evaluation is may belong to isoc it's reevaluated with max quality
-	
-	if(!eval.evaluation->isMaxQuality()) {
-		delete eval.evaluation;
-		auto reevaluatedSolution = reevalMaxQuality();
-		setEvaluation(eval.mappedPositions, reevaluatedSolution.evaluation);
-
-		eval = reevaluatedSolution;
 	}
 
-	if(eval.evaluation->interval() < siIsoc) {
-		logIterationResults(positions, eval.evaluation, "BAD-AFTER-REEVAL", eval.timeEvaluation);
-		// removes evaluation from memory
-		for(auto p: positions){
-			delete p;
+	// evaluation is may belong to isoc it's reevaluated with max quality
+	if (strategy == REFINE_ISOC_ON_INTERSECTION)
+	{
+		if (!eval.evaluation->isMaxQuality()) {
+			delete eval.evaluation;
+			auto reevaluatedSolution = reevalMaxQuality();
+			setEvaluation(eval.mappedPositions, reevaluatedSolution.evaluation);
+
+			eval = reevaluatedSolution;
 		}
-		return false;
-	} 
+
+		if (eval.evaluation->interval() < siIsoc) {
+			logIterationResults(positions, eval.evaluation, "BAD-AFTER-REEVAL", eval.timeEvaluation);
+			// removes evaluation from memory
+			for (auto p : positions){
+				delete p;
+			}
+			return false;
+		}
+	}
 	
 	if(eval.evaluation->interval() > siIsoc) {
 		logger->log("Better   solution: %s\n", qPrintable(eval.evaluation->infoShort()));
@@ -202,9 +290,6 @@ bool Problem::recalcISOC(
 		return true;
 	}
 	else {
-		logger->log("Probable solution: %s\n", qPrintable(eval.evaluation->infoShort()));
-		logIterationResults(positions, eval.evaluation, "PROBABLE", eval.timeEvaluation);
-
 		// recalculate ISOC and SIISOC
 		auto newSiIsoc = eval.evaluation->interval();
 		for(auto configuration: isoc){
@@ -212,6 +297,9 @@ bool Problem::recalcISOC(
 		}
 		siIsoc = newSiIsoc;
 		isoc.append(Configuration(eval.evaluation, positions));
+
+		logger->log("Probable solution: %s. ISOC size %d\n", qPrintable(eval.evaluation->infoShort()), isoc.length());
+		logIterationResults(positions, eval.evaluation, "PROBABLE", eval.timeEvaluation);
 	}
 	return false;
 }
@@ -303,7 +391,7 @@ Problem::EvaluateSolutionResult Problem::evaluateSolution(const QVector<Conditio
 		}
 
 		// TODO use evaluate fast
-		auto candidate = optimizationFunction->evaluateFast(fastEvaluationQuality);
+		auto candidate = optimizationFunction->evaluateFast(evalConfigurationQuality());
 		/*auto candidate = optimizationFunction->evaluateRadiosity();
 		auto imagePath = outputDir.filePath(
 			QString("solution-%1.png").arg(currentIteration, 4, 10, QLatin1Char('0'))

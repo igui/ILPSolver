@@ -143,3 +143,26 @@ void Problem::logStatistics()
 
 	logger->log("Other\t%s\n", toString(otherTime).c_str());
 }
+
+void Problem::logStrategy()
+{
+	logger->log("Strategy: ");
+	switch (strategy)
+	{
+	case REFINE_ISOC_ON_INTERSECTION:
+		logger->log("Refine ISOC on Intersection");
+		break;
+	case REFINE_ISOC_ON_END:
+		logger->log("Refine ISOC when finishing");
+		break;
+	case NO_REFINE_ISOC:
+		logger->log("No refine ISOC");
+		break;
+	default:
+		throw std::logic_error("No such strategy");
+	}
+
+	logger->log("\n");
+
+	logger->log("Max photon width: %d\n", renderer->getMaxPhotonWidth());
+}

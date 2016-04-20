@@ -231,8 +231,19 @@ void Problem::readOptimizationFunction(QDomDocument& xml)
 			throw std::logic_error("maxIterations must be an integer");
 		}
 
-		auto conditionNodes = objectivesNode.childNodes();
+		auto fastEvaluationQualityStr = objectivesNode.attribute("fastEvaluationQuality");
+		if (fastEvaluationQualityStr.isEmpty()){
+			throw std::logic_error("fastEvaluationQuality must be present in objectives element");
+		}
+		fastEvaluationQuality = fastEvaluationQualityStr.toFloat(&parseOk);
+		if (!parseOk){
+			throw std::logic_error("fastEvaluationQuality must be a float");
+		}
+		if (fastEvaluationQuality < 0 || fastEvaluationQuality > 1){
+			throw std::logic_error("fastEvaluationQuality must be between 0 and 1");
+		}
 
+		auto conditionNodes = objectivesNode.childNodes();
 		
 		for(int j = 0; j < conditionNodes.length(); ++j)
 		{

@@ -22,13 +22,20 @@ class SurfaceRadiosityEvaluation;
 class QDomDocument;
 class Configuration;
 
+
 uint qHash(const QVector<int> &key, uint seed);
 
 class Problem
 {
 private:
 	static const QString logFileName;
-	static const float fastEvaluationQuality;
+	
+	enum OptimizationStrategy {
+		REFINE_ISOC_ON_INTERSECTION,
+		REFINE_ISOC_ON_END,
+		NO_REFINE_ISOC
+	};
+	static const OptimizationStrategy strategy;
 
 	struct EvaluateSolutionResult {
 		EvaluateSolutionResult();
@@ -44,7 +51,6 @@ private:
 			SurfaceRadiosityEvaluation *eval,
 			float timeEvaluation
 		);
-	void logStatistics();
 
 		bool isCached;
 		QVector<int> mappedPositions;
@@ -82,14 +88,18 @@ private:
 		float evaluationDuration
 		);
 	void logStatistics();
+	void logStrategy();
 
 	// optimization
 	Configuration processInitialConfiguration();
+	float initialConfigurationQuality();
+	float evalConfigurationQuality();
 	bool findFirstImprovement(float maxRadius, float suffleRadius, int retries);
 	bool recalcISOC(
 		const QVector<ConditionPosition *>& positions,
 		EvaluateSolutionResult evaluation
-		);
+	);
+	void finishingISOCRefinement();
 	QVector<int> getMappedPosition(const QVector<ConditionPosition *>& positions);
 	void setEvaluation(
 		const QVector<int>& mappedPositions,
@@ -116,6 +126,7 @@ private:
 	PMOptixRenderer *renderer;
 	int currentIteration;
 	int maxIterations;
+	float fastEvaluationQuality;
 	Logger *logger;
 	QDir outputDir;
 	Statistics statistics;
