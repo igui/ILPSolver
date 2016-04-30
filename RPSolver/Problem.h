@@ -20,6 +20,7 @@ class Condition;
 class SurfaceRadiosity;
 class SurfaceRadiosityEvaluation;
 class QDomDocument;
+class QDomElement;
 class Configuration;
 
 
@@ -35,7 +36,6 @@ private:
 		REFINE_ISOC_ON_END,
 		NO_REFINE_ISOC
 	};
-	static const OptimizationStrategy strategy;
 
 	struct EvaluateSolutionResult {
 		EvaluateSolutionResult();
@@ -72,6 +72,8 @@ private:
 	void readScene(QFile &file, const QString& fileName);
 	void readConditions(QDomDocument& doc);
 	void readOptimizationFunction(QDomDocument& doc);
+	void readOptimizationFunctionBaseAttrs(QDomElement& element);
+	void readOptimizationFunctionChild(QDomElement& element);
 	void readOutputPath(const QString &fileName, QDomDocument& doc);
 
 	// misc
@@ -116,7 +118,7 @@ private:
 	bool inited;
 	Scene *scene;
 	QVector<Condition *> conditions;
-	int meshSize;
+	QList<int> meshSize;
 	QHash<QVector<int>, SurfaceRadiosityEvaluation *> evaluations;
 	
 	QList<Configuration> isoc;
@@ -130,4 +132,5 @@ private:
 	Logger *logger;
 	QDir outputDir;
 	Statistics statistics;
+	OptimizationStrategy strategy;
 };

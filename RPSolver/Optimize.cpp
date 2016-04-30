@@ -19,8 +19,6 @@
 #include <QtConcurrent/QtConcurrentFilter>
 #include <QtConcurrent/QtConcurrentMap>
 
-const Problem::OptimizationStrategy Problem::strategy = Problem::REFINE_ISOC_ON_END;
-
 Problem::Problem():
 	scene(NULL),
 	optimizationFunction(NULL),
@@ -353,8 +351,9 @@ QVector<int> Problem::getMappedPosition(const QVector<ConditionPosition *>& posi
 		auto dimensions = conditions[conditionIdx]->dimensions();
 		for(int dimensionIdx = 0; dimensionIdx < dimensions.length(); ++dimensionIdx) {
 			auto normalizedPosition = positions[conditionIdx]->normalizedPosition();
+			auto meshSizeForDimension = meshSize.at(dimensionIdx % meshSize.length());
 			mappedPositions.append(
-				floorf(meshSize * normalizedPosition[dimensionIdx])
+				floorf(meshSizeForDimension * normalizedPosition[dimensionIdx])
 			);
 		}
 	}

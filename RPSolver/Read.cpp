@@ -7,6 +7,7 @@
 #include <QXmlNodeModelIndex>
 #include <QAbstractXmlNodeModel>
 #include <QDebug>
+#include <algorithm>
 #include "conditions/LightInSurface.h"
 #include "conditions/ObjectInSurface.h"
 #include "conditions/DirectionalLight.h"
@@ -171,10 +172,18 @@ void Problem::readConditions(QDomDocument& xml)
 		auto meshSizeStr = conditionParentNode.attribute("meshSize");
 		if(meshSizeStr.isEmpty())
 			throw std::logic_error("meshSize attribute must be present");
-		bool ok;
-		meshSize = meshSizeStr.toInt(&ok);
-		if(!ok || meshSize <= 0)
-			throw std::logic_error("meshSize attribute must be a non-negative integer");
+		
+		auto meshSizeParts = meshSizeStr.split('x');
+		meshSize.reserve(meshSizeParts.length());
+		// map meshSize to proper parts
+		for (auto part : meshSizeParts)
+		{
+			bool ok;
+			auto parsed = part.trimmed().toInt(&ok);
+			if (!ok || parsed <= 0)
+				throw std::logic_error("meshSize attribute must be a non-negative integer");
+			meshSize.append(parsed);
+		};
 
 		auto conditionNodes = conditionParentNode.childNodes();
 		for(int j = 0; j < conditionNodes.length(); ++j)
@@ -215,69 +224,102 @@ void Problem::readOutputPath(const QString &fileName, QDomDocument& xml)
 void Problem::readOptimizationFunction(QDomDocument& xml)
 {
 	auto nodes = xml.documentElement().childNodes();
+
 	for(int i = 0; i < nodes.length(); ++i)
 	{
 		auto objectivesNode = nodes.at(i).toElement();
 		if(objectivesNode.tagName() != "objectives")
 			continue;
 		
-		QString maxIterationsStr = objectivesNode.attribute("maxIterations");
-		if(maxIterationsStr.isEmpty()){
-			throw std::logic_error("maxIterations must be present in objectives element");
-		}
-		bool parseOk;
-		maxIterations = maxIterationsStr.toInt(&parseOk);
-		if(!parseOk){
-			throw std::logic_error("maxIterations must be an integer");
-		}
-
-		auto fastEvaluationQualityStr = objectivesNode.attribute("fastEvaluationQuality");
-		if (fastEvaluationQualityStr.isEmpty()){
-			throw std::logic_error("fastEvaluationQuality must be present in objectives element");
-		}
-		fastEvaluationQuality = fastEvaluationQualityStr.toFloat(&parseOk);
-		if (!parseOk){
-			throw std::logic_error("fastEvaluationQuality must be a float");
-		}
-		if (fastEvaluationQuality < 0 || fastEvaluationQuality > 1){
-			throw std::logic_error("fastEvaluationQuality must be between 0 and 1");
-		}
+		readOptimizationFunctionBaseAttrs(objectivesNode);
 
 		auto conditionNodes = objectivesNode.childNodes();
 		
 		for(int j = 0; j < conditionNodes.length(); ++j)
 		{
 			auto maximizeRadianceNode = conditionNodes.at(j).toElement();
-			if(maximizeRadianceNode.tagName() != "maximizeRadiance")
-				continue;
-
-			if(optimizationFunction != NULL)
-				throw std::logic_error("only an objective must be set");
-
-			QString surface = maximizeRadianceNode.attribute("surface");
-			if(surface.isEmpty())
-				throw std::logic_error("surface can't be empty");
-
-			QString maxRadiosity = maximizeRadianceNode.attribute("maxRadiosity");
-			float maxRadiosityVal;
-			if (maxRadiosity.isEmpty())
-				maxRadiosityVal = std::numeric_limits<float>::infinity();
-			else
-			{
-				bool ok;
-				maxRadiosityVal = maxRadiosity.toFloat(&ok);
-				if (!ok)
-					throw std::logic_error("Invalid value for maxRadiosity");
-			}
-
-			optimizationFunction = new SurfaceRadiosity(logger, renderer, scene, surface, maxRadiosityVal);
-
-			qDebug("objective: maximize Surface Radiosity on %s. Max value %f", qPrintable(surface), maxRadiosityVal);
+			readOptimizationFunctionChild(maximizeRadianceNode);
 		}
 	}
 
 	if(optimizationFunction == NULL)
 		throw std::logic_error("an objective must be set");
+}
+
+void Problem::readOptimizationFunctionBaseAttrs(QDomElement& objectivesNode)
+{
+	QString maxIterationsStr = objectivesNode.attribute("maxIterations");
+	if (maxIterationsStr.isEmpty()){
+		throw std::logic_error("maxIterations must be present in objectives element");
+	}
+	bool parseOk;
+	maxIterations = maxIterationsStr.toInt(&parseOk);
+	if (!parseOk){
+		throw std::logic_error("maxIterations must be an integer");
+	}
+
+	auto fastEvaluationQualityStr = objectivesNode.attribute("fastEvaluationQuality");
+	if (fastEvaluationQualityStr.isEmpty()){
+		throw std::logic_error("fastEvaluationQuality must be present in objectives element");
+	}
+	fastEvaluationQuality = fastEvaluationQualityStr.toFloat(&parseOk);
+	if (!parseOk){
+		throw std::logic_error("fastEvaluationQuality must be a float");
+	}
+	if (fastEvaluationQuality < 0 || fastEvaluationQuality > 1){
+		throw std::logic_error("fastEvaluationQuality must be between 0 and 1");
+	}
+
+	auto stategyStr = objectivesNode.attribute("strategy");
+	if (stategyStr.isEmpty())
+	{
+		throw std::logic_error("strategy attribute must be present in objectives element");
+	}
+	if (stategyStr == "REFINE_ISOC_ON_INTERSECTION")
+	{
+		strategy = REFINE_ISOC_ON_INTERSECTION;
+	}
+	else if (stategyStr == "REFINE_ISOC_ON_END")
+	{
+		strategy = REFINE_ISOC_ON_END;
+	}
+	else if (stategyStr == "NO_REFINE_ISOC")
+	{
+		strategy = NO_REFINE_ISOC;
+	}
+	else
+	{
+		throw std::logic_error("Invalid value for strategy attribute");
+	}
+}
+
+void Problem::readOptimizationFunctionChild(QDomElement& maximizeRadianceNode)
+{
+	if (maximizeRadianceNode.tagName() != "maximizeRadiance")
+		throw std::logic_error("Unknown node type");
+
+	if (optimizationFunction != NULL)
+		throw std::logic_error("only an objective must be set");
+
+	QString surface = maximizeRadianceNode.attribute("surface");
+	if (surface.isEmpty())
+		throw std::logic_error("surface can't be empty");
+
+	QString maxRadiosity = maximizeRadianceNode.attribute("maxRadiosity");
+	float maxRadiosityVal;
+	if (maxRadiosity.isEmpty())
+		maxRadiosityVal = std::numeric_limits<float>::infinity();
+	else
+	{
+		bool ok;
+		maxRadiosityVal = maxRadiosity.toFloat(&ok);
+		if (!ok)
+			throw std::logic_error("Invalid value for maxRadiosity");
+	}
+
+	optimizationFunction = new SurfaceRadiosity(logger, renderer, scene, surface, maxRadiosityVal);
+
+	qDebug("objective: maximize Surface Radiosity on %s. Max value %f", qPrintable(surface), maxRadiosityVal);
 }
 
 
