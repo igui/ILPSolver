@@ -114,6 +114,12 @@
     <None Include="examples\conference-simple.dae">
       <Filter>examples</Filter>
     </None>
+    <None Include="examples\sponza-2-holes.blend">
+      <Filter>examples</Filter>
+    </None>
+    <None Include="examples\sponza-2-holes.dae">
+      <Filter>examples</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="examples">
@@ -143,6 +149,9 @@
       <Filter>examples</Filter>
     </Xml>
     <Xml Include="examples\conference-simple.xml">
+      <Filter>examples</Filter>
+    </Xml>
+    <Xml Include="examples\sponza-2-holes.xml">
       <Filter>examples</Filter>
     </Xml>
   </ItemGroup>
