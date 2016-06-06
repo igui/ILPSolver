@@ -7,7 +7,7 @@
   <output path="output"/>
 
   <!-- Optimization variables -->
-  <conditions meshSize="20x5">
+  <conditions meshSize="20x6">
     <objectInSurface id="Hole" surface="Ceiling-Top__Geometry" vertexAIndex="0" vertexBIndex="1" vertexCIndex="2" vertexDIndex="3"/>
     <objectInSurface id="Hole2" surface="Ceiling-Top__Geometry" vertexAIndex="0" vertexBIndex="1" vertexCIndex="2" vertexDIndex="3"/>
   </conditions>
