@@ -66,8 +66,8 @@ RT_PROGRAM void closestHitRadiance()
 {
     float3 worldShadingNormal = normalize(rtTransformNormal(RT_OBJECT_TO_WORLD, shadingNormal));
     float3 hitPoint = ray.origin + tHit*ray.direction;
-
-	if(radiancePrd.flags & PRD_IN_HOLE)
+	
+	if(radiancePrd.inHole)
 	{
 		Ray newRay(hitPoint, ray.direction, ray.ray_type, 0.0001);
 		rtTrace(sceneRootObject, newRay, radiancePrd);

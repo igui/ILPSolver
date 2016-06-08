@@ -44,9 +44,17 @@ rtDeclareVariable(float, tHit, rtIntersectionDistance, );
 
 RT_PROGRAM void closestHitRadiance()
 {
-	radiancePrd.flags ^= PRD_IN_HOLE;
+	float3 worldShadingNormal = rtTransformNormal(RT_OBJECT_TO_WORLD, shadingNormal);
+	if (hitFromOutside(ray.direction, worldShadingNormal))
+	{
+		++radiancePrd.inHole;
+	}
+	else
+	{
+		--radiancePrd.inHole;
+	}
 
-    if(radiancePrd.depth <= MAX_RADIANCE_TRACE_DEPTH)
+	if(radiancePrd.depth <= MAX_RADIANCE_TRACE_DEPTH)
     {
 		float3 hitPoint = ray.origin + tHit*ray.direction;
 		Ray newRay = Ray(hitPoint, ray.direction, ray.ray_type, 0.0001);
@@ -62,7 +70,15 @@ rtDeclareVariable(PhotonPRD, photonPrd, rtPayload, );
 
 RT_PROGRAM void closestHitPhoton()
 {
-	photonPrd.inHole = !photonPrd.inHole;
+	float3 worldShadingNormal = rtTransformNormal(RT_OBJECT_TO_WORLD, shadingNormal);
+	if (hitFromOutside(ray.direction, worldShadingNormal))
+	{
+		++photonPrd.inHole;
+	}
+	else
+	{
+		--photonPrd.inHole;
+	}
 
 	photonPrd.depth++;
     if (photonPrd.depth <= MAX_PHOTON_TRACE_DEPTH)
@@ -77,7 +93,15 @@ rtDeclareVariable(ShadowPRD, shadowPrd, rtPayload, );
 
 RT_PROGRAM void closestHitShadow()
 {
-	shadowPrd.inHole = !shadowPrd.inHole;
+	float3 worldShadingNormal = rtTransformNormal(RT_OBJECT_TO_WORLD, shadingNormal);
+	if(hitFromOutside(ray.direction, worldShadingNormal))
+	{
+		++shadowPrd.inHole;
+	}
+	else
+	{
+		--shadowPrd.inHole;
+	}
 
 	float3 hitPoint = ray.origin + tHit*ray.direction;
 	Ray newRay(hitPoint, ray.direction, ray.ray_type, 0.0001);

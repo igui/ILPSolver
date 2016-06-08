@@ -116,7 +116,7 @@ RT_PROGRAM void generator()
     photonPrd.depth = 0;
     photonPrd.weight = 1.0f;
     photonPrd.randomState = randomStates[launchIndex];
-	photonPrd.inHole = false;
+	photonPrd.inHole = 0;
 
     int lightIndex = 0;
 	int n_lights = lights.size();

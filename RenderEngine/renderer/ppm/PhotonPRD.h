@@ -14,5 +14,5 @@ struct PhotonPRD
     optix::uint numStoredPhotons;
     optix::uint depth;
     RandomState randomState;
-	bool inHole;
+	int inHole;
 };
