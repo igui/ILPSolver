@@ -13,7 +13,7 @@
   </conditions>
 
   <!-- Which aspects of the scene must be optimized  -->
-  <objectives maxIterations="2000" fastEvaluationQuality="0.00390625">
+  <objectives maxIterations="2000" fastEvaluationQuality="0.00390625" strategy="REFINE_ISOC_ON_INTERSECTION">
     <maximizeRadiance surface="dais"/>
   </objectives>
 </input>
