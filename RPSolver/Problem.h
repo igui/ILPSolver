@@ -129,6 +129,7 @@ private:
 	int currentIteration;
 	int maxIterations;
 	float fastEvaluationQuality;
+	double startTime;
 	Logger *logger;
 	QDir outputDir;
 	Statistics statistics;

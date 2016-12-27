@@ -26,7 +26,8 @@ Problem::Problem():
 	logger(NULL),
 	renderer(NULL),
 	inited(false),
-	siIsoc(0, 0)
+	siIsoc(0, 0),
+	startTime(0)
 {
 	statistics = { 0 };
 }
@@ -59,7 +60,7 @@ void Problem::optimize()
 
 	qsrand(std::time(NULL));
 	
-	double start =  sutilCurrentTime();
+	startTime = sutilCurrentTime();
 
 	// first solution
 	processInitialConfiguration();
@@ -88,8 +89,8 @@ void Problem::optimize()
 
 	finishingISOCRefinement();
 
-	double totalTime = sutilCurrentTime() - start;
-	statistics.totalTime = totalTime;
+	double totalTime = 
+		statistics.totalTime = sutilCurrentTime() - startTime;;
 	
 	logger->log("%d iterations on %0.2fs. %0.2fs per iteration\n", 
 		(currentIteration+1), totalTime, totalTime/(currentIteration+1));
@@ -106,7 +107,7 @@ void Problem::finishingISOCRefinement()
 		return;
 	}
 
-	logger->log("Finishing Refining ISOC\n");
+	logger->log("Finishing ISOC Refinement\n");
 
 	struct PositionEvalResult {
 		QVector<ConditionPosition *> positions;

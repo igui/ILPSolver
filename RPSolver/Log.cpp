@@ -5,6 +5,7 @@
 #include "optimizations/SurfaceRadiosity.h"
 #include "optimizations/SurfaceRadiosityEvaluation.h"
 #include "conditions/ConditionPosition.h"
+#include "util/sutil.h"
 #include <qDebug>
 
 const QString Problem::logFileName("solutions.csv");
@@ -50,7 +51,8 @@ void Problem::logIterationHeader()
 		out << h << ";";
 	}
 
-	out << "Duration" << ";" 
+	out << "Duration" << ";"
+		<< "Time from start" << ";"
 		<< "Comment" << "\n";
 
 	file.close(); 
@@ -81,6 +83,7 @@ void Problem::logIterationResults(
 	}
 	out << evaluation->info() << ';';
 	out << locale.toString(evaluationDuration, 'f', 6) << ';';
+	out << locale.toString(sutilCurrentTime() - startTime, 'f', 6) << ';';
 	out << iterationComment << '\n';
 
 	file.close(); 
