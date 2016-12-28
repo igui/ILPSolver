@@ -22,6 +22,7 @@
 #include "logging/DummyLogger.h"
 #include <cstdio>
 #include <optixu_matrix_namespace.h>
+#include <sstream>
 #include "util/RelPath.h"
 
 Scene::Scene(Logger *logger)
@@ -679,8 +680,11 @@ float Scene::getNodeArea(const aiScene *scene, const aiNode *node)
 		for(unsigned faceIdx = 0; faceIdx < mesh->mNumFaces; ++ faceIdx)
 		{
 			auto face = mesh->mFaces[faceIdx];
-			if(face.mNumIndices != 3)
-				throw std::invalid_argument("Not a triangle face");
+			if (face.mNumIndices != 3){
+				std::stringstream ss;
+				ss << "Non-triangle face in mesh " << node->mName.C_Str() << ". Got " << face.mNumIndices << " vertex(es).";
+				throw std::invalid_argument(ss.str().c_str());
+			}
 			
 			auto A = mesh->mVertices[face.mIndices[0]];
 			auto B = mesh->mVertices[face.mIndices[1]];
