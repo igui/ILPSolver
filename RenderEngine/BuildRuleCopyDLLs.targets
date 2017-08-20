@@ -21,10 +21,7 @@
    <DllFiles Include="$(QTDIR)\bin\Qt5Concurrent.dll"/>
  </ItemGroup>
  <ItemGroup>
-   <DllFiles Include="$(QTDIR)\bin\icudt54.dll"/>
-   <DllFiles Include="$(QTDIR)\bin\icuin54.dll"/>
-   <DllFiles Include="$(QTDIR)\bin\icuuc54.dll"/>
-   <DllFiles Include="$(GLEW_PATH)\bin\Release\x64\*.dll"/>
+    <DllFiles Include="$(GLEW_PATH)\bin\Release\x64\*.dll"/>
     <DllFiles Include="$(ASSIMP_PATH)\bin\x64\*.dll"/>
     <DllFiles Include="$(OPTIX_PATH)\bin64\*.dll"/>
     <DllFiles Include="$(NVTOOLSEXT_PATH)\bin\x64\*.dll"/>

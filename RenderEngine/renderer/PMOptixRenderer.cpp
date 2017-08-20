@@ -116,7 +116,7 @@ void PMOptixRenderer::initialize(const ComputeDevice & device, Logger *logger)
         Program missProgram = createProgram("PMRayGenerator.cu.ptx", "miss" );
         
         m_context->setRayGenerationProgram( OptixEntryPoint::PPM_RAYTRACE_PASS, generatorProgram );
-        m_context->setExceptionProgram( OptixEntryPoint::PPM_RAYTRACE_PASS, exceptionProgram );
+        //m_context->setExceptionProgram( OptixEntryPoint::PPM_RAYTRACE_PASS, exceptionProgram );
         m_context->setMissProgram(RayType::RADIANCE, missProgram);
         m_context->setMissProgram(RayType::RADIANCE_IN_PARTICIPATING_MEDIUM, missProgram);
     }
@@ -131,7 +131,7 @@ void PMOptixRenderer::initialize(const ComputeDevice & device, Logger *logger)
         Program missProgram = createProgram("PMPhotonGenerator.cu.ptx", "miss");
         m_context->setRayGenerationProgram(OptixEntryPoint::PPM_PHOTON_PASS, generatorProgram);
         m_context->setMissProgram(OptixEntryPoint::PPM_PHOTON_PASS, missProgram);
-        m_context->setExceptionProgram(OptixEntryPoint::PPM_PHOTON_PASS, exceptionProgram);
+        //m_context->setExceptionProgram(OptixEntryPoint::PPM_PHOTON_PASS, exceptionProgram);
     }
 
     m_photons = m_context->createBuffer(RT_BUFFER_OUTPUT);

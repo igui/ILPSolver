@@ -9,9 +9,7 @@
 template<typename T>
 static T* getDevicePtr(optix::Buffer & buffer, int deviceNumber)
 {
-    CUdeviceptr d;
-    buffer->getDevicePointer(deviceNumber, &d);
-    return (T*)d;
+    return (T*) (buffer->getDevicePointer(deviceNumber));
 }
 
 template<typename T>

@@ -120,6 +120,12 @@
     <None Include="examples\sponza-2-holes.dae">
       <Filter>examples</Filter>
     </None>
+    <None Include="examples\hangar.blend">
+      <Filter>examples</Filter>
+    </None>
+    <None Include="examples\hangar.dae">
+      <Filter>examples</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="examples">
@@ -152,6 +158,9 @@
       <Filter>examples</Filter>
     </Xml>
     <Xml Include="examples\sponza-2-holes.xml">
+      <Filter>examples</Filter>
+    </Xml>
+    <Xml Include="examples\hangar.xml">
       <Filter>examples</Filter>
     </Xml>
   </ItemGroup>

@@ -144,7 +144,7 @@ void PPMOptixRenderer::initialize(const ComputeDevice & device, Logger *logger)
         Program missProgram = m_context->createProgramFromPTXFile( relativePathToExe("RayGeneratorPPM.cu.ptx"), "miss" );
         
         m_context->setRayGenerationProgram( OptixEntryPoint::PPM_RAYTRACE_PASS, generatorProgram );
-        m_context->setExceptionProgram( OptixEntryPoint::PPM_RAYTRACE_PASS, exceptionProgram );
+        //m_context->setExceptionProgram( OptixEntryPoint::PPM_RAYTRACE_PASS, exceptionProgram );
         m_context->setMissProgram(RayType::RADIANCE, missProgram);
         m_context->setMissProgram(RayType::RADIANCE_IN_PARTICIPATING_MEDIUM, missProgram);
     }
@@ -155,7 +155,7 @@ void PPMOptixRenderer::initialize(const ComputeDevice & device, Logger *logger)
         Program exceptionProgram =  m_context->createProgramFromPTXFile( relativePathToExe("RayGeneratorPT.cu.ptx"), "exception" );
         Program missProgram = m_context->createProgramFromPTXFile( relativePathToExe("RayGeneratorPT.cu.ptx"), "miss" );
         m_context->setRayGenerationProgram( OptixEntryPoint::PT_RAYTRACE_PASS, generatorProgram );
-        m_context->setExceptionProgram(OptixEntryPoint::PT_RAYTRACE_PASS, exceptionProgram);
+        //m_context->setExceptionProgram(OptixEntryPoint::PT_RAYTRACE_PASS, exceptionProgram);
     }
 
     //
@@ -168,7 +168,7 @@ void PPMOptixRenderer::initialize(const ComputeDevice & device, Logger *logger)
         Program missProgram = m_context->createProgramFromPTXFile( relativePathToExe("PhotonGenerator.cu.ptx"), "miss");
         m_context->setRayGenerationProgram(OptixEntryPoint::PPM_PHOTON_PASS, generatorProgram);
         m_context->setMissProgram(OptixEntryPoint::PPM_PHOTON_PASS, missProgram);
-        m_context->setExceptionProgram(OptixEntryPoint::PPM_PHOTON_PASS, exceptionProgram);
+        //m_context->setExceptionProgram(OptixEntryPoint::PPM_PHOTON_PASS, exceptionProgram);
     }
 
     m_photons = m_context->createBuffer(RT_BUFFER_OUTPUT);

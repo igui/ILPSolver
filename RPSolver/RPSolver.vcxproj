@@ -18,14 +18,14 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
-    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 7.0.props" />
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 8.0.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -110,6 +110,8 @@
     <None Include="examples\conference.dae" />
     <None Include="examples\cornell.blend" />
     <None Include="examples\cornell.dae" />
+    <None Include="examples\hangar.blend" />
+    <None Include="examples\hangar.dae" />
     <None Include="examples\sponza-2-holes.blend" />
     <None Include="examples\sponza-2-holes.dae" />
     <None Include="examples\sponza-color.blend" />
@@ -122,6 +124,7 @@
     <Xml Include="examples\conference-simple.xml">
       <SubType>Designer</SubType>
     </Xml>
+    <Xml Include="examples\hangar.xml" />
     <Xml Include="examples\sponza-2-holes.xml">
       <SubType>Designer</SubType>
     </Xml>
@@ -138,7 +141,7 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="..\RenderEngine\BuildRuleCopyDLLs.targets" />
-    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 7.0.targets" />
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 8.0.targets" />
     <Import Project="..\RenderEngine\BuildRuleQt.targets" />
     <Import Project="..\RenderEngine\BuildRuleResources.targets" />
   </ImportGroup>
