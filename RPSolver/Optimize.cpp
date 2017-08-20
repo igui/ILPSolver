@@ -69,7 +69,8 @@ void Problem::optimize()
 	while(currentIteration < maxIterations)
 	{
 		float radius = 0.05f;
-		while(radius < 1.0f){
+		while(radius < 1.0f && currentIteration < maxIterations)
+		{
 			float suffleRadius = getShuffleRadius(
 				(float) currentIteration / maxIterations
 			);
@@ -78,7 +79,8 @@ void Problem::optimize()
 				suffleRadius,
 				getRetriesForRadius(radius)
 				);
-			if(improvementFound){
+			if(improvementFound)
+			{
 				radius = 0.05f;
 			} else {
 				radius += 0.05;
@@ -150,9 +152,8 @@ float Problem::initialConfigurationQuality()
 	case REFINE_ISOC_ON_INTERSECTION:
 		return 1.0f;
 	case REFINE_ISOC_ON_END:
-		return fastEvaluationQuality;
 	case NO_REFINE_ISOC:
-		return 1.0f;
+		return fastEvaluationQuality;
 	default:
 		throw std::logic_error("No such strategy");
 		break;
@@ -164,11 +165,9 @@ float Problem::evalConfigurationQuality()
 	switch (strategy)
 	{
 	case REFINE_ISOC_ON_INTERSECTION:
-		return fastEvaluationQuality;
 	case REFINE_ISOC_ON_END:
-		return fastEvaluationQuality;
 	case NO_REFINE_ISOC:
-		return 1.0f;
+		return fastEvaluationQuality;
 	default:
 		throw std::logic_error("No such strategy");
 		break;
@@ -222,6 +221,13 @@ Configuration Problem::processInitialConfiguration()
 	return initialConfig;
 }
 
+static void cleanPositionsFromMemory(const QVector<ConditionPosition *> &positions)
+{
+	for (auto p : positions){
+		delete p;
+	}
+}
+
 bool Problem::recalcISOC(
 	const QVector<ConditionPosition *> &positions,
 	Problem::EvaluateSolutionResult eval)
@@ -242,10 +248,7 @@ bool Problem::recalcISOC(
 		++currentIteration;
 		logIterationResults(positions, eval.evaluation, "BAD", eval.timeEvaluation);
 
-		// removes positions from memory
-		for (auto p : positions){
-			delete p;
-		}
+		cleanPositionsFromMemory(positions);
 		return false;
 	}
 
@@ -262,45 +265,45 @@ bool Problem::recalcISOC(
 
 		if (eval.evaluation->interval() < siIsoc) {
 			logIterationResults(positions, eval.evaluation, "BAD-AFTER-REEVAL", eval.timeEvaluation);
-			// removes evaluation from memory
-			for (auto p : positions){
-				delete p;
-			}
+			cleanPositionsFromMemory(positions);
 			return false;
 		}
 	}
+
+	bool isImprovement = false;
+	QList<Configuration> newIsoc;
+	for (auto configuration : isoc)
+	{
+		switch (eval.evaluation->compareWith(configuration.evaluation()))
+		{
+		case SurfaceRadiosityEvaluation::WORSE:
+			logIterationResults(positions, eval.evaluation, "BAD-AFTER-REEVAL-ISOC", eval.timeEvaluation);
+			cleanPositionsFromMemory(positions);
+			return false;
+		case SurfaceRadiosityEvaluation::INDISTINGUISHABLE:
+			newIsoc.append(configuration);
+			break;
+		case SurfaceRadiosityEvaluation::BETTER:
+			isImprovement = true;
+			cleanPositionsFromMemory(configuration.positions());
+			break;
+		}
+	}
+	isoc = newIsoc;
+	isoc.append(Configuration(eval.evaluation, positions));
 	
-	if(eval.evaluation->interval() > siIsoc) {
-		logger->log("Better   solution: %s\n", qPrintable(eval.evaluation->infoShort()));
-		logIterationResults(positions, eval.evaluation, "BETTER", eval.timeEvaluation);
-
-		QtConcurrent::blockingFilter(isoc, [eval](Configuration config){
-			return config.evaluation()->interval().intersects(eval.evaluation->interval());
-		});
-
-		auto newSiIsoc = eval.evaluation->interval();
-		for(auto configuration: isoc){
-			newSiIsoc = newSiIsoc.intersection(configuration.evaluation()->interval());
-		}
-		siIsoc = newSiIsoc;
-
-		isoc.append(Configuration(eval.evaluation, positions));
-
-		return true;
+	siIsoc = eval.evaluation->interval();
+	
+	for (auto configuration : isoc){
+		siIsoc = siIsoc.intersection(configuration.evaluation()->interval());
 	}
-	else {
-		// recalculate ISOC and SIISOC
-		auto newSiIsoc = eval.evaluation->interval();
-		for(auto configuration: isoc){
-			newSiIsoc = newSiIsoc.intersection(configuration.evaluation()->interval());
-		}
-		siIsoc = newSiIsoc;
-		isoc.append(Configuration(eval.evaluation, positions));
+	logger->log("Probable solution: %s. ISOC size %d\n", qPrintable(eval.evaluation->infoShort()), isoc.length());
 
-		logger->log("Probable solution: %s. ISOC size %d\n", qPrintable(eval.evaluation->infoShort()), isoc.length());
-		logIterationResults(positions, eval.evaluation, "PROBABLE", eval.timeEvaluation);
-	}
-	return false;
+
+	auto iterationResultComment = isImprovement ? "BETTER" : "PROBABLE";
+	logIterationResults(positions, eval.evaluation, iterationResultComment, eval.timeEvaluation);
+
+	return isImprovement;
 }
 
 bool Problem::findFirstImprovement(float maxRadius, float shuffleRadius, int retries)
@@ -391,12 +394,12 @@ Problem::EvaluateSolutionResult Problem::evaluateSolution(const QVector<Conditio
 		}
 
 		// TODO use evaluate fast
-		auto candidate = optimizationFunction->evaluateFast(evalConfigurationQuality());
-		/*auto candidate = optimizationFunction->evaluateRadiosity();
+		/*auto candidate = optimizationFunction->evaluateFast(evalConfigurationQuality());*/
+		auto candidate = optimizationFunction->evaluateRadiosity();
 		auto imagePath = outputDir.filePath(
 			QString("solution-%1.png").arg(currentIteration, 4, 10, QLatin1Char('0'))
 		);
-		optimizationFunction->saveImage(imagePath);*/
+		optimizationFunction->saveImage(imagePath);
 		
 		evaluations[mappedPositions] = candidate;
 

@@ -16,6 +16,12 @@ private:
 public:
 	SurfaceRadiosityEvaluation(float val, float radius, int photons, bool isMaxQuality, bool isValid);
 
+	enum ComparisonResult {
+		BETTER,
+		WORSE,
+		INDISTINGUISHABLE
+	};
+
 	bool valid() const;
 	float val() const;
 	float radius() const;
@@ -24,4 +30,6 @@ public:
 	bool isMaxQuality() const;
 	virtual QString info() const;
 	virtual QString infoShort() const;
+
+	ComparisonResult compareWith(const SurfaceRadiosityEvaluation* other) const;
 };

@@ -13,7 +13,7 @@
   </conditions>
 
   <!-- Which aspects of the scene must be optimized  -->
-  <objectives maxIterations="7000" fastEvaluationQuality="0.0078125" strategy="REFINE_ISOC_ON_INTERSECTION">
+  <objectives maxIterations="7000" fastEvaluationQuality="1" strategy="NOT_REFINE_ISOC">
     <maximizeRadiance surface="Vase"/>
   </objectives>
 </input>

@@ -58,3 +58,21 @@ QString SurfaceRadiosityEvaluation:: infoShort() const
 	return locale.toString(m_val, 'f', 6);
 }
 
+SurfaceRadiosityEvaluation::ComparisonResult SurfaceRadiosityEvaluation::compareWith(const SurfaceRadiosityEvaluation* other) const
+{
+	const static float z = 1.96f;
+
+	bool distiguishable = fabsf(m_val - other->m_val) > z * sqrtf( powf(m_radius, 2.0f) + powf(m_radius, 2.0f) );
+	if (!distiguishable)
+	{
+		return SurfaceRadiosityEvaluation::INDISTINGUISHABLE;
+	}
+	else if (m_val < other->m_val)
+	{
+		return SurfaceRadiosityEvaluation::WORSE;
+	}
+	else
+	{
+		return SurfaceRadiosityEvaluation::BETTER;
+	}
+}

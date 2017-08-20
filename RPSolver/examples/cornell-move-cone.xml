@@ -13,7 +13,7 @@
   </conditions>
 
   <!-- Which aspects of the scene must be optimized  -->
-  <objectives maxIterations="1000" fastEvaluationQuality="0.00390625" strategy="REFINE_ISOC_ON_END">
+  <objectives maxIterations="1000" fastEvaluationQuality="0.005" strategy="REFINE_ISOC_ON_END">
     <maximizeRadiance surface="Cone"/>
   </objectives>
 </input>
