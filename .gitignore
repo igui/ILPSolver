@@ -31,3 +31,5 @@ RPSolver/examples/log.txt
 *.vcxproj.user
 Gui/x64/Debug
 RenderEngine/x64/Debug/
+RPSolver/x64/Debug/
+Standalone/x64/Debug/
