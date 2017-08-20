@@ -29,3 +29,5 @@ RPSolver/examples/output
 RPSolver/examples/log.txt
 *.blend1
 *.vcxproj.user
+Gui/x64/Debug
+RenderEngine/x64/Debug/
