@@ -23,12 +23,12 @@ If this is your first time hearing about *Opposite Renderer*, we recommend you s
 
 ### Dependencies
 
-- [Visual Studio 2013](http://www.visualstudio.com/)
-- [CUDA](https://developer.nvidia.com/cuda-downloads) v7.0 
-- [OptiX](https://developer.nvidia.com/download) v3.8
+- [Visual Studio 2015](http://www.visualstudio.com/)
+- [CUDA](https://developer.nvidia.com/cuda-downloads) v8.0 
+- [OptiX](https://developer.nvidia.com/download) v4.1
    - **Note:** You must register first by completing a form. Then download information is emailed to you. 
-- [Qt Open Source](http://www.qt.io/download-open-source/) 5.5 for Windows 
-  - Specifically the version `msvc2013_64` for 5.5
+- [Qt Open Source](http://www.qt.io/download-open-source/) 5.9 for Windows 
+  - Specifically the version `msvc2015` for 5.9
 - [FreeGlut](http://www.transmissionzero.co.uk/software/freeglut-devel/) MSVC Package
 - [GLEW](http://sourceforge.net/projects/glew/files/) - OpenGL Extension Wrangler Library  
 - [Open Asset Import Library](http://sourceforge.net/projects/assimp/files/)
@@ -36,7 +36,7 @@ If this is your first time hearing about *Opposite Renderer*, we recommend you s
   - Almost all recent GeForce GPUs support CUDA.
   - This is a run only dependency, as the project can be built if the system doesn't
     have a CUDA compatible card.
-- Windows 8.1 or newer, running on 64 bits.
+- Windows 10 or newer, running on 64 bits.
 
 Notes:
 
@@ -57,11 +57,11 @@ The project needs some [environment variables](http://environmentvariables.org/M
 	
 	For example
 	
-	    QTDIR=C:\Qt\5.5\msvc2013_64
+	    QTDIR=C:\Qt\5.9\msvc2015
 	    GLEW_PATH=C:\Program Files\Common Files\glew
 	    ASSIMP_PATH=C:\Program Files\Assimp
 	    FREEGLUT_PATH=C:\Program Files\Common Files\freeglut
-	    OPTIX_PATH=C:\ProgramData\NVIDIA Corporation\OptiX SDK 3.8.0
+	    OPTIX_PATH=C:\ProgramData\NVIDIA Corporation\OptiX SDK 4.1.1
 
 * Open the Visual Studio Solution `OppositeRenderer.sln` and build.
 
