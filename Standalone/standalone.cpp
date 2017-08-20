@@ -48,7 +48,7 @@ int main( int argc, char** argv )
 
 		ComputeDevice device = repo.front();
 
-        StandaloneApplication application = StandaloneApplication(qApplication, device);
+        StandaloneApplication application(qApplication, device);
 
         // Run application
         QThread* applicationThread = new QThread(&qApplication);

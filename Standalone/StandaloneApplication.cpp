@@ -11,7 +11,7 @@
 
 StandaloneApplication::StandaloneApplication(QApplication & qApplication, const ComputeDevice & device)
     : Application(qApplication),
-      m_renderManager(StandaloneRenderManager(qApplication, *this, device))
+      m_renderManager(qApplication, *this, device)
 {
     connect(&m_renderManager, SIGNAL(newFrameReadyForDisplay(const float*, unsigned long long)), 
             this, SIGNAL(newFrameReadyForDisplay(const float*, unsigned long long)));
