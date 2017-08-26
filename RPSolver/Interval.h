@@ -10,6 +10,7 @@ public:
 	float top() const;
 	bool intersects(const Interval& other) const;
 	Interval intersection(const Interval &other) const;
+	Interval inclusion(const Interval& other) const;
 	bool operator == (const Interval& other) const;
 
 	// returns

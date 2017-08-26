@@ -91,6 +91,7 @@ private:
 		);
 	void logStatistics();
 	void logStrategy();
+	void logCachedMesh();
 
 	// optimization
 	Configuration processInitialConfiguration();

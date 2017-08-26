@@ -55,6 +55,17 @@ Interval Interval::intersection(const Interval &other) const
 	return Interval(center, radius);
 }
 
+Interval Interval::inclusion(const Interval &other) const
+{
+	auto a = std::min(m_center - m_radius, other.m_center - other.m_radius);
+	auto b = std::max(m_center + m_radius, other.m_center + other.m_radius);
+
+	auto center = (a + b) / 2.0f;
+	auto radius = std::max((b - a) / 2.0f, 0.0f);
+
+	return Interval(center, radius);
+}
+
 bool Interval::operator == (const Interval& other) const
 {
 	return m_center == other.m_center && m_radius == other.m_radius;

@@ -7,6 +7,7 @@
 #include "conditions/ConditionPosition.h"
 #include "util/sutil.h"
 #include <qDebug>
+#include <QVector>
 
 const QString Problem::logFileName("solutions.csv");
 
@@ -168,4 +169,51 @@ void Problem::logStrategy()
 	logger->log("\n");
 
 	logger->log("Max photon width: %d\n", renderer->getMaxPhotonWidth());
+}
+
+
+void Problem::logCachedMesh()
+{
+	if (evaluations.isEmpty() || evaluations.keys().begin()->length() != 2)
+	{
+		return; // don't care about difficult to graph meshes
+	}
+
+	int nrows = meshSize[0];
+	int ncolumns;
+	if (meshSize.length() == 1)
+	{
+		ncolumns = nrows;
+	}
+	else
+	{
+		ncolumns = meshSize[1];
+	}
+
+	logger->log("Cached grid\n");
+	QVector<bool> grid(nrows*ncolumns, false);
+
+	for (auto element: evaluations.keys())
+	{
+		int row = element[0];
+		int column = element[1];
+
+		if (row < 0 || column < 0)
+		{
+			logger->log("\tWarning element out of range %d %d\n", row, column);
+			continue;
+		}
+
+		int idx = row  * ncolumns + element[1];
+		grid[idx] = true;
+	}
+
+	for (int row = 0; row < nrows; ++row)
+	{
+		for (int column = 0; column < ncolumns; ++column) {
+			int idx = row * nrows + column;
+			logger->log("%c", grid[idx] ? ' ' : 'X');
+		}
+		logger->log("\n");
+	}
 }

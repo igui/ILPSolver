@@ -99,6 +99,8 @@ void Problem::optimize()
 
 	logStatistics();
 
+	logCachedMesh();
+
 	logBestConfigurations();
 }
 
@@ -233,19 +235,16 @@ bool Problem::recalcISOC(
 	Problem::EvaluateSolutionResult eval)
 {
 	if (eval.isCached) {
-		++currentIteration;
 		return false;
 	}
 
 	if (!eval.evaluation->valid())
 	{
 		logIterationResults(positions, eval.evaluation, "INVALID", eval.timeEvaluation);
-		++currentIteration;
 		return false;
 	}
 
 	if (eval.evaluation->interval() < siIsoc) {
-		++currentIteration;
 		logIterationResults(positions, eval.evaluation, "BAD", eval.timeEvaluation);
 
 		cleanPositionsFromMemory(positions);
@@ -295,7 +294,7 @@ bool Problem::recalcISOC(
 	siIsoc = eval.evaluation->interval();
 	
 	for (auto configuration : isoc){
-		siIsoc = siIsoc.intersection(configuration.evaluation()->interval());
+		siIsoc = siIsoc.inclusion(configuration.evaluation()->interval());
 	}
 	logger->log("Probable solution: %s. ISOC size %d\n", qPrintable(eval.evaluation->infoShort()), isoc.length());
 
@@ -310,7 +309,7 @@ bool Problem::findFirstImprovement(float maxRadius, float shuffleRadius, int ret
 {
 	static const int neighbourhoodRetries = 20;
 
-	while(retries-- > 0){
+	while(retries-- > 0 && currentIteration < maxIterations){
 		// move the reference point to some element of the configuration file
 		int someConfigIdx = rand() % isoc.length();
 		auto positions = isoc.at(someConfigIdx).positions();
@@ -338,6 +337,12 @@ bool Problem::findFirstImprovement(float maxRadius, float shuffleRadius, int ret
 		}
 
 		auto eval = evaluateSolution(neighbourPosition);
+		++currentIteration;
+		
+		if (currentIteration % 100 == 0){
+			logStatistics();
+		}
+
 		bool isImprovement = recalcISOC(neighbourPosition, eval);
 		if(isImprovement)
 		{
@@ -394,13 +399,15 @@ Problem::EvaluateSolutionResult Problem::evaluateSolution(const QVector<Conditio
 		}
 
 		// TODO use evaluate fast
-		/*auto candidate = optimizationFunction->evaluateFast(evalConfigurationQuality());*/
+#ifndef DEBUG_SOLUTIONS
+		auto candidate = optimizationFunction->evaluateFast(evalConfigurationQuality());
+#else
 		auto candidate = optimizationFunction->evaluateRadiosity();
 		auto imagePath = outputDir.filePath(
 			QString("solution-%1.png").arg(currentIteration, 4, 10, QLatin1Char('0'))
 		);
 		optimizationFunction->saveImage(imagePath);
-		
+#endif	
 		evaluations[mappedPositions] = candidate;
 
 		evaluation = candidate;
