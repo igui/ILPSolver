@@ -110,6 +110,8 @@
     <None Include="examples\conference.dae" />
     <None Include="examples\cornell.blend" />
     <None Include="examples\cornell.dae" />
+    <None Include="examples\hangar.blend" />
+    <None Include="examples\hangar.dae" />
     <None Include="examples\sponza-2-holes.blend" />
     <None Include="examples\sponza-2-holes.dae" />
     <None Include="examples\sponza-color.blend" />
@@ -120,6 +122,9 @@
   </ItemGroup>
   <ItemGroup>
     <Xml Include="examples\conference-simple.xml">
+      <SubType>Designer</SubType>
+    </Xml>
+    <Xml Include="examples\hangar.xml">
       <SubType>Designer</SubType>
     </Xml>
     <Xml Include="examples\sponza-2-holes.xml">
@@ -134,6 +139,11 @@
     <Xml Include="examples\cornell-move-cone.xml" />
     <Xml Include="examples\cornell-move-light.xml" />
     <Xml Include="examples\sponza-hole.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="examples\Blackboard.png" />
+    <Image Include="examples\RedCarpet.jpg" />
+    <Image Include="examples\sponzaFloor.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

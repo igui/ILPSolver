@@ -7,13 +7,13 @@
   <output path="output"/>
 
   <!-- Optimization variables -->
-  <conditions meshSize="200">
-    <objectInSurface id="BigBox" surface="BigBox__Geometry" vertexAIndex="1" vertexBIndex="3" vertexCIndex="0" vertexDIndex="2">
+  <conditions meshSize="40">
+    <objectInSurface id="BigBox" surface="BigBox__Geometry" vertexAIndex="0" vertexBIndex="1" vertexCIndex="2" vertexDIndex="3">
     </objectInSurface>
   </conditions>
 
   <!-- Which aspects of the scene must be optimized  -->
-  <objectives maxIterations="1000" fastEvaluationQuality="1" strategy="REFINE_ISOC_ON_END">
+  <objectives maxIterations="1000" fastEvaluationQuality="0.001" strategy="REFINE_ISOC_ON_END">
     <maximizeRadiance surface="BigBox"/>
   </objectives>
 </input>

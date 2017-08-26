@@ -120,6 +120,12 @@
     <None Include="examples\sponza-2-holes.dae">
       <Filter>examples</Filter>
     </None>
+    <None Include="examples\hangar.blend">
+      <Filter>examples</Filter>
+    </None>
+    <None Include="examples\hangar.dae">
+      <Filter>examples</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="examples">
@@ -154,10 +160,24 @@
     <Xml Include="examples\sponza-2-holes.xml">
       <Filter>examples</Filter>
     </Xml>
+    <Xml Include="examples\hangar.xml">
+      <Filter>examples</Filter>
+    </Xml>
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="optimizations\SurfaceRadiosity.cu">
       <Filter>optimizations</Filter>
     </CudaCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="examples\RedCarpet.jpg">
+      <Filter>examples</Filter>
+    </Image>
+    <Image Include="examples\sponzaFloor.png">
+      <Filter>examples</Filter>
+    </Image>
+    <Image Include="examples\Blackboard.png">
+      <Filter>examples</Filter>
+    </Image>
   </ItemGroup>
 </Project>
