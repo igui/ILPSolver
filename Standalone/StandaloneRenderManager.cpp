@@ -15,6 +15,7 @@
 #include <QCoreApplication>
 #include <QApplication>
 #include "Application.hxx"
+#include <algorithm>
 
 StandaloneRenderManager::StandaloneRenderManager(QApplication & qApplication, Application & application, const ComputeDevice& device) :
     m_device(device),
@@ -82,29 +83,70 @@ void StandaloneRenderManager::onContinueRayTracing()
     continueRayTracingIfRunningAsync();
 }
 
-static void logHitCount(Logger *logger, OptixRenderer *renderer)
+void StandaloneRenderManager::logHitCount()
 {
-	PMOptixRenderer *pmOptixRenderer = dynamic_cast<PMOptixRenderer *>(renderer);
+	auto pmOptixRenderer = dynamic_cast<PMOptixRenderer *>(m_renderer);
 	if(!pmOptixRenderer)
 		return;
 	
 	auto objectIdToName = pmOptixRenderer->objectToNameMapping();
 	auto radiances = pmOptixRenderer->getRadiance();
 	auto hitCounts = pmOptixRenderer->getHitCount();
-	logger->log("Hits \n");
+	m_logger.log("Hits \n");
 	
 	int sumHits = 0;
 	for(int i = 0; i < hitCounts.size(); ++i)
 	{
 		auto hitCount = hitCounts.at(i);
 		auto radiance = radiances.at(i);
-		logger->log("\t%20s: %10d\t%10f\n", objectIdToName.at(i).c_str(), hitCount, radiance);
+		auto average = m_hitCumulativeSum.at(i) / m_nextIterationNumber;
+		auto stddev = sqrtf(m_hitCumulativeSum.at(i) / (m_nextIterationNumber+1));
+
+		m_logger.log("\t%20s: %10d\tAvg: %10f\tStddev: %10f\tRadiance: %10f\n",
+			objectIdToName.at(i).c_str(),
+			hitCount,
+			average,
+			stddev,
+			radiance
+		);
 		sumHits += hitCount;
 	}
 
-	logger->log("Hit ratio: %0.2f\n", (float)sumHits / pmOptixRenderer->totalPhotons());
-	logger->log("Emitted power: %0.2f\n", pmOptixRenderer->getEmittedPower());
+	m_logger.log("Hit ratio: %0.2f\n", (float)sumHits / pmOptixRenderer->totalPhotons());
+	m_logger.log("Emitted power: %0.2f\n", pmOptixRenderer->getEmittedPower());
 
+}
+
+void StandaloneRenderManager::calculateAvgStdDevHits()
+{
+	auto pmOptixRenderer = dynamic_cast<PMOptixRenderer *>(m_renderer);
+	if (!pmOptixRenderer)
+		return;
+
+	auto hitCounts = pmOptixRenderer->getHitCount();
+
+	// https://math.stackexchange.com/questions/374881/recursive-formula-for-variance
+	if (m_nextIterationNumber == 1)
+	{
+		// M_1 = x_1
+		m_hitCumulativeSum.resize(hitCounts.size());
+		std::copy(hitCounts.cbegin(), hitCounts.cend(), m_hitCumulativeSum.begin());
+		// S_1 = 0
+		m_hitCumulativeErrorSquared.resize(hitCounts.size(), 0.0f);
+	}
+	else
+	{
+		for (int i = 0; i < hitCounts.size(); ++i)
+		{
+			m_hitCumulativeSum[i] += hitCounts[i];
+		}
+		for (int i = 0; i < hitCounts.size(); ++i)
+		{
+			m_hitCumulativeErrorSquared[i] +=
+				pow(m_nextIterationNumber*hitCounts[i] - m_hitCumulativeSum[i], 2) /
+				m_nextIterationNumber * (m_nextIterationNumber - 1);
+		}
+	}
 }
 
 void StandaloneRenderManager::renderNextIteration()
@@ -159,7 +201,8 @@ void StandaloneRenderManager::renderNextIteration()
             m_nextIterationNumber++;
 			//m_application.setRunningStatus(RunningStatus::PAUSE);
 
-			logHitCount(&m_logger, m_renderer);
+			calculateAvgStdDevHits();
+			logHitCount();
         }
     }
     catch(const std::exception & E)

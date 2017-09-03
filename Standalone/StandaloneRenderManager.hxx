@@ -47,6 +47,8 @@ private slots:
 private:
     void fillRenderStatistics();
     void continueRayTracingIfRunningAsync();
+	void calculateAvgStdDevHits();
+	void logHitCount();
 	void reinitRenderer(OptixRenderer *newRenderer);
 
     Application & m_application;
@@ -62,4 +64,11 @@ private:
     bool m_compileScene;
     bool m_noEmittedSignals;
 	SignalLogger m_logger;
+
+ 	// Cumulative Sum of hits. Used to calculate AVG
+	// A[i] * N = AVG_N(hit) N is the iteration number
+	std::vector<float> m_hitCumulativeSum;
+
+	// A[i] * (N-1) = STDDEV(Hit_i). N is the iteration number
+	std::vector<float> m_hitCumulativeErrorSquared;
 };
