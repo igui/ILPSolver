@@ -98,7 +98,7 @@ void StandaloneRenderManager::logHitCount()
 	for(int i = 0; i < hitCounts.size(); ++i)
 	{
 		auto hitCount = hitCounts.at(i);
-		auto radiance = radiances.at(i);
+		auto radiance = radiances.at(i) / m_currentScene->getObjectArea(i);
 		auto average = m_hitCumulativeSum.at(i) / m_nextIterationNumber;
 		auto stddev = sqrtf(m_hitCumulativeSum.at(i) / (m_nextIterationNumber+1));
 
