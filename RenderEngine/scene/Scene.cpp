@@ -372,8 +372,11 @@ optix::Group Scene::getSceneRootGroup( optix::Context & context, QMap<QString, o
     }
 #endif
 
-    optix::Acceleration acceleration = context->createAcceleration("Trbvh", "Bvh");
-    rootNodeGroup->setAcceleration( acceleration );
+    //optix::Acceleration acceleration = context->createAcceleration("Trbvh", "Bvh");
+	optix::Acceleration acceleration = context->createAcceleration("MedianBvh", "Bvh");
+	
+	
+	rootNodeGroup->setAcceleration( acceleration );
     acceleration->markDirty();
 
 	m_logger->log("Scene getSceneRootGroup: ellapsed %5.2fs\n", timer.elapsed() / 1000.0f);
