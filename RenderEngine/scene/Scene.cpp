@@ -25,6 +25,10 @@
 #include <sstream>
 #include "util/RelPath.h"
 
+
+static const char *accelerationBuilder = "MedianBvh";
+static const char *accelerationTraverser = "Bvh";
+
 Scene::Scene(Logger *logger)
     : m_scene(NULL),
       m_importer(new Assimp::Importer()),
@@ -372,9 +376,7 @@ optix::Group Scene::getSceneRootGroup( optix::Context & context, QMap<QString, o
     }
 #endif
 
-    //optix::Acceleration acceleration = context->createAcceleration("Trbvh", "Bvh");
-	optix::Acceleration acceleration = context->createAcceleration("MedianBvh", "Bvh");
-	
+    optix::Acceleration acceleration = context->createAcceleration(accelerationBuilder, accelerationTraverser);
 	
 	rootNodeGroup->setAcceleration( acceleration );
     acceleration->markDirty();
@@ -550,7 +552,7 @@ optix::Group Scene::getGroupFromNode(optix::Context & context, aiNode* node, QVe
         }
 
         {
-            optix::Acceleration acceleration = context->createAcceleration("Trbvh", "Bvh");
+            optix::Acceleration acceleration = context->createAcceleration(accelerationBuilder, accelerationTraverser);
             acceleration->setProperty( "vertex_buffer_name", "vertexBuffer" );
             acceleration->setProperty( "index_buffer_name", "indexBuffer" );
             geometryGroup->setAcceleration( acceleration );
@@ -566,7 +568,7 @@ optix::Group Scene::getGroupFromNode(optix::Context & context, aiNode* node, QVe
         group->setChildCount(1);
 		group->setChild(0, transform);
         {
-            optix::Acceleration acceleration = context->createAcceleration("NoAccel", "NoAccel");
+            optix::Acceleration acceleration = context->createAcceleration(accelerationBuilder, accelerationTraverser);
             group->setAcceleration( acceleration );
         }
 
@@ -594,7 +596,7 @@ optix::Group Scene::getGroupFromNode(optix::Context & context, aiNode* node, QVe
         }
 
         optix::Group group = context->createGroup(transforms.begin(), transforms.end());
-        optix::Acceleration acceleration = context->createAcceleration("Trbvh", "Bvh");
+        optix::Acceleration acceleration = context->createAcceleration(accelerationBuilder, accelerationTraverser);
         group->setAcceleration( acceleration );
 
 		if(nameMapping != NULL)
