@@ -126,6 +126,7 @@
     <None Include="examples\hangar.dae">
       <Filter>examples</Filter>
     </None>
+    <None Include="utils\plot.py" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="examples">

@@ -119,6 +119,7 @@
     <None Include="examples\sponza-hole.blend" />
     <None Include="examples\sponza-hole.dae" />
     <None Include="make_statistics.ps1" />
+    <None Include="utils\plot.py" />
   </ItemGroup>
   <ItemGroup>
     <Xml Include="examples\conference-simple.xml">
