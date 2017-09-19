@@ -3,8 +3,14 @@
 #include <QLocale>
 
 
-ObjectInSurfacePosition::ObjectInSurfacePosition(const QString& nodeName, optix::float3 initialPosition, const optix::Matrix4x4 &transformation, const QVector<float>& normalizedPosition) :
+ObjectInSurfacePosition::ObjectInSurfacePosition(
+	const QString& nodeName,
+	const QString& lightName,
+	optix::float3 initialPosition,
+	const optix::Matrix4x4 &transformation,
+	const QVector<float>& normalizedPosition) :
 	nodeName(nodeName),
+	lightName(lightName),
 	initialPosition(initialPosition),
 	m_transformation(transformation),
 	m_normalizedPosition(normalizedPosition)
@@ -23,8 +29,12 @@ QVector<float> ObjectInSurfacePosition::normalizedPosition() const
 
 void ObjectInSurfacePosition::apply(PMOptixRenderer *renderer) const
 {
-	auto position = this->position() - initialPosition;
 	renderer->setNodeTransformation(nodeName, m_transformation);
+	
+	if (!lightName.isEmpty())
+	{
+		renderer->setNodeTransformation(lightName, m_transformation);
+	}
 }
 
 optix::float3 ObjectInSurfacePosition::position() const

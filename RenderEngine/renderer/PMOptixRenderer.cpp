@@ -666,12 +666,6 @@ static void transformBufferMatrix(Buffer buffer, const Matrix4x4& matrix)
 	buffer->unmap();
 }
 
-void PMOptixRenderer::transformNode(const QString &nodeName, const optix::Matrix4x4 &transformation)
-{
-	transformNodeImpl(nodeName, transformation, true);
-}
-
-
 void PMOptixRenderer::setNodeTransformation(const QString &nodeName, const optix::Matrix4x4 &transformation)
 {
 	transformNodeImpl(nodeName, transformation, false);

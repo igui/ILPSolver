@@ -58,12 +58,14 @@ static QVector<Vector3> getAndCheckNodeInScene(Scene *scene, const QString& obje
 ObjectInSurface::ObjectInSurface(Scene *scene,
 	const QString& nodeId,
 	const QString& surfaceId,
+	const QString& childLightId,
 	int surfaceVertexAIndex,
 	int surfaceVertexBIndex,
 	int surfaceVertexCIndex,
 	int surfaceVertexDIndex
 	) :
-	m_nodeId(nodeId)
+	m_nodeId(nodeId),
+	childLightId(childLightId)
 {
 	getAndCheckNodeInScene(scene, nodeId);
 	auto surfacePoints = getAndCheckNodeInScene(scene, surfaceId);
@@ -116,7 +118,13 @@ ConditionPosition *ObjectInSurface::findNeighbour(ConditionPosition *from, float
 	auto displacementTransformation = optix::Matrix4x4().identity().translate(displacement);
 	// applies currentTransformation to the renderer
 	auto currentTransformation = displacementTransformation * ((ObjectInSurfacePosition *)from)->transformation();
-	return new ObjectInSurfacePosition(m_nodeId, base, currentTransformation, normalizedPosition);
+	return new ObjectInSurfacePosition(
+		m_nodeId,
+		childLightId,
+		base,
+		currentTransformation,
+		normalizedPosition
+	);
 }
 
 static float getRandomAngle()
@@ -164,7 +172,12 @@ bool ObjectInSurface::pointInSurface(optix::float2 point) const
 
 ConditionPosition *ObjectInSurface::initial() const
 {
-	return new ObjectInSurfacePosition(m_nodeId, base, optix::Matrix4x4::identity(), QVector<float>() << 0.0f << 0.0f);
+	return new ObjectInSurfacePosition(
+		m_nodeId, 
+		childLightId,
+		base,
+		optix::Matrix4x4::identity(), 
+		QVector<float>() << 0.0f << 0.0f);
 }
 
 QStringList ObjectInSurface::header() const

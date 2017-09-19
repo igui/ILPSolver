@@ -64,6 +64,7 @@ static Condition *readObjectInSurface(Scene *scene, const QDomElement& element)
 	QString surfaceVertexBIndex = element.attribute("vertexBIndex");
 	QString surfaceVertexCIndex = element.attribute("vertexCIndex");
 	QString surfaceVertexDIndex = element.attribute("vertexDIndex");
+	QString light = element.attribute("light");
 
 	if (id.isEmpty())
 		throw std::logic_error("id can't be empty");
@@ -96,7 +97,8 @@ static Condition *readObjectInSurface(Scene *scene, const QDomElement& element)
 
 	qDebug("condition: Object in Surface id: %s, surface: %s", qPrintable(id), qPrintable(surface));
 
-	return new ObjectInSurface(scene, id, surface, vertexAIndex, vertexBIndex, vertexCIndex, vertexDIndex);
+	return new ObjectInSurface(scene, id, surface, light,
+			vertexAIndex, vertexBIndex, vertexCIndex, vertexDIndex);
 }
 
 static Condition *readDirectionalLight(Scene *scene, const QDomElement& element)

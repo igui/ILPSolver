@@ -8,7 +8,9 @@
 
   <!-- Optimization variables -->
   <conditions meshSize="20">
-    <lightInSurface id="LightGroup" surface="Ceiling"></lightInSurface>
+    <objectInSurface id="LightGroup" surface="Ceiling" light="PointLight"
+                     vertexAIndex="0" vertexBIndex="1" vertexCIndex="2" vertexDIndex="3">
+    </objectInSurface>
     <!--<lightInSurface id="LightPlane_2" surface="Ceiling"></lightInSurface>-->
   </conditions>
 

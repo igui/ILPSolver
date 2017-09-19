@@ -10,6 +10,7 @@ public:
 	ObjectInSurface(Scene *scene,
 		const QString& nodeId,
 		const QString& surfaceId,
+		const QString& childLightId = "",
 		int surfaceVertexAIndex = 0,
 		int surfaceVertexBIndex = 1,
 		int surfaceVertexCIndex = 2,
@@ -25,6 +26,7 @@ private:
 	optix::float3 generatePointNeighbourhood(optix::float3 center, float radius, unsigned int& retries) const;
 private:
 	QString m_nodeId;
+	QString childLightId;
 	optix::float3 base; // quad origin in world coordinates
 
 	// orthonormal base of the plane containing the surface.
