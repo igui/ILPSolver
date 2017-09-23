@@ -711,9 +711,10 @@ void PMOptixRenderer::transformNodeImpl(const QString &nodeName, const optix::Ma
 			transform->setMatrix(false, transformation.getData(), NULL);
 		}
 	}
+	if (childCount > 0) {
 	m_context["sceneRootObject"]->getGroup()->getAcceleration()->markDirty();
 	group->getAcceleration()->markDirty();
-
+	}
 
 	// update the light buffer if node is a light
 	if(m_lights->contains(nodeName))
@@ -747,11 +748,6 @@ Group PMOptixRenderer::getGroup(const QString &nodeName)
 	{
 		throw std::invalid_argument((nodeName + " doesn't exists").toStdString());
 	}
-	unsigned int childCount = group->getChildCount();
-	if (childCount == 0)
-	{
-		throw std::invalid_argument((nodeName + " has no geometries").toStdString());
-	}
 	return group;
 }
 
@@ -759,8 +755,14 @@ void PMOptixRenderer::setNodeDiffuseMaterialKd(const QString &nodeName, optix::f
 {
 	auto group = getGroup(nodeName);
 	
+	unsigned int childCount = group->getChildCount();
+	if (childCount == 0)
+	{
+		throw std::invalid_argument((nodeName + " has no geometries").toStdString());
+	}
+	
 	// apply transform to every thing in on group
-	for (unsigned int childIdx = 0; childIdx < group->getChildCount(); ++childIdx)
+	for (unsigned int childIdx = 0; childIdx < childCount; ++childIdx)
 	{
 		auto transform = group->getChild<Transform>(childIdx);
 		auto geometryGroup = transform->getChild<GeometryGroup>();
