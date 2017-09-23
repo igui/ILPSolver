@@ -8,14 +8,17 @@
 
   <!-- Optimization variables -->
   <conditions meshSize="20">
-    <objectInSurface id="LightGroup" surface="Ceiling" light="PointLight"
+    <objectInSurface id="LightGroup1" surface="Ceiling" light="LightPoint1"
+                     vertexAIndex="0" vertexBIndex="1" vertexCIndex="2" vertexDIndex="3">
+    </objectInSurface>
+    <objectInSurface id="LightGroup2" surface="Ceiling" light="LightPoint2"
                      vertexAIndex="0" vertexBIndex="1" vertexCIndex="2" vertexDIndex="3">
     </objectInSurface>
     <!--<lightInSurface id="LightPlane_2" surface="Ceiling"></lightInSurface>-->
   </conditions>
 
   <!-- Which aspects of the scene must be optimized  -->
-  <objectives maxIterations="200" fastEvaluationQuality="0.00390625" strategy="REFINE_ISOC_ON_INTERSECTION">
-    <maximizeRadiance surface="dais"/>
+  <objectives maxIterations="1000" fastEvaluationQuality="0.00390625" strategy="REFINE_ISOC_ON_INTERSECTION">
+    <maximizeRadiance surface="Table"/>
   </objectives>
 </input>
