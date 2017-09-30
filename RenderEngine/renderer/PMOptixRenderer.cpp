@@ -443,7 +443,7 @@ void PMOptixRenderer::render(unsigned int photonLaunchWidth, unsigned int height
 		// Recalculate Acceleration Structures
 		//
 		m_statistics.recalcAccelerationStructures += calcEllapsedTime([&](){
-			nvtx::ScopedRange r("Transfer photon map to GPU");
+			nvtx::ScopedRange r("Recalc Accel Structures");
 			m_context->launch(OptixEntryPoint::PPM_INDIRECT_RADIANCE_ESTIMATION_PASS,
 				0, 0);
 		});
@@ -712,8 +712,8 @@ void PMOptixRenderer::transformNodeImpl(const QString &nodeName, const optix::Ma
 		}
 	}
 	if (childCount > 0) {
-	m_context["sceneRootObject"]->getGroup()->getAcceleration()->markDirty();
-	group->getAcceleration()->markDirty();
+		m_context["sceneRootObject"]->getGroup()->getAcceleration()->markDirty();
+		group->getAcceleration()->markDirty();
 	}
 
 	// update the light buffer if node is a light
