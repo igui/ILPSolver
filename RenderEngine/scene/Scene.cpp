@@ -568,7 +568,7 @@ optix::Group Scene::getGroupFromNode(optix::Context & context, aiNode* node, QVe
         group->setChildCount(1);
 		group->setChild(0, transform);
         {
-            optix::Acceleration acceleration = context->createAcceleration(accelerationBuilder, accelerationTraverser);
+			optix::Acceleration acceleration = context->createAcceleration("NoAccel", "NoAccel");
             group->setAcceleration( acceleration );
         }
 
