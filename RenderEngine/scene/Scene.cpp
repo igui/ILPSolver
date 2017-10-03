@@ -560,13 +560,9 @@ optix::Group Scene::getGroupFromNode(optix::Context & context, aiNode* node, QVe
         }
 
         // Create group that contains the GeometryInstance
-		optix::Transform transform = context->createTransform();
-		transform->setMatrix(false, optix::Matrix4x4::identity().getData(), NULL); 
-		transform->setChild(geometryGroup);
-
         optix::Group group = context->createGroup();
         group->setChildCount(1);
-		group->setChild(0, transform);
+		group->setChild(0, geometryGroup);
         {
 			optix::Acceleration acceleration = context->createAcceleration("NoAccel", "NoAccel");
             group->setAcceleration( acceleration );
@@ -581,21 +577,18 @@ optix::Group Scene::getGroupFromNode(optix::Context & context, aiNode* node, QVe
     }
     else if(node->mNumChildren > 0)
     {
-        QVector<optix::Transform> transforms;
+        QVector<optix::Group> childGroups;
         for(unsigned int i = 0; i < node->mNumChildren; i++)
         {
             aiNode* childNode = node->mChildren[i];
 			optix::Group childGroup = getGroupFromNode(context, childNode, geometries, materials, nameMapping);
             if(childGroup)
             {
-				auto childTransform = context->createTransform();
-				childTransform->setMatrix(false, optix::Matrix4x4::identity().getData(), NULL); 
-				childTransform->setChild(childGroup);
-                transforms.push_back(childTransform);
+				childGroups.push_back(childGroup);
             }
         }
 
-        optix::Group group = context->createGroup(transforms.begin(), transforms.end());
+        optix::Group group = context->createGroup(childGroups.begin(), childGroups.end());
         optix::Acceleration acceleration = context->createAcceleration(accelerationBuilder, accelerationTraverser);
         group->setAcceleration( acceleration );
 

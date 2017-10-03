@@ -686,6 +686,33 @@ void PMOptixRenderer::setLightDirection(const QString &lightName, const Vector3 
     m_lightBuffer->unmap();
 }
 
+static optix::Transform getOrMakeTransform(Context context, Group group, int childIdx) {
+	auto childType = group->getChildType(childIdx);
+	Group childGroup;
+	GeometryGroup childGeometryGroup;
+	Transform transform;
+
+	if (childType == RT_OBJECTTYPE_TRANSFORM)
+		return group->getChild<Transform>(childIdx);
+
+	transform = context->createTransform();
+	transform->setMatrix(false, optix::Matrix4x4::identity().getData(), NULL);
+
+	switch (childType) {
+	case(RT_OBJECTTYPE_GROUP) :
+		transform->setChild(group->getChild<Group>(childIdx));
+		break;
+	case(RT_OBJECTTYPE_GEOMETRY_GROUP) :
+		transform->setChild(group->getChild<GeometryGroup>(childIdx));
+		break;
+	default:
+		throw new Exception("Unknown object type");
+	}
+
+	group->setChild(childIdx, transform);
+	return transform;
+}
+
 void PMOptixRenderer::transformNodeImpl(const QString &nodeName, const optix::Matrix4x4 &transformation, bool preMultiply)
 {
 	auto group = getGroup(nodeName);
@@ -694,7 +721,7 @@ void PMOptixRenderer::transformNodeImpl(const QString &nodeName, const optix::Ma
 	// apply transform to every thing in on group
 	for(unsigned int childIdx = 0; childIdx < childCount; ++childIdx)
 	{
-		auto transform = group->getChild<Transform>(childIdx);
+		auto transform = getOrMakeTransform(m_context, group, childIdx);
 		
 		// if premultiply is true it takes into account the previous transformation
 		// otherwise it simply overwrites it
