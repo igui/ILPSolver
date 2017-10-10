@@ -11,10 +11,11 @@
 bool Glass::m_optixMaterialIsCreated = false;
 optix::Material Glass::m_optixMaterial;
 
-Glass::Glass( float indexOfRefraction, const Vector3 & Ks )
+Glass::Glass( float indexOfRefraction, const Vector3 & Ks, const Vector3 & Kd)
 {
     this->indexOfRefraction = indexOfRefraction;
     this->Ks = Ks;
+	this->Kd = Kd;
 }
 
 optix::Material Glass::getOptixMaterial(optix::Context & context, bool useHoleCheckProgram)
@@ -50,7 +51,7 @@ optix::Material Glass::getOptixMaterial(optix::Context & context, bool useHoleCh
 void Glass::registerGeometryInstanceValues(optix::GeometryInstance & instance )
 {
     instance["indexOfRefraction"]->setFloat(this->indexOfRefraction);
-    instance["Kd"]->setFloat( 0, 0 , 0 );
+    instance["Kd"]->setFloat(this->Kd);
     instance["Ks"]->setFloat(this->Ks);
 }
 

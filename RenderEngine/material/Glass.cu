@@ -12,8 +12,10 @@
 #include "renderer/helpers/random.h"
 #include "renderer/helpers/helpers.h"
 #include "renderer/RayType.h"
+#include "renderer/ppm/Photon.h"
 #include "renderer/RadiancePRD.h"
 #include "renderer/ppm/PhotonPRD.h"
+#include "renderer/helpers/store_photon.h"
 
 using namespace optix;
 
@@ -22,12 +24,14 @@ using namespace optix;
 //
 
 rtDeclareVariable(rtObject, sceneRootObject, , );
+rtBuffer<Photon, 1> photons;
 
 //
 // Ray generation program
 //
 
 rtDeclareVariable(uint2, launchIndex, rtLaunchIndex, );
+rtDeclareVariable(PhotonPRD, photonPrd, rtPayload, );
 
 //
 // Closest hit material
@@ -41,6 +45,9 @@ rtDeclareVariable(float3, shadingNormal, attribute shadingNormal, );
 rtDeclareVariable(RadiancePRD, radiancePrd, rtPayload, );
 rtDeclareVariable(optix::Ray, ray, rtCurrentRay, );
 rtDeclareVariable(float, tHit, rtIntersectionDistance, );
+rtDeclareVariable(unsigned int, objectId, , );
+rtDeclareVariable(uint, storefirstHitPhotons, , );
+rtDeclareVariable(uint, maxPhotonDepositsPerEmitted, , );
 
 struct IndexOfRefractions
 {
@@ -148,8 +155,12 @@ RT_PROGRAM void anyHitRadiance()
 /*
 // Pass the photon along its way through the glass
 */
+__device__ inline void storePhoton(const optix::float3 & power, const optix::float3 & position, const optix::float3 & rayDirection, const optix::uint & objectId)
+{
+	Photon photon(power, position, rayDirection, objectId);
+	STORE_PHOTON(photon);
+}
 
-rtDeclareVariable(PhotonPRD, photonPrd, rtPayload, );
 
 RT_PROGRAM void closestHitPhoton()
 {
@@ -179,6 +190,15 @@ RT_PROGRAM void closestHitPhoton()
     {
         newRayDirection = refractionDirection;
     }
+
+	photonPrd.power *= Kd;
+	OPTIX_DEBUG_PRINT(photonPrd.depth, "Hit Diffuse P(%.2f %.2f %.2f) RT=%d\n", hitPoint.x, hitPoint.y, hitPoint.z, ray.ray_type);
+	photonPrd.weight *= fmaxf(Kd);
+
+	if (storefirstHitPhotons && photonPrd.depth == 0 || photonPrd.depth >= 1 && photonPrd.numStoredPhotons < maxPhotonDepositsPerEmitted)
+	{
+		storePhoton(photonPrd.power, hitPoint, ray.direction, objectId);
+	}
 
     OPTIX_DEBUG_PRINT(photonPrd.depth, "Photon hit glass %s (%s) %s P(%.2f %.2f %.2f)\n", isHitFromOutside ? "outside" : "inside",
         willTravelInsideGlass(isHitFromOutside, isReflected)  ? "will travel inside" : "will travel outside", isReflected ? "reflect":"refract", hitPoint.x, hitPoint.y, hitPoint.z);

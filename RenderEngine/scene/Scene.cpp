@@ -219,13 +219,26 @@ void Scene::loadSceneMaterials()
             continue;
         }
 
-        // Glass Material
-
         float indexOfRefraction;
         if(material->Get(AI_MATKEY_REFRACTI, indexOfRefraction) == AI_SUCCESS && indexOfRefraction > 1.0f)
         {
+			// Glass Material
+			aiColor3D diffuseColor;
+			aiColor3D specularColor;
+			auto Kd = optix::make_float3(0);
+			auto Ks = optix::make_float3(1);
+
+			if (material->Get(AI_MATKEY_COLOR_DIFFUSE, diffuseColor) == AI_SUCCESS)
+			{
+				Kd = toFloat3(diffuseColor);
+			}
+			if (material->Get(AI_MATKEY_COLOR_SPECULAR, specularColor) == AI_SUCCESS)
+			{
+				Ks = toFloat3(specularColor);
+			}
+
             //m_logger->log("\tGlass: IOR: %g\n", indexOfRefraction);
-            Material* material = new Glass(indexOfRefraction, optix::make_float3(1,1,1));
+            Material* material = new Glass(indexOfRefraction, Ks, Kd);
             m_materials.push_back(material);
             continue;
         }

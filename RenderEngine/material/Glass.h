@@ -13,10 +13,11 @@ class Glass : public Material
 private:
     float indexOfRefraction;
     Vector3 Ks;
+	Vector3 Kd;
     static bool m_optixMaterialIsCreated;
     static optix::Material m_optixMaterial;
 public:
-    Glass(float indexOfRefraction, const Vector3 & Ks);
+	Glass(float indexOfRefraction, const Vector3 & Ks, const Vector3 & Kd);
     virtual optix::Material getOptixMaterial(optix::Context & context, bool useHoleCheckProgram);
     virtual void registerGeometryInstanceValues(optix::GeometryInstance & instance);
 	virtual Material* clone();
