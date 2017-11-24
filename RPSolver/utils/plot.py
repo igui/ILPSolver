@@ -14,6 +14,8 @@ from contextlib import ExitStack
 import locale
 from os import path
 
+
+
 def is_valid(row):
     return len(row) > 1
 
@@ -30,12 +32,15 @@ def map_row(row):
     time_from_start,
     comment) = row
 
-    return (locale.atof(bigbox_x),
-         locale.atof(bigbox_z),
-         locale.atof(radiosity_center),
-        locale.atof(radiosity_min),
-        locale.atof(radiosity_max)
+    res = (locale.atof(bigbox_x.replace('.', ',')),
+         locale.atof(bigbox_z.replace('.', ',')),
+         locale.atof(radiosity_center.replace('.', ',')),
+        locale.atof(radiosity_min.replace('.', ',')),
+        locale.atof(radiosity_max.replace('.', ',')),
+        comment
     )
+    #print(res)
+    return res
 
 def unzip(lst):
     n = len(lst[0])
@@ -60,16 +65,15 @@ def get_graph():
 def make_plot():
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
-    ax.set_xlabel('X Label')
-    ax.set_ylabel('Y Label')
-    ax.set_zlabel('Z Label')
 
-    xs, ys, zs, z_min, z_max = get_graph()
+    xs, ys, zs, z_min, z_max, comment = get_graph()
 
-    ax.scatter(xs, ys, zs, c='r', marker='o')
+    ax.set_color_cycle(['red', 'black', 'yellow'])
+    ax.scatter(xs, ys, zs, marker='o', c=zs, cmap='coolwarm')
     
-    for i in range(len(xs)):
-        ax.plot([xs[i], xs[i]], [ys[i], ys[i]], [z_min[i], z_max[i]], marker="_", c='b')
+	# Error bars
+    # for i in range(len(xs)):
+    #    ax.plot([xs[i], xs[i]], [ys[i], ys[i]], [z_min[i], z_max[i]], marker="_", c='b')
 
     plt.show()
 
